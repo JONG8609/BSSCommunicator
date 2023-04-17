@@ -10,58 +10,36 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.ListView;
 
 import com.google.android.material.navigation.NavigationView;
-import com.otosone.bsscommunicator.adapter.ChargingAdapter;
-import com.otosone.bsscommunicator.databinding.ActivityChargingBinding;
+import com.otosone.bsscommunicator.databinding.ActivityChargerBinding;
+import com.otosone.bsscommunicator.databinding.ActivityFanAndHeaterBinding;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ChargingActivity extends AppCompatActivity
+public class ChargerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
-    private ListView listView;
-    private ChargingAdapter adapter;
-    private List<ChargingItem> itemList;
-    private ActivityChargingBinding binding;
-
+    private ActivityChargerBinding binding;
     private DrawerLayout drawer;
     private NavigationView navigationView;
-    ImageView chargingMenuIv;
 
+    private ImageView chargerMenuIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Databinding();
+        DataBinding();
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        chargingMenuIv.setOnClickListener(v -> openNavigationDrawer());
 
-        itemList = new ArrayList<>();
+        chargerMenuIv.setOnClickListener(v -> openNavigationDrawer());
+    }
 
-        adapter = new ChargingAdapter(this, itemList);
-        itemList.add(new ChargingItem(false, "", "1"));
-        itemList.add(new ChargingItem(false, "", "2"));
-        itemList.add(new ChargingItem(false, "", "3"));
-        itemList.add(new ChargingItem(false, "", "4"));
-        itemList.add(new ChargingItem(false, "", "5"));
-        itemList.add(new ChargingItem(false, "", "6"));
-        itemList.add(new ChargingItem(false, "", "7"));
-        itemList.add(new ChargingItem(false, "", "8"));
-        itemList.add(new ChargingItem(false, "", "9"));
-        itemList.add(new ChargingItem(false, "", "10"));
-        itemList.add(new ChargingItem(false, "", "11"));
-        itemList.add(new ChargingItem(false, "", "12"));
-        itemList.add(new ChargingItem(false, "", "13"));
-        itemList.add(new ChargingItem(false, "", "14"));
-        itemList.add(new ChargingItem(false, "", "15"));
-        itemList.add(new ChargingItem(false, "", "16"));
-
-        listView.setAdapter(adapter);
+    private void DataBinding() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_charger);
+        drawer = binding.drawerLayout;
+        navigationView = binding.navView;
+        chargerMenuIv = binding.chargerMenuIv;
     }
 
     @Override
@@ -115,13 +93,5 @@ public class ChargingActivity extends AppCompatActivity
         if (drawer != null) {
             drawer.openDrawer(GravityCompat.START);
         }
-    }
-
-    private void Databinding() {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_charging);
-        chargingMenuIv = binding.chargingMenuIv;
-        listView = binding.chargingListView;
-        drawer = binding.drawerLayout;
-        navigationView = binding.navView;
     }
 }

@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context=".StationActivity">
+        tools:context=".FanAndHeaterActivity">
 
         <FrameLayout
             android:id="@+id/content_layout"
@@ -24,6 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginBottom="5dp"
                 android:weightSum="2">
 
                 <LinearLayout
@@ -37,7 +38,7 @@
                         android:layout_height="wrap_content">
 
                         <ImageView
-                            android:id="@+id/status_menu_iv"
+                            android:id="@+id/fan_and_heater_menu_iv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/menu" />
@@ -62,59 +63,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:weightSum="2">
+                android:weightSum="8">
 
                 <LinearLayout
                     android:id="@+id/thislayout"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="3"
                     android:background="@drawable/blank_rounded"
                     android:orientation="vertical"
-                    android:weightSum="6">
+                    android:weightSum="3">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:orientation="horizontal"
-                        android:weightSum="7"
-                        android:layout_weight="2">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="3"/>
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:orientation="horizontal"
-                        android:weightSum="7"
+                        android:weightSum="2"
                         android:layout_weight="1">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Report period"
+                            android:text="FAN"
+                            android:textSize="40dp"
                             android:gravity="left|center"
-                            android:textSize="25dp"
-                            android:layout_weight="3"/>
+                            android:layout_weight="1"/>
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:gravity="right|center"
-                            android:text="Min"
-                            android:textSize="25dp"
-                            android:background="@drawable/blank_rounded"
-                            android:layout_weight="4"/>
+                            android:layout_weight="1"/>
 
                     </LinearLayout>
 
@@ -122,80 +100,52 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:orientation="horizontal"
-                        android:weightSum="7"
+                        android:weightSum="2"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Start Temp."
+                            android:gravity="left|center"
+                            android:textSize="35dp"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="right|center"
+                            android:text="C"
+                            android:textSize="35dp"
+                            android:background="@drawable/blank_rounded"
+                            android:layout_weight="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2"
                         android:layout_marginTop="5dp"
                         android:layout_weight="1">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="Battery In Timeout"
+                            android:text="Stop Temp."
                             android:gravity="left|center"
-                            android:textSize="25dp"
-                            android:layout_weight="3"/>
+                            android:textSize="35dp"
+                            android:layout_weight="1"/>
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="right|center"
-                            android:text="Sec"
-                            android:textSize="25dp"
+                            android:text="C"
+                            android:textSize="35dp"
                             android:background="@drawable/blank_rounded"
-                            android:layout_weight="4"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:orientation="horizontal"
-                        android:weightSum="7"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="Battery Out Timeout"
-                            android:gravity="left|center"
-                            android:textSize="25dp"
-                            android:layout_weight="3"/>
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/blank_rounded"
-                            android:gravity="right|center"
-                            android:text="Sec"
-                            android:textSize="25dp"
-                            android:layout_weight="4"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:orientation="horizontal"
-                        android:weightSum="7"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="Payment Timeout"
-                            android:gravity="left|center"
-                            android:textSize="25dp"
-                            android:layout_weight="3"/>
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/blank_rounded"
-                            android:gravity="right|center"
-                            android:text="Sec"
-                            android:textSize="25dp"
-                            android:layout_weight="4"/>
+                            android:layout_weight="1"/>
 
                     </LinearLayout>
 
@@ -205,9 +155,94 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="3"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/blank_rounded"
                     android:orientation="vertical"
-                    android:weightSum="6">
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="FAN"
+                            android:textSize="40dp"
+                            android:gravity="left|center"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Start Temp."
+                            android:gravity="left|center"
+                            android:textSize="35dp"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="right|center"
+                            android:text="C"
+                            android:textSize="35dp"
+                            android:background="@drawable/blank_rounded"
+                            android:layout_weight="1"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_marginTop="5dp"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="Stop Temp."
+                            android:gravity="left|center"
+                            android:textSize="35dp"
+                            android:layout_weight="1"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="right|center"
+                            android:text="C"
+                            android:textSize="35dp"
+                            android:background="@drawable/blank_rounded"
+                            android:layout_weight="1"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
 
                 </LinearLayout>
             </LinearLayout>

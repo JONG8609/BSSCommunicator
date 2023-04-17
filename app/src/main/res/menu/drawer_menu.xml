@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_status"
+            android:icon="@drawable/rounded_button"
+            android:title="Status" />
+        <item
+            android:id="@+id/nav_reset"
+            android:icon="@drawable/rounded_button"
+            android:title="Reset" />
+        <item
+            android:id="@+id/nav_charging"
+            android:icon="@drawable/rounded_button"
+            android:title="Chgarging" />
+        <item
+            android:id="@+id/nav_door"
+            android:icon="@drawable/rounded_button"
+            android:title="Door" />
+        <item
+            android:id="@+id/nav_station"
+            android:icon="@drawable/rounded_button"
+            android:title="Station" />
+        <item
+            android:id="@+id/nav_fan_and_heater"
+            android:icon="@drawable/rounded_button"
+            android:title="FanAndHeater" />
+        <item
+            android:id="@+id/nav_charger"
+            android:icon="@drawable/rounded_button"
+            android:title="Charger" />
+
+    </group>
+</menu>

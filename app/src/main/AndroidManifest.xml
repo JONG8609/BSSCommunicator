@@ -20,6 +20,12 @@
         android:theme="@style/Theme.BSSCommunicator"
         tools:targetApi="31">
         <activity
+            android:name=".ChargerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FanAndHeaterActivity"
+            android:exported="false" />
+        <activity
             android:name=".StationActivity"
             android:exported="false" />
         <activity
@@ -30,9 +36,6 @@
             android:exported="false" />
         <activity
             android:name=".ResetActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TopActivity"
             android:exported="false" />
         <activity
             android:name=".StatusActivity"

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -34,7 +35,7 @@ public class BluetoothScanActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     private BluetoothAdapter mBluetoothAdapter;
-    private ImageButton scan_btn;
+    private Button scan_btn;
     private ActivityBluetoothScanBinding binding;
     private Context context;
 
