@@ -20,27 +20,6 @@
         android:theme="@style/Theme.BSSCommunicator"
         tools:targetApi="31">
         <activity
-            android:name=".ChargerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".FanAndHeaterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".StationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".DoorActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ChargingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ResetActivity"
-            android:exported="false" />
-        <activity
-            android:name=".StatusActivity"
-            android:exported="false" />
-        <activity
             android:name=".BluetoothScanActivity"
             android:exported="false" />
         <activity

@@ -3,20 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.drawerlayout.widget.DrawerLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:id="@+id/drawer_layout"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        tools:context=".ResetActivity"
-        tools:openDrawer="start">
+        tools:context=".navFragments.ResetFragment">
 
-        <FrameLayout
-            android:id="@+id/content_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
+        <!-- TODO: Update blank fragment layout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,31 +33,21 @@
                 </FrameLayout>
             </LinearLayout>
 
-
-
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center">
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/reset_btn"
                 android:layout_width="150dp"
                 android:layout_height="75dp"
-                android:gravity="center"
-                android:text="BSS Reset"
-                android:id="@+id/reset_btn"/>
-        </LinearLayout>
+                android:layout_gravity="center"
+                android:text="BSS Reset" />
+        </FrameLayout>
 
-        <com.google.android.material.navigation.NavigationView
-            android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            app:headerLayout="@layout/nav_header"
-            app:menu="@menu/drawer_menu" />
-
-    </androidx.drawerlayout.widget.DrawerLayout>
+    </FrameLayout>
 
 </layout>
