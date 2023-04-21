@@ -86,19 +86,15 @@ dependencies {
 
     // Charts
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-
     // Color Picker
     implementation 'com.larswerkman:HoloColorPicker:1.5'
-
     // LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
-
     // FileProvider
     implementation 'com.commonsware.cwac:provider:0.5.3'
-
     // Image Crop
     implementation "com.naver.android.helloyako:imagecropview:1.2.4"
-
     //
     testImplementation 'junit:junit:4.13.2'
+    implementation 'com.polidea.rxandroidble2:rxandroidble:1.12.0'
 }

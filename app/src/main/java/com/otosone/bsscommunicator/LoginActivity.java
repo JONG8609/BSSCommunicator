@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
                 String password = password_et.getText().toString().trim();
 
                 if(authenticateUser(username, password) == 1){
-                    Intent intent = new Intent(LoginActivity.this, BluetoothScanActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, ScanActivity.class);
                     startActivity(intent);
                     finish();
                 }else {
