@@ -39,7 +39,7 @@
             android:layout_below="@+id/button_send"
             android:layout_marginTop="16dp"
             android:padding="8dp"
-            android:text="Received Data:"
+            android:text="@string/received_data"
             android:textSize="18sp" />
 
     </RelativeLayout>
