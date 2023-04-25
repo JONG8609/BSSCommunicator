@@ -66,7 +66,7 @@ public class ScanActivity extends AppCompatActivity {
         binding.buttonSend.setOnClickListener(view -> {
             String message = binding.editTextMessage.getText().toString();
             if (isBound && !message.isEmpty()) {
-                bluetoothConnectionService.sendMessage(message);
+                //bluetoothConnectionService.sendMessage();
             }
         });
 

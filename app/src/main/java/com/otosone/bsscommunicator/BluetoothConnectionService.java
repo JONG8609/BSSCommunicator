@@ -24,7 +24,7 @@ import com.polidea.rxandroidble2.scan.ScanSettings;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -39,28 +39,24 @@ public class BluetoothConnectionService extends Service {
     private RxBleClient rxBleClient;
     private MessageReceivedListener messageReceivedListener;
     private ConnectionStateListener connectionStateListener;
-    private static final String CHANNEL_ID = "BluetoothConnectionServiceChannel";
+    public static final String ACTION_DATA_AVAILABLE = "com.otosone.bsscommunicator.ACTION_DATA_AVAILABLE";
+    public static final String EXTRA_DATA = "com.otosone.bsscommunicator.EXTRA_DATA";
 
+    private static final String CHANNEL_ID = "BluetoothConnectionServiceChannel";
+    private Disposable notificationDisposable;
+
+    private StringBuilder dataBuffer = new StringBuilder();
     public interface MessageReceivedListener {
         void onMessageReceived(String message);
     }
 
-    public void setMessageReceivedListener(MessageReceivedListener listener) {
-        this.messageReceivedListener = new MessageReceivedListener() {
-            @Override
-            public void onMessageReceived(String message) {
-                try {
-                    JSONObject json = new JSONObject(message);
-                    listener.onMessageReceived(json.toString());
-                } catch (JSONException e) {
-                    Log.e("JSONError", "Error parsing JSON", e);
-                }
-            }
-        };
+    public void setMessageReceivedListener(MessageReceivedListener messageReceivedListener) {
+        this.messageReceivedListener = messageReceivedListener;
+        Log.d("BluetoothConnService", "MessageReceivedListener set");
     }
 
     public class LocalBinder extends Binder {
-       public BluetoothConnectionService getService() {
+        public BluetoothConnectionService getService() {
             return BluetoothConnectionService.this;
         }
     }
@@ -71,6 +67,14 @@ public class BluetoothConnectionService extends Service {
         this.connectionStateListener = listener;
     }
 
+    private void broadcastUpdate(final String action, String data) {
+        final Intent intent = new Intent(action);
+        if (data != null) {
+            intent.putExtra(EXTRA_DATA, data);
+        }
+        sendBroadcast(intent);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -79,6 +83,7 @@ public class BluetoothConnectionService extends Service {
 
     public interface ConnectionStateListener {
         void onDeviceConnected();
+
         void onDeviceDisconnected();
     }
 
@@ -105,7 +110,7 @@ public class BluetoothConnectionService extends Service {
                 );
     }
 
-    private void disconnect() {
+    public void disconnect() {
         if (connectionDisposable != null && !connectionDisposable.isDisposed()) {
             connectionDisposable.dispose();
             if (connectionStateListener != null) {
@@ -123,18 +128,20 @@ public class BluetoothConnectionService extends Service {
         setupNotification(connection);
     }
 
-    public void sendMessage(String message) {
-        if (connection == null || message.isEmpty()) {
-            Log.e("SendMessageError", "Connection is null or message is empty");
+    public void sendMessage(JSONObject jsonObject) {
+        if (connection == null ||
+                jsonObject == null) {
+            Log.e("SendMessageError", "Connection is null or JSON object is null");
             return;
         }
 
-        byte[] data = message.getBytes();
+        byte[] data = jsonObject.toString().getBytes(StandardCharsets.UTF_8);
 
         connection.writeCharacteristic(UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), data)
                 .subscribe(
                         bytes -> {
                             Log.d("SendData", "Data sent successfully");
+                            Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
                         },
                         throwable -> {
                             Log.e("SendDataError", "Error sending data", throwable);
@@ -147,24 +154,34 @@ public class BluetoothConnectionService extends Service {
                 .flatMap(notificationObservable -> notificationObservable)
                 .subscribe(
                         bytes -> {
-                            String receivedData = new String(bytes, Charset.forName("UTF-8"));
-                            Log.d("ReceivedData", "Data received: " + receivedData);
-                            Log.d("ReceivedData", "Raw bytes: " + Arrays.toString(bytes));
+                            String receivedData = new String(bytes, StandardCharsets.US_ASCII);
+                            Log.d("ReceivedData", "Data received (ASCII): " + receivedData);
+
+                            String filteredData = receivedData.replaceAll("[^\\x20-\\x7E]", ""); // Remove non-printable ASCII characters
+                            Log.d("FilteredData", "Filtered data: " + filteredData);
+
                             try {
-                                // Parse the received data as a JSON object
-                                JSONObject json = new JSONObject(receivedData);
+                                JSONObject json = new JSONObject(filteredData);
                                 if (messageReceivedListener != null) {
-                                    messageReceivedListener.onMessageReceived(receivedData);
+                                    messageReceivedListener.onMessageReceived(filteredData);
                                 }
+
+                                broadcastUpdate(ACTION_DATA_AVAILABLE, filteredData);
                             } catch (JSONException e) {
-                                // The received data is not a valid JSON string
-                                Log.e("JSONError", "Error parsing JSON", e);
+                                Log.e("JSONError", "Error parsing JSON: " + e.getMessage());
                             }
                         },
                         throwable -> {
-                            Log.e("ReceiveDataError", "Error receiving data", throwable);
+                            Log.e("ReceiveDataError", "Error receiving data: " + throwable.getMessage());
                         }
                 );
+
+    }
+
+    private void disposeNotification() {
+        if (notificationDisposable != null && !notificationDisposable.isDisposed()) {
+            notificationDisposable.dispose();
+        }
     }
 
     public void scanBleDevices(ScanSettings scanSettings, ScanFilter scanFilter, Consumer<ScanResult> onScanResult) {
@@ -202,7 +219,7 @@ public class BluetoothConnectionService extends Service {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Bluetooth Connection Service")
                 .setContentText("Service is running")
-                .setSmallIcon(R.drawable.blank_rounded) // Replace with your own notification icon
+                .setSmallIcon(R.mipmap.ic_launcher) // Replace with your own notification icon
                 .setContentIntent(pendingIntent)
                 .build();
 

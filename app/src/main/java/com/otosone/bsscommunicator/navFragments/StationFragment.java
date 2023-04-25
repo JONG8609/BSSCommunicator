@@ -5,19 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 
 import com.otosone.bsscommunicator.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
@@ -26,11 +24,6 @@ import com.otosone.bsscommunicator.databinding.FragmentStationBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StationFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StationFragment extends Fragment {
 
     FragmentStationBinding binding;
@@ -65,7 +58,16 @@ public class StationFragment extends Fragment {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
             isBound = true;
+
             Log.d("StationFragment", "Service connected");
+
+            // Set the MessageReceivedListener
+            bluetoothConnectionService.setMessageReceivedListener(jsonString -> {
+                getActivity().runOnUiThread(() -> {
+                    // Display the Toast message on the UI thread
+                    Toast.makeText(getActivity(), "Received JSON: " + jsonString, Toast.LENGTH_LONG).show();
+                });
+            });
         }
 
         @Override
@@ -82,16 +84,12 @@ public class StationFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-
         }
     }
-
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_station, container, false);
         View root = binding.getRoot();
         Databind();
@@ -110,7 +108,7 @@ public class StationFragment extends Fragment {
                 // Create a JSON object
                 JSONObject json = new JSONObject();
                 try {
-                    json.put("result", "STA_CFG");
+                    json.put("request", "STA_CFG");
                     json.put("reportPeriod", reportPeriod);
                     json.put("batInTimeout", batteryInTimeout);
                     json.put("batOutTimeout", batteryOutTimeout);
@@ -119,13 +117,12 @@ public class StationFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 // Convert the JSON object into a String
                 String jsonString = json.toString();
 
                 // Call the sendMessage method with the JSON String as an argument
                 if (isBound && bluetoothConnectionService != null) {
-                    bluetoothConnectionService.sendMessage(jsonString);
+                    bluetoothConnectionService.sendMessage(json);
                     Log.d("json11", jsonString);
                 } else {
                     Log.e("StationFragment", "BluetoothConnectionService is not bound");
@@ -135,6 +132,7 @@ public class StationFragment extends Fragment {
 
         return root;
     }
+
     private void Databind() {
         stationBtn = binding.stationBtn;
         reportPeriodEt = binding.reportPeriodEt;
@@ -142,8 +140,9 @@ public class StationFragment extends Fragment {
         batteryOutTimeoutEt = binding.batteryOutTimeoutEt;
         paymentTimeoutEt = binding.paymentTimeoutEt;
         paymentTypeEt = binding.paymentTypeEt;
-
     }
+
+    @Override
     public void onResume() {
         super.onResume();
         bindBluetoothConnectionService();
@@ -155,9 +154,22 @@ public class StationFragment extends Fragment {
         unbindBluetoothConnectionService();
     }
 
+
     private void bindBluetoothConnectionService() {
         Intent intent = new Intent(getContext(), BluetoothConnectionService.class);
         getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        Log.d("receivedincome", "income");
+        String a = String.valueOf(isBound);
+        Log.d("receivedincome", a);
+        if (isBound && bluetoothConnectionService != null) {
+            bluetoothConnectionService.setMessageReceivedListener(jsonString -> {
+                getActivity().runOnUiThread(() -> {
+                    // Display the Toast message on the UI thread
+                    Toast.makeText(getActivity(), "Received JSON: " + jsonString, Toast.LENGTH_LONG).show();
+                    Log.d("received11111", jsonString);
+                });
+            });
+        }
     }
 
     private void unbindBluetoothConnectionService() {
@@ -166,5 +178,4 @@ public class StationFragment extends Fragment {
             isBound = false;
         }
     }
-
 }
