@@ -21,6 +21,11 @@ import com.polidea.rxandroidble2.scan.ScanFilter;
 import com.polidea.rxandroidble2.scan.ScanResult;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.UUID;
 
 import io.reactivex.disposables.Disposable;
@@ -33,6 +38,7 @@ public class BluetoothConnectionService extends Service {
     private RxBleConnection connection;
     private RxBleClient rxBleClient;
     private MessageReceivedListener messageReceivedListener;
+    private ConnectionStateListener connectionStateListener;
     private static final String CHANNEL_ID = "BluetoothConnectionServiceChannel";
 
     public interface MessageReceivedListener {
@@ -40,19 +46,40 @@ public class BluetoothConnectionService extends Service {
     }
 
     public void setMessageReceivedListener(MessageReceivedListener listener) {
-        this.messageReceivedListener = listener;
+        this.messageReceivedListener = new MessageReceivedListener() {
+            @Override
+            public void onMessageReceived(String message) {
+                try {
+                    JSONObject json = new JSONObject(message);
+                    listener.onMessageReceived(json.toString());
+                } catch (JSONException e) {
+                    Log.e("JSONError", "Error parsing JSON", e);
+                }
+            }
+        };
     }
 
     public class LocalBinder extends Binder {
-        BluetoothConnectionService getService() {
+       public BluetoothConnectionService getService() {
             return BluetoothConnectionService.this;
         }
+    }
+
+
+
+    public void setConnectionStateListener(ConnectionStateListener listener) {
+        this.connectionStateListener = listener;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         rxBleClient = RxBleClient.create(this);
+    }
+
+    public interface ConnectionStateListener {
+        void onDeviceConnected();
+        void onDeviceDisconnected();
     }
 
     @Nullable
@@ -68,6 +95,9 @@ public class BluetoothConnectionService extends Service {
                 .subscribe(
                         connection -> {
                             onDeviceConnected(connection);
+                            if (connectionStateListener != null) {
+                                connectionStateListener.onDeviceConnected();
+                            }
                         },
                         throwable -> {
                             Log.e("ConnectionError", "Error connecting to device", throwable);
@@ -78,7 +108,14 @@ public class BluetoothConnectionService extends Service {
     private void disconnect() {
         if (connectionDisposable != null && !connectionDisposable.isDisposed()) {
             connectionDisposable.dispose();
+            if (connectionStateListener != null) {
+                connectionStateListener.onDeviceDisconnected();
+            }
         }
+    }
+
+    public boolean isConnected() {
+        return connection != null;
     }
 
     private void onDeviceConnected(RxBleConnection connection) {
@@ -88,6 +125,7 @@ public class BluetoothConnectionService extends Service {
 
     public void sendMessage(String message) {
         if (connection == null || message.isEmpty()) {
+            Log.e("SendMessageError", "Connection is null or message is empty");
             return;
         }
 
@@ -109,10 +147,18 @@ public class BluetoothConnectionService extends Service {
                 .flatMap(notificationObservable -> notificationObservable)
                 .subscribe(
                         bytes -> {
-                            String receivedData = new String(bytes);
+                            String receivedData = new String(bytes, Charset.forName("UTF-8"));
                             Log.d("ReceivedData", "Data received: " + receivedData);
-                            if (messageReceivedListener != null) {
-                                messageReceivedListener.onMessageReceived(receivedData);
+                            Log.d("ReceivedData", "Raw bytes: " + Arrays.toString(bytes));
+                            try {
+                                // Parse the received data as a JSON object
+                                JSONObject json = new JSONObject(receivedData);
+                                if (messageReceivedListener != null) {
+                                    messageReceivedListener.onMessageReceived(receivedData);
+                                }
+                            } catch (JSONException e) {
+                                // The received data is not a valid JSON string
+                                Log.e("JSONError", "Error parsing JSON", e);
                             }
                         },
                         throwable -> {

@@ -75,10 +75,22 @@ public class ScanActivity extends AppCompatActivity {
         binding.listView.setAdapter(arrayAdapter);
         binding.listView.setOnItemClickListener((parent, view, position, id) -> {
             RxBleDevice selectedDevice = foundDevices.get(position);
+            bluetoothConnectionService.setConnectionStateListener(new BluetoothConnectionService.ConnectionStateListener() {
+                @Override
+                public void onDeviceConnected() {
+                    runOnUiThread(() -> {
+                        Intent intent = new Intent(ScanActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    });
+                }
+
+                @Override
+                public void onDeviceDisconnected() {
+                    // Handle disconnection if needed
+                }
+            });
             bluetoothConnectionService.connectToDevice(selectedDevice);
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
         });
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
