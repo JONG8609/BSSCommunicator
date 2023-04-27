@@ -14,15 +14,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.common.util.IOUtils;
 import com.otosone.bsscommunicator.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.databinding.FragmentStationBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class StationFragment extends Fragment {
 
@@ -32,9 +38,7 @@ public class StationFragment extends Fragment {
     private boolean isBound = false;
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
+    private StringBuilder jsonStringBuilder = new StringBuilder();
 
     private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt, paymentTypeEt;
     private Button stationBtn, mainBtn;
@@ -62,13 +66,20 @@ public class StationFragment extends Fragment {
             Log.d("StationFragment", "Service connected");
 
             // Set the MessageReceivedListener
-            bluetoothConnectionService.setMessageReceivedListener(jsonString -> {
+            bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
+                Log.d("StationFragment", "MessageReceivedListener called");
                 getActivity().runOnUiThread(() -> {
-                    // Display the Toast message on the UI thread
-                    Toast.makeText(getActivity(), "Received JSON: " + jsonString, Toast.LENGTH_LONG).show();
+
+                    Toast.makeText(getActivity(), "Received JSON: " + completeJsonString, Toast.LENGTH_LONG).show();
+                    Log.d("StationFragment", "Complete JSON: " + completeJsonString);
                 });
+
+                Log.d("StationFragment", "Complete JSON: " + completeJsonString);
+
             });
+
         }
+
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
@@ -81,10 +92,6 @@ public class StationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -117,18 +124,19 @@ public class StationFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // Convert the JSON object into a String
                 String jsonString = json.toString();
-
-                // Call the sendMessage method with the JSON String as an argument
+                Log.d("ASCII", jsonString);
+                // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
-                    bluetoothConnectionService.sendMessage(json);
+                    bluetoothConnectionService.sendAsciiMessage(jsonString);
                     Log.d("json11", jsonString);
                 } else {
                     Log.e("StationFragment", "BluetoothConnectionService is not bound");
                 }
+
             }
         });
+
 
         return root;
     }
@@ -153,23 +161,13 @@ public class StationFragment extends Fragment {
         super.onPause();
         unbindBluetoothConnectionService();
     }
-
-
+    public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
+        this.bluetoothConnectionService = bluetoothConnectionService;
+    }
+    private ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream();
     private void bindBluetoothConnectionService() {
         Intent intent = new Intent(getContext(), BluetoothConnectionService.class);
         getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-        Log.d("receivedincome", "income");
-        String a = String.valueOf(isBound);
-        Log.d("receivedincome", a);
-        if (isBound && bluetoothConnectionService != null) {
-            bluetoothConnectionService.setMessageReceivedListener(jsonString -> {
-                getActivity().runOnUiThread(() -> {
-                    // Display the Toast message on the UI thread
-                    Toast.makeText(getActivity(), "Received JSON: " + jsonString, Toast.LENGTH_LONG).show();
-                    Log.d("received11111", jsonString);
-                });
-            });
-        }
     }
 
     private void unbindBluetoothConnectionService() {
@@ -178,4 +176,17 @@ public class StationFragment extends Fragment {
             isBound = false;
         }
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+    }
 }
+

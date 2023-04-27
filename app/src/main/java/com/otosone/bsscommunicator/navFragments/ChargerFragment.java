@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.otosone.bsscommunicator.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.databinding.FragmentChargerBinding;
 
@@ -18,17 +19,8 @@ import com.otosone.bsscommunicator.databinding.FragmentChargerBinding;
  * create an instance of this fragment.
  */
 public class ChargerFragment extends Fragment {
-
+    private BluetoothConnectionService bluetoothConnectionService;
     FragmentChargerBinding binding;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public ChargerFragment() {
         // Required empty public constructor
@@ -46,8 +38,6 @@ public class ChargerFragment extends Fragment {
     public static ChargerFragment newInstance(String param1, String param2) {
         ChargerFragment fragment = new ChargerFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,10 +45,6 @@ public class ChargerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
     }
 
@@ -69,5 +55,9 @@ public class ChargerFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_charger, container, false);
         return binding.getRoot();
+    }
+
+    public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
+        this.bluetoothConnectionService = bluetoothConnectionService;
     }
 }

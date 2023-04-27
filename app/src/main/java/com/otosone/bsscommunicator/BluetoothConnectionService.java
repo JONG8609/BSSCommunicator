@@ -14,6 +14,8 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.otosone.bsscommunicator.R;
+import com.otosone.bsscommunicator.ScanActivity;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -21,15 +23,14 @@ import com.polidea.rxandroidble2.scan.ScanFilter;
 import com.polidea.rxandroidble2.scan.ScanResult;
 import com.polidea.rxandroidble2.scan.ScanSettings;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class BluetoothConnectionService extends Service {
 
@@ -43,9 +44,10 @@ public class BluetoothConnectionService extends Service {
     public static final String EXTRA_DATA = "com.otosone.bsscommunicator.EXTRA_DATA";
 
     private static final String CHANNEL_ID = "BluetoothConnectionServiceChannel";
-    private Disposable notificationDisposable;
+    private ConnectionFailedListener connectionFailedListener;
 
-    private StringBuilder dataBuffer = new StringBuilder();
+    private Disposable notificationDisposable;
+    private StringBuilder receivedMessageBuilder = new StringBuilder();
     public interface MessageReceivedListener {
         void onMessageReceived(String message);
     }
@@ -61,18 +63,8 @@ public class BluetoothConnectionService extends Service {
         }
     }
 
-
-
     public void setConnectionStateListener(ConnectionStateListener listener) {
         this.connectionStateListener = listener;
-    }
-
-    private void broadcastUpdate(final String action, String data) {
-        final Intent intent = new Intent(action);
-        if (data != null) {
-            intent.putExtra(EXTRA_DATA, data);
-        }
-        sendBroadcast(intent);
     }
 
     @Override
@@ -128,61 +120,85 @@ public class BluetoothConnectionService extends Service {
         setupNotification(connection);
     }
 
-    public void sendMessage(JSONObject jsonObject) {
-        if (connection == null ||
-                jsonObject == null) {
-            Log.e("SendMessageError", "Connection is null or JSON object is null");
+    public void sendAsciiMessage(String message) {
+        if (connection == null || message == null) {
+            Log.e("SendAsciiMessageError", "Connection is null or message is null");
             return;
         }
 
-        byte[] data = jsonObject.toString().getBytes(StandardCharsets.UTF_8);
+        // Add a delimiter (e.g., newline character) to the end of the message
+        message += "\n";
 
-        connection.writeCharacteristic(UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), data)
-                .subscribe(
-                        bytes -> {
-                            Log.d("SendData", "Data sent successfully");
-                            Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
-                        },
-                        throwable -> {
-                            Log.e("SendDataError", "Error sending data", throwable);
-                        }
-                );
+        byte[] data = message.getBytes(StandardCharsets.UTF_8);
+        String dataAsString = new String(data, StandardCharsets.UTF_8);
+        Log.d("SendData", dataAsString);
+
+        // Determine the chunk size
+        int chunkSize = 20; // You can adjust this value depending on your needs
+
+        for (int i = 0; i < data.length; i += chunkSize) {
+            int endIndex = Math.min(i + chunkSize, data.length);
+            byte[] chunk = Arrays.copyOfRange(data, i, endIndex);
+
+            connection.writeCharacteristic(UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), chunk)
+                    .subscribe(
+                            bytes -> {
+                                Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
+                            },
+                            throwable -> {
+                                Log.e("SendDataError", "Error sending data", throwable);
+                            }
+                    );
+        }
     }
 
     private void setupNotification(RxBleConnection connection) {
         connection.setupNotification(UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"))
                 .flatMap(notificationObservable -> notificationObservable)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         bytes -> {
-                            String receivedData = new String(bytes, StandardCharsets.US_ASCII);
-                            Log.d("ReceivedData", "Data received (ASCII): " + receivedData);
-
-                            String filteredData = receivedData.replaceAll("[^\\x20-\\x7E]", ""); // Remove non-printable ASCII characters
-                            Log.d("FilteredData", "Filtered data: " + filteredData);
-
-                            try {
-                                JSONObject json = new JSONObject(filteredData);
-                                if (messageReceivedListener != null) {
-                                    messageReceivedListener.onMessageReceived(filteredData);
-                                }
-
-                                broadcastUpdate(ACTION_DATA_AVAILABLE, filteredData);
-                            } catch (JSONException e) {
-                                Log.e("JSONError", "Error parsing JSON: " + e.getMessage());
-                            }
+                            String receivedMessage = new String(bytes, StandardCharsets.UTF_8);
+                            Log.d("Received UTF-8 Message", receivedMessage);
+                            processReceivedData(receivedMessage);
                         },
                         throwable -> {
                             Log.e("ReceiveDataError", "Error receiving data: " + throwable.getMessage());
                         }
                 );
-
     }
 
-    private void disposeNotification() {
-        if (notificationDisposable != null && !notificationDisposable.isDisposed()) {
-            notificationDisposable.dispose();
+
+
+
+    private void processReceivedData(String receivedMessage) {
+        Log.d("ProcessReceivedData", "Received message: " + receivedMessage);
+
+        int delimiterIndex = receivedMessage.indexOf("}");
+
+        if (delimiterIndex != -1) {
+            receivedMessageBuilder.append(receivedMessage.substring(0, delimiterIndex + 1));
+            String completeJsonString = receivedMessageBuilder.toString();
+            Log.d("ProcessReceivedData", "Complete JSON String: " + completeJsonString);
+            receivedMessageBuilder.setLength(0);
+
+            if (messageReceivedListener != null) {
+                Log.d("ProcessReceivedData", "Calling messageReceivedListener");
+                messageReceivedListener.onMessageReceived(completeJsonString);
+            } else {
+                Log.d("ProcessReceivedData", "messageReceivedListener is null");
+            }
+        } else {
+            receivedMessageBuilder.append(receivedMessage);
         }
     }
+
+
+    public void setConnectionFailedListener(ConnectionFailedListener connectionFailedListener) {
+        this.connectionFailedListener = connectionFailedListener;
+    }
+
 
     public void scanBleDevices(ScanSettings scanSettings, ScanFilter scanFilter, Consumer<ScanResult> onScanResult) {
         Disposable scanDisposable = rxBleClient.scanBleDevices(scanSettings, scanFilter)
