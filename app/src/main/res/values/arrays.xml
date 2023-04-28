@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spinner_choices">
+        <item>0. Set SoC</item>
+        <item>1. FET On</item>
+        <item>2. Cycle Counter Clear</item>
+        <item>3. OC Protection Clear</item>
+        <item>4. Alarm Log Clear</item>
+        <item>5. Permanent Error Clear</item>
+        <item>6. Cell Balancing Enable</item>
+        <item>7. Cell Balancing Disable</item>
+    </string-array>
+</resources>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <CheckBox
+        android:id="@+id/bms_checkbox"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:id="@+id/bms1_tv"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="Text 1"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/bms_spinner_tv"
+        android:layout_width="130dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:gravity="center"
+        android:text="Text 1"
+        android:textSize="16sp" />
+
+    <Spinner
+        android:id="@+id/bms_spinner"
+        android:layout_width="20dp"
+        android:layout_height="match_parent" />
+
+    <EditText
+        android:id="@+id/bms2_et"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@android:color/transparent"
+        android:text="Text 2"
+        android:textSize="14sp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:clickable="false"
+        android:longClickable="false"
+        android:cursorVisible="false"/>
+
+</LinearLayout>
