@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.otosone.bsscommunicator.ChargingItem;
+import com.otosone.bsscommunicator.listItem.ChargingItem;
 import com.otosone.bsscommunicator.R;
 
 import java.util.List;
@@ -24,7 +24,8 @@ public class ChargingAdapter extends BaseAdapter {
     public ChargingAdapter(Context context, List<ChargingItem> chargingItems) {
         this.context = context;
         this.chargingItems = chargingItems;
-        this.layoutInflater = LayoutInflater.from(context);
+        this.layoutInflater =
+                LayoutInflater.from(context);
     }
 
     @Override
@@ -54,9 +55,17 @@ public class ChargingAdapter extends BaseAdapter {
         TextView charging1_tv = convertView.findViewById(R.id.charging1_tv);
         TextView charging2_tv = convertView.findViewById(R.id.charging2_tv);
 
-        checkBox.setChecked(chargingItem.isChecked());
-        charging1_tv.setText(chargingItem.getText1());
-        charging2_tv.setText(chargingItem.getText2());
+        charging1_tv.setText(chargingItem.getId());
+        charging2_tv.setText(chargingItem.getCharging());
+
+        checkBox.setOnCheckedChangeListener(null); // Remove any existing listeners
+        checkBox.setChecked(chargingItem.isChecked()); // Set the initial state of the checkbox
+
+        // Add a new OnCheckedChangeListener
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Your logic for handling the checkbox change
+            chargingItem.setChecked(isChecked);
+        });
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,11 +84,11 @@ public class ChargingAdapter extends BaseAdapter {
         LayoutInflater inflater = LayoutInflater.from(context);
         View titleView = inflater.inflate(R.layout.charging_dialog_title, null);
         TextView titleId = titleView.findViewById(R.id.title_id);
-        titleId.setText("ID: " + getItem(position).getText1());
+        titleId.setText("ID: " + getItem(position).getId());
         builder.setCustomTitle(titleView);
 
         String[] choices = {"START", "STOP"};
-        int[] selectedIndex = new int[]{getItem(position).getText2().equals("START") ? 0 : 1};
+        int[] selectedIndex = new int[]{getItem(position).getCharging().equals("START") ? 0 : 1};
         builder.setSingleChoiceItems(choices, selectedIndex[0], new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -93,9 +102,9 @@ public class ChargingAdapter extends BaseAdapter {
                 ChargingItem chargingItem = getItem(position);
 
                 if (selectedIndex[0] == 0) {
-                    chargingItem.setText2("START");
+                    chargingItem.setCharging("START");
                 } else {
-                    chargingItem.setText2("STOP");
+                    chargingItem.setCharging("STOP");
                 }
 
                 notifyDataSetChanged();

@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.otosone.bsscommunicator.BluetoothConnectionService;
+import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.databinding.FragmentResetBinding;
 

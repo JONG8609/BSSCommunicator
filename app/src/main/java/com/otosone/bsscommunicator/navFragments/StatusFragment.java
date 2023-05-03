@@ -1,19 +1,27 @@
 package com.otosone.bsscommunicator.navFragments;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.otosone.bsscommunicator.BluetoothConnectionService;
+import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.databinding.FragmentStatusBinding;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,15 +34,74 @@ public class StatusFragment extends Fragment {
     private TextView charger1Tv, charger2Tv, charger3Tv, charger4Tv, charger5Tv, charger6Tv, charger7Tv, charger8Tv, charger9Tv, charger10Tv, charger11Tv, charger12Tv, charger13Tv, charger14Tv, charger15Tv, charger16Tv;
     private TextView isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv;
     FragmentStatusBinding binding;
+    private boolean isBound = false;
 
-
-    // TODO: Rename and change types and number of parameters
+    private StringBuilder jsonStringBuilder = new StringBuilder();
     public static StatusFragment newInstance(String param1, String param2) {
         StatusFragment fragment = new StatusFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
+            bluetoothConnectionService = binder.getService();
+            isBound = true;
+
+            Log.d("StationFragment", "Service connected");
+
+            // Set the MessageReceivedListener
+            bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
+                Log.d("StationFragment", "MessageReceivedListener called");
+                getActivity().runOnUiThread(() -> {
+
+                    Toast.makeText(getActivity(), "Received JSON: " + completeJsonString, Toast.LENGTH_LONG).show();
+                    Log.d("StationFragment", "Complete JSON: " + completeJsonString);
+
+                    // Parse the received JSON string
+                    try {
+                        JSONObject receivedJson = new JSONObject(completeJsonString);
+
+                      //  if (receivedJson.has("request") && receivedJson.getString("request").equals("STA_CFG")) {
+                      //      if (receivedJson.has("reportPeriod")) {
+                      //          reportPeriodEt.setText(String.valueOf(receivedJson.getInt("reportPeriod")));
+                      //      }
+                      //      if (receivedJson.has("batInTimeout")) {
+                      //          batteryInTimeoutEt.setText(String.valueOf(receivedJson.getInt("batInTimeout")));
+                      //      }
+                      //      if (receivedJson.has("batOutTimeout")) {
+                      //          batteryOutTimeoutEt.setText(String.valueOf(receivedJson.getInt("batOutTimeout")));
+                      //      }
+                      //      if (receivedJson.has("payTimeout")) {
+                      //          paymentTimeoutEt.setText(String.valueOf(receivedJson.getInt("payTimeout")));
+                      //      }
+                      //      if (receivedJson.has("payType")) {
+                      //          paymentTypeEt.setText(String.valueOf(receivedJson.getInt("payType")));
+                      //      }
+                      //  }
+
+                    } catch (JSONException e) {
+                        Log.e("StationFragment", "Error parsing received JSON", e);
+                    }
+                });
+
+                Log.d("StationFragment", "Complete JSON: " + completeJsonString);
+
+            });
+
+        }
+
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bluetoothConnectionService = null;
+            isBound = false;
+            Log.d("StationFragment", "Service disconnected");
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

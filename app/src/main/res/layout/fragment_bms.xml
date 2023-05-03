@@ -44,6 +44,7 @@
                     android:gravity="right">
 
                     <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/bmsBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/rounded_button"
@@ -63,14 +64,14 @@
 
                 <TextView
                     android:id="@+id/bms_checkbox"
-                    android:layout_width="80dp"
+                    android:layout_width="40dp"
                     android:textColor="@color/white"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="20dp"
                     android:textColor="@color/white"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
@@ -80,7 +81,7 @@
 
                 <TextView
                     android:text="CMD"
-                    android:layout_width="120dp"
+                    android:layout_width="220dp"
                     android:textColor="@color/white"
                     android:layout_height="match_parent"
                     android:gravity="center" />

@@ -3,7 +3,6 @@ package com.otosone.bsscommunicator.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +10,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.otosone.bsscommunicator.BMSItem;
+import com.otosone.bsscommunicator.listItem.BMSItem;
 import com.otosone.bsscommunicator.R;
-import com.otosone.bsscommunicator.utils.InputFilterMinMax;
 
 import java.util.List;
 
@@ -62,15 +61,24 @@ public class BMSAdapter extends BaseAdapter {
         TextView bms2_et = convertView.findViewById(R.id.bms2_et);
         TextView bms_spinner_tv = convertView.findViewById(R.id.bms_spinner_tv);
 
-        checkBox.setChecked(bmsItem.isChecked());
-        bms1_tv.setText(bmsItem.getId());
-        bms2_et.setText(String.valueOf(bmsItem.getValue()));
+        bms1_tv.setText(Integer.toString(bmsItem.getId()));
+        bms2_et.setText(Integer.toString(bmsItem.getValue()));
+
+        checkBox.setOnCheckedChangeListener(null); // Remove any existing listeners
+        checkBox.setChecked(bmsItem.isChecked()); // Set the initial state of the checkbox
+
+        // Add a new OnCheckedChangeListener
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Your logic for handling the checkbox change
+            bmsItem.setChecked(isChecked);
+        });
 
         // Set the default value for bms_spinner_tv
-        if (bmsItem.getCmd() == null || bmsItem.getCmd().isEmpty()) {
+        if (bmsItem.getCmd() == -1) {
             bms_spinner_tv.setText("0. Set SoC");
         } else {
-            bms_spinner_tv.setText(bmsItem.getCmd());
+            String[] spinnerChoices = context.getResources().getStringArray(R.array.spinner_choices);
+            bms_spinner_tv.setText(spinnerChoices[bmsItem.getCmd()]);
         }
 
         convertView.setOnClickListener(new View.OnClickListener() {
@@ -83,7 +91,6 @@ public class BMSAdapter extends BaseAdapter {
         return convertView;
     }
 
-
     private void showToggleDialog(int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
@@ -95,27 +102,25 @@ public class BMSAdapter extends BaseAdapter {
         Spinner dialogSpinner = dialogView.findViewById(R.id.dialog_spinner);
         EditText valueEditText = dialogView.findViewById(R.id.dialog_value_edit_text);
         TextView bmsid_tv = dialogView.findViewById(R.id.bmsid_tv);
-        bmsid_tv.setText(getItem(position).getId());
+        bmsid_tv.setText(String.valueOf(getItem(position).getId()));
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, R.array.spinner_choices, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dialogSpinner.setAdapter(adapter);
 
         // Set the selected index of the Spinner based on the current value
-        String currentValue = getItem(position).getCmd();
-        dialogSpinner.setSelection(adapter.getPosition(currentValue));
+        int currentValue = getItem(position).getCmd();
+        dialogSpinner.setSelection(currentValue);
 
         // Set the current value of the EditText
         valueEditText.setText(String.valueOf(getItem(position).getValue()));
 
         // Enable or disable the EditText based on the Spinner value
-        valueEditText.setEnabled("0. Set SoC".equals(currentValue));
-
+        valueEditText.setEnabled(currentValue == 0);
         // Update the EditText state when the Spinner value changes
         dialogSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItem = parent.getItemAtPosition(position).toString();
-                valueEditText.setEnabled("0. Set SoC".equals(selectedItem));
+                valueEditText.setEnabled(position == 0);
             }
 
             @Override
@@ -131,10 +136,10 @@ public class BMSAdapter extends BaseAdapter {
                 BMSItem bmsItem = getItem(position);
 
                 // Set the selected value from the Spinner
-                String selectedValue = dialogSpinner.getSelectedItem().toString();
+                int selectedValue = dialogSpinner.getSelectedItemPosition();
                 bmsItem.setCmd(selectedValue);
 
-                // Set the value fromthe EditText, if it is enabled
+                // Set the value from the EditText, if it is enabled
                 if (valueEditText.isEnabled()) {
                     int newValue;
                     try {

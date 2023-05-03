@@ -1,21 +1,37 @@
 package com.otosone.bsscommunicator.navFragments;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.IBinder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.otosone.bsscommunicator.BluetoothConnectionService;
-import com.otosone.bsscommunicator.DoorItem;
+import com.otosone.bsscommunicator.adapter.ChargingAdapter;
+import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
+import com.otosone.bsscommunicator.listItem.ChargingItem;
+import com.otosone.bsscommunicator.listItem.DoorItem;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.adapter.DoorAdapter;
 import com.otosone.bsscommunicator.databinding.FragmentDoorBinding;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +40,89 @@ public class DoorFragment extends Fragment {
 
     FragmentDoorBinding binding;
     private BluetoothConnectionService bluetoothConnectionService;
+    private boolean isBound = false;
+    private DoorAdapter doorAdapter;
+    private List<DoorItem> doorItems;
+    private Button doorBtn;
     public static DoorFragment newInstance(String param1, String param2) {
         DoorFragment fragment = new DoorFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
+
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
+            bluetoothConnectionService = binder.getService();
+            isBound = true;
+
+            Log.d("StationFragment", "Service connected");
+
+            // Set the MessageReceivedListener
+            bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
+                Log.d("DoorFragment", "MessageReceivedListener called");
+                getActivity().runOnUiThread(() -> {
+
+                    Toast.makeText(getActivity(), "Received JSON: " + completeJsonString, Toast.LENGTH_LONG).show();
+                    Log.d("DoorFragment", "Complete JSON: " + completeJsonString);
+
+                    // Parse the received JSON string
+                    try {
+                        JSONObject receivedJson = new JSONObject(completeJsonString);
+
+                        if (receivedJson.has("type") && receivedJson.getString("type").equals("CTRL_DOOR")) {
+                            int count = receivedJson.getInt("count");
+                            JSONArray doorList = receivedJson.getJSONArray("doorList");
+
+                            List<DoorItem> doorItems = new ArrayList<>();
+
+                            for (int i = 0; i < 16; i++) {
+                                boolean found = false;
+
+                                for (int j = 0; j < count; j++) {
+                                    JSONObject doorObj = doorList.getJSONObject(j);
+                                    int id = doorObj.getInt("id");
+                                    boolean open = doorObj.getBoolean("open");
+
+                                    if (id == i + 1) {
+                                        DoorItem item = new DoorItem(false, String.format("%02d", i + 1), open ? "OPEN" : "CLOSE");
+                                        doorItems.add(item);
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!found) {
+                                    DoorItem item = new DoorItem(false, String.format("%02d", i + 1), "CLOSE");
+                                    doorItems.add(item);
+                                }
+                            }
+
+                            DoorAdapter doorAdapter = new DoorAdapter(requireContext(), doorItems);
+                            binding.doorListView.setAdapter(doorAdapter);
+                        }
+
+                    } catch (JSONException e) {
+                        Log.e("DoorFragment", "Error parsing received JSON", e);
+                    }
+                });
+
+                Log.d("DoorFragment", "Complete JSON: " + completeJsonString);
+
+            });
+
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bluetoothConnectionService = null;
+            isBound = false;
+            Log.d("StationFragment", "Service disconnected");
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,36 +136,97 @@ public class DoorFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_door, container, false);
 
         // Create a list of DoorItems
-        List<DoorItem> doorItems = new ArrayList<>();
-        doorItems.add(new DoorItem(false, "01", "LOCK"));
-        doorItems.add(new DoorItem(true, "02", "LOCK"));
-        doorItems.add(new DoorItem(false, "03", "LOCK"));
-        doorItems.add(new DoorItem(true, "04", "LOCK"));
-        doorItems.add(new DoorItem(false, "05", "LOCK"));
-        doorItems.add(new DoorItem(true, "06", "LOCK"));
-        doorItems.add(new DoorItem(false, "08", "LOCK"));
-        doorItems.add(new DoorItem(true, "09", "LOCK"));
-        doorItems.add(new DoorItem(false, "10", "LOCK"));
-        doorItems.add(new DoorItem(true, "11", "LOCK"));
-        doorItems.add(new DoorItem(false, "12", "LOCK"));
-        doorItems.add(new DoorItem(true, "13", "LOCK"));
-        doorItems.add(new DoorItem(true, "14", "LOCK"));
-        doorItems.add(new DoorItem(false, "15", "LOCK"));
-        doorItems.add(new DoorItem(true, "16", "LOCK"));
-        // Add more items as needed
+        doorBtn = binding.doorBtn;
+        doorItems = new ArrayList<>();
+        for (int i = 1; i <= 16; i++) {
+            doorItems.add(new DoorItem(false, String.format("%02d", i), "STOP"));
+        }
 
-        // Initialize the DoorItemAdapter
-        DoorAdapter doorAdapter = new DoorAdapter(requireContext(), doorItems);
+        doorAdapter = new DoorAdapter(requireContext(), doorItems);
 
-        // Bind the DoorItemAdapter to the ListView
         ListView listView = binding.doorListView;
         listView.setAdapter(doorAdapter);
 
 
+        //프로토콜 변경 해야됨
+        doorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Create a JSON object
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("type", "CTRL_CHG");
+                    JSONArray doorList = new JSONArray();
+
+                    int checkedCount = 0;
+                    for (DoorItem item : doorItems) {
+                        if (item.isChecked()) {
+                            JSONObject doorObj = new JSONObject();
+                            doorObj.put("id", Integer.parseInt(item.getId()));
+                            doorObj.put("charge", item.getDoorStatus().equals("START") ? 1 : 0);
+                            doorList.put(doorObj);
+                            checkedCount++;
+                        }
+                    }
+                    json.put("count", checkedCount);
+                    json.put("chgList", doorList);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String jsonString = json.toString();
+                Log.d("UTF=8", jsonString);
+
+                // Call the sendAsciiMessage method with the string as an argument
+                if (isBound && bluetoothConnectionService != null) {
+                    bluetoothConnectionService.sendMessage(jsonString);
+                    Log.d("json11", jsonString);
+                } else {
+                    Log.e("ChargingFragment", "BluetoothConnectionService is not bound");
+                }
+            }
+        });
+
         return binding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        bindBluetoothConnectionService();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unbindBluetoothConnectionService();
+    }
     public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
         this.bluetoothConnectionService = bluetoothConnectionService;
+    }
+    private ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream();
+    private void bindBluetoothConnectionService() {
+        Intent intent = new Intent(getContext(), BluetoothConnectionService.class);
+        getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void unbindBluetoothConnectionService() {
+        if (isBound) {
+            getActivity().unbindService(serviceConnection);
+            isBound = false;
+        }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
     }
 }

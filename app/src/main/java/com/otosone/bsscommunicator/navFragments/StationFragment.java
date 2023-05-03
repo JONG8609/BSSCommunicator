@@ -18,8 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.common.util.IOUtils;
-import com.otosone.bsscommunicator.BluetoothConnectionService;
+import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.databinding.FragmentStationBinding;
 
@@ -27,8 +26,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 public class StationFragment extends Fragment {
 
@@ -36,12 +33,11 @@ public class StationFragment extends Fragment {
 
     private BluetoothConnectionService bluetoothConnectionService;
     private boolean isBound = false;
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+
     private StringBuilder jsonStringBuilder = new StringBuilder();
 
     private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt, paymentTypeEt;
-    private Button stationBtn, mainBtn;
+    private Button stationBtn;
 
     public StationFragment() {
         // Required empty public constructor
@@ -50,8 +46,6 @@ public class StationFragment extends Fragment {
     public static StationFragment newInstance(String param1, String param2) {
         StationFragment fragment = new StationFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,6 +66,32 @@ public class StationFragment extends Fragment {
 
                     Toast.makeText(getActivity(), "Received JSON: " + completeJsonString, Toast.LENGTH_LONG).show();
                     Log.d("StationFragment", "Complete JSON: " + completeJsonString);
+
+                    // Parse the received JSON string
+                    try {
+                        JSONObject receivedJson = new JSONObject(completeJsonString);
+
+                        if (receivedJson.has("request") && receivedJson.getString("request").equals("STA_CFG")) {
+                            if (receivedJson.has("reportPeriod")) {
+                                reportPeriodEt.setText(String.valueOf(receivedJson.getInt("reportPeriod")));
+                            }
+                            if (receivedJson.has("batInTimeout")) {
+                                batteryInTimeoutEt.setText(String.valueOf(receivedJson.getInt("batInTimeout")));
+                            }
+                            if (receivedJson.has("batOutTimeout")) {
+                                batteryOutTimeoutEt.setText(String.valueOf(receivedJson.getInt("batOutTimeout")));
+                            }
+                            if (receivedJson.has("payTimeout")) {
+                                paymentTimeoutEt.setText(String.valueOf(receivedJson.getInt("payTimeout")));
+                            }
+                            if (receivedJson.has("payType")) {
+                                paymentTypeEt.setText(String.valueOf(receivedJson.getInt("payType")));
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        Log.e("StationFragment", "Error parsing received JSON", e);
+                    }
                 });
 
                 Log.d("StationFragment", "Complete JSON: " + completeJsonString);
@@ -103,7 +123,6 @@ public class StationFragment extends Fragment {
         stationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("222223", "11123");
 
                 // Extract values from EditText views
                 int reportPeriod = Integer.parseInt(reportPeriodEt.getText().toString());
@@ -125,10 +144,10 @@ public class StationFragment extends Fragment {
                     e.printStackTrace();
                 }
                 String jsonString = json.toString();
-                Log.d("ASCII", jsonString);
+                Log.d("UTF=8", jsonString);
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
-                    bluetoothConnectionService.sendAsciiMessage(jsonString);
+                    bluetoothConnectionService.sendMessage(jsonString);
                     Log.d("json11", jsonString);
                 } else {
                     Log.e("StationFragment", "BluetoothConnectionService is not bound");

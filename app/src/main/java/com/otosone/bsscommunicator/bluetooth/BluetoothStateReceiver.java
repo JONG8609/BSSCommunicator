@@ -1,9 +1,11 @@
-package com.otosone.bsscommunicator;
+package com.otosone.bsscommunicator.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.otosone.bsscommunicator.MainActivity;
 
 public class BluetoothStateReceiver extends BroadcastReceiver {
 

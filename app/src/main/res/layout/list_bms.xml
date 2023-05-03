@@ -7,14 +7,14 @@
 
     <CheckBox
         android:id="@+id/bms_checkbox"
-        android:layout_width="80dp"
+        android:layout_width="40dp"
         android:layout_height="match_parent"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dp" />
 
     <TextView
         android:id="@+id/bms1_tv"
-        android:layout_width="50dp"
+        android:layout_width="20dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
         android:gravity="center"
@@ -23,7 +23,7 @@
 
     <TextView
         android:id="@+id/bms_spinner_tv"
-        android:layout_width="130dp"
+        android:layout_width="200dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
         android:gravity="center"

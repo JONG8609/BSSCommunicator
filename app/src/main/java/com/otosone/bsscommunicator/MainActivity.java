@@ -1,6 +1,5 @@
 package com.otosone.bsscommunicator;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -16,8 +15,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -25,6 +22,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
+import com.otosone.bsscommunicator.bluetooth.BluetoothStateReceiver;
+import com.otosone.bsscommunicator.bluetooth.ConnectionFailedListener;
 import com.otosone.bsscommunicator.databinding.ActivityMainBinding;
 import com.otosone.bsscommunicator.navFragments.BMSFragment;
 import com.otosone.bsscommunicator.navFragments.ChargerFragment;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ConnectionFailedListener{
+public class MainActivity extends AppCompatActivity implements ConnectionFailedListener {
 
     private ActivityMainBinding binding;
     private ExpandableListAdapter expandableListAdapter;

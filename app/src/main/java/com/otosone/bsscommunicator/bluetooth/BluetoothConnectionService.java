@@ -1,4 +1,4 @@
-package com.otosone.bsscommunicator;
+package com.otosone.bsscommunicator.bluetooth;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -26,6 +26,7 @@ import com.polidea.rxandroidble2.scan.ScanSettings;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -120,27 +121,29 @@ public class BluetoothConnectionService extends Service {
         setupNotification(connection);
     }
 
-    public void sendAsciiMessage(String message) {
-        if (connection == null || message == null) {
+    public void sendMessage(String message) {
+        if (connection == null || message
+                == null) {
             Log.e("SendAsciiMessageError", "Connection is null or message is null");
             return;
         }
 
-        // Add a delimiter (e.g., newline character) to the end of the message
-        message += "\n";
+        // \r\n 더해주기
+        message += "\r\n";
 
         byte[] data = message.getBytes(StandardCharsets.UTF_8);
         String dataAsString = new String(data, StandardCharsets.UTF_8);
         Log.d("SendData", dataAsString);
 
         // Determine the chunk size
-        int chunkSize = 20; // You can adjust this value depending on your needs
+        int chunkSize = 10; // You can adjust this value depending on your needs
 
         for (int i = 0; i < data.length; i += chunkSize) {
             int endIndex = Math.min(i + chunkSize, data.length);
             byte[] chunk = Arrays.copyOfRange(data, i, endIndex);
 
             connection.writeCharacteristic(UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), chunk)
+                    .delay(50, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(
                             bytes -> {
                                 Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
@@ -169,36 +172,58 @@ public class BluetoothConnectionService extends Service {
                 );
     }
 
-
-
-
     private void processReceivedData(String receivedMessage) {
         Log.d("ProcessReceivedData", "Received message: " + receivedMessage);
 
-        int delimiterIndex = receivedMessage.indexOf("}");
+        receivedMessageBuilder.append(receivedMessage);
 
-        if (delimiterIndex != -1) {
-            receivedMessageBuilder.append(receivedMessage.substring(0, delimiterIndex + 1));
-            String completeJsonString = receivedMessageBuilder.toString();
-            Log.d("ProcessReceivedData", "Complete JSON String: " + completeJsonString);
-            receivedMessageBuilder.setLength(0);
+        int openBraceIndex = receivedMessageBuilder.indexOf("{");
+        while (openBraceIndex != -1) {
+            int closeBraceIndex = findMatchingClosingBrace(receivedMessageBuilder, openBraceIndex);
 
-            if (messageReceivedListener != null) {
-                Log.d("ProcessReceivedData", "Calling messageReceivedListener");
-                messageReceivedListener.onMessageReceived(completeJsonString);
+            if (closeBraceIndex != -1) {
+                String completeJsonString = receivedMessageBuilder.substring(openBraceIndex, closeBraceIndex + 1);
+                Log.d("ProcessReceivedData", "Complete JSON String: " + completeJsonString);
+
+                if (messageReceivedListener != null) {
+                    Log.d("ProcessReceivedData", "Calling messageReceivedListener");
+                    messageReceivedListener.onMessageReceived(completeJsonString);
+                } else {
+                    Log.d("ProcessReceivedData", "messageReceivedListener is null");
+                }
+
+                receivedMessageBuilder.delete(0, closeBraceIndex + 1);
             } else {
-                Log.d("ProcessReceivedData", "messageReceivedListener is null");
+                break;
             }
-        } else {
-            receivedMessageBuilder.append(receivedMessage);
+
+            openBraceIndex = receivedMessageBuilder.indexOf("{");
         }
     }
+
+    private int findMatchingClosingBrace(StringBuilder builder, int openBraceIndex) {
+        int balance = 0;
+        for (int i = openBraceIndex; i < builder.length(); i++) {
+            char currentChar = builder.charAt(i);
+            if (currentChar == '{') {
+                balance++;
+            } else if (currentChar == '}') {
+                balance--;
+            }
+
+            if (balance == 0) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
 
 
     public void setConnectionFailedListener(ConnectionFailedListener connectionFailedListener) {
         this.connectionFailedListener = connectionFailedListener;
     }
-
 
     public void scanBleDevices(ScanSettings scanSettings, ScanFilter scanFilter, Consumer<ScanResult> onScanResult) {
         Disposable scanDisposable = rxBleClient.scanBleDevices(scanSettings, scanFilter)

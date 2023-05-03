@@ -10,7 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.otosone.bsscommunicator.DoorItem;
+import com.otosone.bsscommunicator.listItem.DoorItem;
 import com.otosone.bsscommunicator.R;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class DoorAdapter extends BaseAdapter {
     public DoorAdapter(Context context, List<DoorItem> doorItems) {
         this.context = context;
         this.doorItems = doorItems;
-        layoutInflater = LayoutInflater.from(context);
+        this.layoutInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -44,22 +44,19 @@ public class DoorAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_door, parent, false);
-            holder = new ViewHolder();
-            holder.checkBox = convertView.findViewById(R.id.door_checkbox);
-            holder.text1 = convertView.findViewById(R.id.door1_tv);
-            holder.text2 = convertView.findViewById(R.id.door2_tv);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
         }
 
-        DoorItem doorItem = doorItems.get(position);
-        holder.checkBox.setChecked(doorItem.isChecked());
-        holder.text1.setText(doorItem.getText1());
-        holder.text2.setText(doorItem.getText2());
+        DoorItem doorItem = getItem(position);
+
+        CheckBox checkBox = convertView.findViewById(R.id.door_checkbox);
+        TextView door1_tv = convertView.findViewById(R.id.door1_tv);
+        TextView door2_tv = convertView.findViewById(R.id.door2_tv);
+
+        checkBox.setChecked(doorItem.isChecked());
+        door1_tv.setText(doorItem.getId());
+        door2_tv.setText(doorItem.getDoorStatus());
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,39 +75,42 @@ public class DoorAdapter extends BaseAdapter {
         LayoutInflater inflater = LayoutInflater.from(context);
         View titleView = inflater.inflate(R.layout.door_dialog_title, null);
         TextView titleId = titleView.findViewById(R.id.title_id);
-        titleId.setText("ID: " + getItem(position).getText1());
+        titleId.setText("ID: " + getItem(position).getId());
         builder.setCustomTitle(titleView);
 
         String[] choices = {"LOCK", "UNLOCK"};
-        builder.setSingleChoiceItems(choices, -1, new DialogInterface.OnClickListener() {
+        int[] selectedIndex = new int[]{getItem(position).getDoorStatus().equals("LOCK") ? 0 : 1};
+        builder.setSingleChoiceItems(choices, selectedIndex[0], new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                DoorItem doorItem = doorItems.get(position);
-
-                if (which == 0) {
-                    doorItem.setText2("LOCK");
-                } else {
-                    doorItem.setText2("UNLOCK");
-                }
+                selectedIndex[0] = which;
             }
         });
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
+            public void onClick(DialogInterface dialog, int id) {
+                DoorItem doorItem = getItem(position);
+
+                if (selectedIndex[0] == 0) {
+                    doorItem.setDoorStatus("LOCK");
+                } else {
+                    doorItem.setDoorStatus("UNLOCK");
+                }
+
                 notifyDataSetChanged();
             }
         });
 
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // Do nothing, just close the dialog
+                dialog.cancel();
+            }
+        });
 
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
-    private static class ViewHolder {
-        CheckBox checkBox;
-        TextView text1;
-        TextView text2;
-    }
 }

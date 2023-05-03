@@ -21,8 +21,8 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-import com.otosone.bsscommunicator.BluetoothConnectionService;
-import com.otosone.bsscommunicator.ConnectionFailedListener;
+import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
+import com.otosone.bsscommunicator.bluetooth.ConnectionFailedListener;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.databinding.FragmentScanBinding;
 import com.polidea.rxandroidble2.RxBleDevice;
