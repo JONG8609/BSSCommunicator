@@ -3,6 +3,7 @@ package com.otosone.bsscommunicator.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.otosone.bsscommunicator.listItem.BMSItem;
 import com.otosone.bsscommunicator.R;
+import com.otosone.bsscommunicator.utils.InputFilterMinMax;
 
 import java.util.List;
 
@@ -63,6 +65,7 @@ public class BMSAdapter extends BaseAdapter {
 
         bms1_tv.setText(Integer.toString(bmsItem.getId()));
         bms2_et.setText(Integer.toString(bmsItem.getValue()));
+        bms2_et.setFilters(new InputFilter[] {new InputFilterMinMax(0, 100)});
 
         checkBox.setOnCheckedChangeListener(null); // Remove any existing listeners
         checkBox.setChecked(bmsItem.isChecked()); // Set the initial state of the checkbox
@@ -101,6 +104,7 @@ public class BMSAdapter extends BaseAdapter {
         View dialogView = inflater.inflate(R.layout.bms_dialog_spinner, null);
         Spinner dialogSpinner = dialogView.findViewById(R.id.dialog_spinner);
         EditText valueEditText = dialogView.findViewById(R.id.dialog_value_edit_text);
+        valueEditText.setFilters(new InputFilter[] {new InputFilterMinMax(0, 100)});
         TextView bmsid_tv = dialogView.findViewById(R.id.bmsid_tv);
         bmsid_tv.setText(String.valueOf(getItem(position).getId()));
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, R.array.spinner_choices, android.R.layout.simple_spinner_item);

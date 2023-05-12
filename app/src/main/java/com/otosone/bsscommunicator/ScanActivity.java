@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 
+import com.otosone.bsscommunicator.adapter.DeviceArrayAdapter;
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.databinding.ActivityScanBinding;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -46,7 +47,7 @@ public class ScanActivity extends AppCompatActivity {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) service;
             bluetoothConnectionService = binder.getService();
             bluetoothConnectionService.setMessageReceivedListener(message -> {
-                binding.textViewReceivedData.setText(getString(R.string.received_data, message));
+
             });
             isBound = true;
             startScan();
@@ -63,15 +64,8 @@ public class ScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_scan);
 
-        binding.buttonSend.setOnClickListener(view -> {
-            String message = binding.editTextMessage.getText().toString();
-            if (isBound && !message.isEmpty()) {
-                //bluetoothConnectionService.sendMessage();
-            }
-        });
-
         foundDevices = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, foundDevices);
+        arrayAdapter = new DeviceArrayAdapter(this,foundDevices);
         binding.listView.setAdapter(arrayAdapter);
         binding.listView.setOnItemClickListener((parent, view, position, id) -> {
             RxBleDevice selectedDevice = foundDevices.get(position);
@@ -121,8 +115,7 @@ public class ScanActivity extends AppCompatActivity {
         }
     }
 
-    private void startScan
-            () {
+    private void startScan() {
         ScanSettings scanSettings = new ScanSettings.Builder()
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
@@ -176,13 +169,7 @@ public class ScanActivity extends AppCompatActivity {
                 .setPositiveButton("Yes", (dialog, which) -> {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
+
                         return;
                     }
                     startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);

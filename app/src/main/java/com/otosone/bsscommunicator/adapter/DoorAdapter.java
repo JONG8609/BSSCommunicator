@@ -58,6 +58,13 @@ public class DoorAdapter extends BaseAdapter {
         door1_tv.setText(doorItem.getId());
         door2_tv.setText(doorItem.getDoorStatus());
 
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                doorItem.setChecked(!doorItem.isChecked());
+            }
+        });
+
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -13,12 +13,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -30,11 +33,15 @@ import com.otosone.bsscommunicator.navFragments.BMSFragment;
 import com.otosone.bsscommunicator.navFragments.ChargerFragment;
 import com.otosone.bsscommunicator.navFragments.ChargingFragment;
 import com.otosone.bsscommunicator.navFragments.DoorFragment;
-import com.otosone.bsscommunicator.navFragments.FanAndHeaterFragment;
+import com.otosone.bsscommunicator.navFragments.FanFragment;
+import com.otosone.bsscommunicator.navFragments.HeaterFragment;
 import com.otosone.bsscommunicator.navFragments.ResetFragment;
 import com.otosone.bsscommunicator.navFragments.ScanFragment;
 import com.otosone.bsscommunicator.navFragments.StationFragment;
 import com.otosone.bsscommunicator.navFragments.StatusFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,31 +61,45 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
     private boolean isBound = false;
     private BluetoothConnectionService bluetoothConnectionService;
     private ServiceConnection serviceConnection;
+    private TextView versionNameTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        drawer = binding.drawerLayout;
+        navigationView = binding.navView;
+        navigationMenuButton = binding.navigationMenuButton;
+        mainBtn = binding.mainBtn;
 
         BluetoothStateReceiver bluetoothStateReceiver = new BluetoothStateReceiver(this);
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothStateReceiver, filter);
 
 
-        drawer = binding.drawerLayout;
-        navigationView = binding.navView;
-        navigationMenuButton = binding.navigationMenuButton;
-        mainBtn = binding.mainBtn;
+
         navigationMenuButton.setOnClickListener(v -> openNavigationDrawer());
 
         expandableListView = navigationView.findViewById(R.id.expandableListView);
+
+        View footerView = getLayoutInflater().inflate(R.layout.footer, null);
+        TextView versionNameTextView = footerView.findViewById(R.id.version_name);
+
+        // Set the version name
+        SharedPreferences sharedPreferences = getSharedPreferences("apkVersion", Context.MODE_PRIVATE);
+        String apkVersion = sharedPreferences.getString("apkVersion", "1.2.4");
+        versionNameTextView.setText("V" + apkVersion);
+
+        // Add the footer view to the expandable list view
+        expandableListView.addFooterView(footerView);
 
         prepareListData();
 
         expandableListAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
         expandableListView.setAdapter(expandableListAdapter);
+
+
 
         expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
             Fragment selectedFragment = null;
@@ -97,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                         StatusFragment statusFragment = new StatusFragment();
                         statusFragment.setBluetoothConnectionService(bluetoothConnectionService);
                         selectedFragment = new StatusFragment();
+                        navigationView.setVisibility(View.GONE);
                         mainBtn.setVisibility(View.GONE);
                     }
                     break;
@@ -133,16 +155,22 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                         case 0:
                             StationFragment stationFragment = new StationFragment();
                             stationFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = stationFragment;
+                            selectedFragment = new StationFragment();
                             mainBtn.setVisibility(View.GONE);
                             break;
                         case 1:
-                            FanAndHeaterFragment fanAndHeaterFragment = new FanAndHeaterFragment();
-                            fanAndHeaterFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new FanAndHeaterFragment();
+                            FanFragment fanFragment = new FanFragment();
+                            fanFragment.setBluetoothConnectionService(bluetoothConnectionService);
+                            selectedFragment = new FanFragment();
                             mainBtn.setVisibility(View.GONE);
                             break;
                         case 2:
+                            HeaterFragment heaterFragment = new HeaterFragment();
+                            heaterFragment.setBluetoothConnectionService(bluetoothConnectionService);
+                            selectedFragment = new HeaterFragment();
+                            mainBtn.setVisibility(View.GONE);
+                            break;
+                        case 3:
                             ChargerFragment chargerFragment = new ChargerFragment();
                             chargerFragment.setBluetoothConnectionService(bluetoothConnectionService);
                             selectedFragment = new ChargerFragment();
@@ -179,10 +207,41 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                 BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) service;
                 bluetoothConnectionService = binder.getService();
                 bluetoothConnectionService.setMessageReceivedListener(message -> {
+
+                    try {
+                        JSONObject receivedJson = new JSONObject(message);
+
+                        if (receivedJson.has("request") && receivedJson.getString("request").equals("INFO")) {
+                            // Extract stationId and apkVersion from the received JSON
+                            JSONObject dataObject = receivedJson.getJSONObject("data");
+                            String stationId = dataObject.getString("stationId");
+                            String apkVersion = dataObject.getString("apkVersion");
+
+                            // Save the extracted values as SharedPreferences
+                            SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("your_preferences_name", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("stationId", stationId);
+                            editor.putString("apkVersion", apkVersion);
+                            editor.apply();
+
+                            // Create a response JSON object
+                            JSONObject responseJson = new JSONObject();
+                            responseJson.put("response", "INFO");
+                            responseJson.put("result", "ok");
+                            responseJson.put("error_code", 0);
+
+                            // Send the response to the server
+                            bluetoothConnectionService.sendMessage(responseJson.toString());
+                        }
+
+                    } catch (JSONException e) {
+                        Log.e("StationFragment", "Error parsing received JSON", e);
+                    }
+
                 });
                 isBound = true;
-
             }
+
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
@@ -241,7 +300,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
 
         List<String> preferencesMenu = new ArrayList<>();
         preferencesMenu.add("Station");
-        preferencesMenu.add("FAN&Heater");
+        preferencesMenu.add("Fan");
+        preferencesMenu.add("Heater");
         preferencesMenu.add("Charger");
 
         List<String> managementMenu = new ArrayList<>();

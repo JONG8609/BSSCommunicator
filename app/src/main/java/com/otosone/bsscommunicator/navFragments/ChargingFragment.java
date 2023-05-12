@@ -57,54 +57,32 @@ public class ChargingFragment extends Fragment {
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("StationFragment", "MessageReceivedListener called");
                 getActivity().runOnUiThread(() -> {
-
-                    Toast.makeText(getActivity(), "Received JSON: " + completeJsonString, Toast.LENGTH_LONG).show();
-                    Log.d("ChargingFragment", "Complete JSON: " + completeJsonString);
 
                     // Parse the received JSON string
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
-                        if (receivedJson.has("type") && receivedJson.getString("type").equals("CTRL_CHG")) {
-                            int count = receivedJson.getInt("count");
-                            JSONArray chgList = receivedJson.getJSONArray("chgList");
+                        if (receivedJson.has("response") && receivedJson.getString("response").equals("CTRL_CHG")) {
+                            String result = receivedJson.getString("result");
+                            int errorCode = receivedJson.getInt("error_code");
 
-                            List<ChargingItem> chargingItems = new ArrayList<>();
-
-                            for (int i = 0; i < 16; i++) {
-                                boolean found = false;
-
-                                for (int j = 0; j < count; j++) {
-                                    JSONObject chgObj = chgList.getJSONObject(j);
-                                    int id = chgObj.getInt("id");
-                                    int charge = chgObj.getInt("charge");
-
-                                    if (id == i + 1) {
-                                        ChargingItem item = new ChargingItem(false, String.format("%02d", i + 1), charge == 1 ? "START" : "STOP");
-                                        chargingItems.add(item);
-                                        found = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!found) {
-                                    ChargingItem item = new ChargingItem(false, String.format("%02d", i + 1), "STOP");
-                                    chargingItems.add(item);
-                                }
+                            if (result.equals("ok") && errorCode == 0) {
+                                JSONObject responseJson = new JSONObject();
+                                responseJson.put("response", "CTRL_CHG");
+                                responseJson.put("result", "ok");
+                                responseJson.put("error_code", 0);
+                                // Handle success case here
+                            } else {
+                                // Handle error case here
+                                Log.e("StationFragment", "Received error: result = " + result + ", error_code = " + errorCode);
                             }
-
-                            ChargingAdapter chargingAdapter = new ChargingAdapter(requireContext(), chargingItems);
-                            binding.chargingListView.setAdapter(chargingAdapter);
                         }
 
                     } catch (JSONException e) {
                         Log.e("ChargingFragment", "Error parsing received JSON", e);
                     }
                 });
-
-                Log.d("ChargingFragment", "Complete JSON: " + completeJsonString);
 
             });
 
@@ -145,7 +123,7 @@ public class ChargingFragment extends Fragment {
                 // Create a JSON object
                 JSONObject json = new JSONObject();
                 try {
-                    json.put("type", "CTRL_CHG");
+                    json.put("request", "CTRL_CHG");
                     JSONArray chgList = new JSONArray();
 
                     int checkedCount = 0;
@@ -166,12 +144,10 @@ public class ChargingFragment extends Fragment {
                 }
 
                 String jsonString = json.toString();
-                Log.d("UTF=8", jsonString);
 
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
-                    Log.d("json11", jsonString);
                 } else {
                     Log.e("ChargingFragment", "BluetoothConnectionService is not bound");
                 }
@@ -195,7 +171,6 @@ public class ChargingFragment extends Fragment {
     public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
         this.bluetoothConnectionService = bluetoothConnectionService;
     }
-    private ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream();
     private void bindBluetoothConnectionService() {
         Intent intent = new Intent(getContext(), BluetoothConnectionService.class);
         getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);

@@ -6,6 +6,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,35 +20,34 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
-import com.otosone.bsscommunicator.databinding.FragmentStationBinding;
+import com.otosone.bsscommunicator.databinding.FragmentFanBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link FanFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class FanFragment extends Fragment {
 
-public class StationFragment extends Fragment {
-
-    FragmentStationBinding binding;
-
+    FragmentFanBinding binding;
     private BluetoothConnectionService bluetoothConnectionService;
     private boolean isBound = false;
+    private StringBuilder jsonStringBuilder = new StringBuilder();
+    private Button fanBtn;
+    private EditText fanStartTempEt, fanStopTempEt;
 
-    private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt, paymentTypeEt;
-    private Button stationBtn;
-
-    public StationFragment() {
+    public FanFragment() {
         // Required empty public constructor
     }
 
-    public static StationFragment newInstance(String param1, String param2) {
-        StationFragment fragment = new StationFragment();
+
+    public static FanFragment newInstance() {
+        FanFragment fragment = new FanFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -55,67 +59,83 @@ public class StationFragment extends Fragment {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
             isBound = true;
-            Log.d("StationFragment", "Service connected");
+            //sendFanRequest();
+            Log.d("FanFragment", "Service connected");
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("StationFragment", "MessageReceivedListener called");
+
                 getActivity().runOnUiThread(() -> {
 
+                    // Parse the received JSON string
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
-                        if (receivedJson.has("request") && receivedJson.getString("request").equals("STA_CFG")) {
-                            // Create a response JSON object
+                        if (receivedJson.has("request") && receivedJson.getString("request").equals("FAN_CFG")) {
                             JSONObject responseJson = new JSONObject();
-                            responseJson.put("response", "STA_CFG");
+                            responseJson.put("response", "FAN_CFG");
                             responseJson.put("result", "ok");
                             responseJson.put("error_code", 0);
-
                             JSONObject dataObject = new JSONObject();
-                            dataObject.put("reportPeriod", Integer.parseInt(reportPeriodEt.getText().toString()));
-                            dataObject.put("batInTimeout", Integer.parseInt(batteryInTimeoutEt.getText().toString()));
-                            dataObject.put("batOutTimeout", Integer.parseInt(batteryOutTimeoutEt.getText().toString()));
-                            dataObject.put("payTimeout", Integer.parseInt(paymentTimeoutEt.getText().toString()));
-                            dataObject.put("payType", Integer.parseInt(paymentTypeEt.getText().toString()));
-
+                            dataObject.put("startTemp", Integer.parseInt(fanStartTempEt.getText().toString()));
+                            dataObject.put("stopTemp", Integer.parseInt(fanStopTempEt.getText().toString()));
                             responseJson.put("data", dataObject);
 
                             // Send the response to the server
                             bluetoothConnectionService.sendMessage(responseJson.toString());
                         }
-
-                        if (receivedJson.has("response") && receivedJson.getString("response").equals("STA_CFG")) {
+                        if (receivedJson.has("response") && receivedJson.getString("response").equals("FAN_CFG")) {
                             String result = receivedJson.getString("result");
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
                                 JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "STA_CFG");
+                                responseJson.put("response", "FAN_CFG");
                                 responseJson.put("result", "ok");
                                 responseJson.put("error_code", 0);
                                 // Handle success case here
                             } else {
                                 // Handle error case here
-                                Log.e("StationFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                Log.e("fanFragment", "Received error: result = " + result + ", error_code = " + errorCode);
                             }
                         }
+
                     } catch (JSONException e) {
-                        Log.e("StationFragment", "Error parsing received JSON", e);
+                        Log.e("FanFragment", "Error parsing received JSON", e);
                     }
                 });
 
-                Log.d("StationFragment", "Complete JSON: " + completeJsonString);
+                Log.d("FanFragment", "Complete JSON: " + completeJsonString);
+
             });
 
+        }
+        private void sendFanRequest() {
+            // Create a JSON object
+            JSONObject json = new JSONObject();
 
+            try {
+                json.put("request", "FAN_CFG");
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String jsonString = json.toString();
+
+            // Call the sendAsciiMessage method with the string as an argument
+            if (isBound && bluetoothConnectionService != null) {
+                bluetoothConnectionService.sendMessage(jsonString);
+
+            } else {
+                Log.e("StatusFragment","Cannot send message, service is not bound or null");
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("StationFragment", "Service disconnected");
+            Log.d("FanFragment", "Service disconnected");
         }
     };
 
@@ -127,80 +147,67 @@ public class StationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_station, container, false);
+        // Inflate the layout for this fragment
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_fan, container, false);
         View root = binding.getRoot();
         Databind();
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("stationValue", Context.MODE_PRIVATE);
-        int reportPeriod = sharedPreferences.getInt("reportPeriod", 60);
-        int batteryInTimeout = sharedPreferences.getInt("batteryInTimeout", 60);
-        int batteryOutTimeout = sharedPreferences.getInt("batteryOutTimeout", 60);
-        int paymentTimeout = sharedPreferences.getInt("paymentTimeout", 60);
-        int paymentType = sharedPreferences.getInt("paymentType", 3);
 
-        reportPeriodEt.setText(String.valueOf(reportPeriod));
-        batteryInTimeoutEt.setText(String.valueOf(batteryInTimeout));
-        batteryOutTimeoutEt.setText(String.valueOf(batteryOutTimeout));
-        paymentTimeoutEt.setText(String.valueOf(paymentTimeout));
-        paymentTypeEt.setText(String.valueOf(paymentType));
-        stationBtn.setOnClickListener(new View.OnClickListener() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("fanValue", Context.MODE_PRIVATE);
+        int fanStartTemp = sharedPreferences.getInt("fanStartTemp", 35);
+        int fanStopTemp = sharedPreferences.getInt("fanStopTemp", 30);
+
+        fanStartTempEt.setText(String.valueOf(fanStartTemp));
+        fanStopTempEt.setText(String.valueOf(fanStopTemp));
+
+        fanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Extract values from EditText views
-                int reportPeriod = Integer.parseInt(reportPeriodEt.getText().toString());
-                int batteryInTimeout = Integer.parseInt(batteryInTimeoutEt.getText().toString());
-                int batteryOutTimeout = Integer.parseInt(batteryOutTimeoutEt.getText().toString());
-                int paymentTimeout = Integer.parseInt(paymentTimeoutEt.getText().toString());
-                int paymentType = Integer.parseInt(paymentTypeEt.getText().toString());
+                int fanStartTemp = Integer.parseInt(fanStartTempEt.getText().toString());
+                int fanStopTemp = Integer.parseInt(fanStopTempEt.getText().toString());
 
                 // Save the values to SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putInt("reportPeriod", reportPeriod);
-                editor.putInt("batteryInTimeout", batteryInTimeout);
-                editor.putInt("batteryOutTimeout", batteryOutTimeout);
-                editor.putInt("paymentTimeout", paymentTimeout);
-                editor.putInt("paymentType", paymentType);
+                editor.putInt("fanStartTemp", fanStartTemp);
+                editor.putInt("fanStopTemp", fanStopTemp);
                 editor.apply();
 
                 // Create a JSON object
-                JSONObject json = new JSONObject();
-                JSONObject dataJson = new JSONObject();
+                JSONObject fanJson = new JSONObject();
+                JSONObject fanDataJson = new JSONObject();
                 try {
-                    dataJson.put("reportPeriod", reportPeriod);
-                    dataJson.put("batInTimeout", batteryInTimeout);
-                    dataJson.put("batOutTimeout", batteryOutTimeout);
-                    dataJson.put("payTimeout", paymentTimeout);
-                    dataJson.put("payType", paymentType);
+                    fanDataJson.put("startTemp", fanStartTemp);
+                    fanDataJson.put("stopTemp", fanStopTemp);
 
-                    json.put("request", "STA_CFG");
-                    json.put("data", dataJson);
+                    fanJson.put("request", "FAN_CFG");
+                    fanJson.put("data", fanDataJson);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                String jsonString = json.toString();
-                Log.d("UTF=8", jsonString);
+                String fanJsonString = fanJson.toString();
+                Log.d("UTF-8", fanJsonString);
+
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
-                    bluetoothConnectionService.sendMessage(jsonString);
-                    Log.d("json11", jsonString);
+                    bluetoothConnectionService.sendMessage(fanJsonString);
+                    Log.d("json11", fanJsonString);
                 } else {
-                    Log.e("StationFragment", "BluetoothConnectionService is not bound");
+                    Log.e("FanFragment", "BluetoothConnectionService is not bound");
                 }
 
             }
         });
 
 
+
         return root;
     }
 
     private void Databind() {
-        stationBtn = binding.stationBtn;
-        reportPeriodEt = binding.reportPeriodEt;
-        batteryInTimeoutEt = binding.batteryInTimeoutEt;
-        batteryOutTimeoutEt = binding.batteryOutTimeoutEt;
-        paymentTimeoutEt = binding.paymentTimeoutEt;
-        paymentTypeEt = binding.paymentTypeEt;
+        fanBtn = binding.fanBtn;
+        fanStartTempEt = binding.fanStartTempEt;
+        fanStopTempEt = binding.fanStopTempEt;
     }
 
     @Override
@@ -214,10 +221,11 @@ public class StationFragment extends Fragment {
         super.onPause();
         unbindBluetoothConnectionService();
     }
+
     public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
         this.bluetoothConnectionService = bluetoothConnectionService;
     }
-    private ByteArrayOutputStream messageBuffer = new ByteArrayOutputStream();
+
     private void bindBluetoothConnectionService() {
         Intent intent = new Intent(getContext(), BluetoothConnectionService.class);
         getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
@@ -242,4 +250,3 @@ public class StationFragment extends Fragment {
 
     }
 }
-

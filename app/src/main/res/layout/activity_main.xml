@@ -24,6 +24,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
@@ -65,7 +67,8 @@
             android:layout_marginTop="50dp"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="start">
+            android:layout_gravity="start"
+            >
 
             <ExpandableListView
                 android:id="@+id/expandableListView"

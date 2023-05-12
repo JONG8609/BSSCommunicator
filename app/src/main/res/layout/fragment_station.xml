@@ -19,6 +19,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:weightSum="2">
 
                 <LinearLayout
@@ -65,6 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:layout_margin="10dp"
                     android:background="@drawable/blank_rounded"
                     android:orientation="vertical"
                     android:weightSum="7">
@@ -79,6 +82,10 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:text="Station"
+                            android:layout_marginLeft="10dp"
+                            android:gravity="left|center"
+                            android:textSize="25dp"
                             android:layout_weight="3" />
 
                         <TextView
@@ -92,6 +99,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
                         android:orientation="horizontal"
                         android:weightSum="7">
 
@@ -101,7 +110,7 @@
                             android:layout_weight="3"
                             android:gravity="left|center"
                             android:text="Report period"
-                            android:textSize="25dp" />
+                            android:textSize="20dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -117,7 +126,7 @@
                                 android:layout_weight="2"
                                 android:background="@android:color/transparent"
                                 android:gravity="right|center"
-                                android:inputType="text"
+                                android:inputType="number"
                                 android:text="111"
                                 android:textSize="25dp"
                                 android:focusable="true"
@@ -141,6 +150,8 @@
                         android:layout_height="0dp"
                         android:layout_marginTop="5dp"
                         android:layout_weight="1"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
                         android:orientation="horizontal"
                         android:weightSum="7">
 
@@ -150,7 +161,7 @@
                             android:layout_weight="3"
                             android:gravity="left|center"
                             android:text="Battery In Timeout"
-                            android:textSize="25dp" />
+                            android:textSize="20dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -174,7 +185,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="3"
                                 android:gravity="left|center"
-                                android:text="Min"
+                                android:text="Sec"
                                 android:textSize="25dp" />
 
                         </LinearLayout>
@@ -186,6 +197,8 @@
                         android:layout_height="0dp"
                         android:layout_marginTop="5dp"
                         android:layout_weight="1"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
                         android:orientation="horizontal"
                         android:weightSum="7">
 
@@ -195,7 +208,7 @@
                             android:layout_weight="3"
                             android:gravity="left|center"
                             android:text="Battery Out Timeout"
-                            android:textSize="25dp" />
+                            android:textSize="20dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -219,7 +232,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="3"
                                 android:gravity="left|center"
-                                android:text="Min"
+                                android:text="Sec"
                                 android:textSize="25dp" />
 
                         </LinearLayout>
@@ -231,6 +244,8 @@
                         android:layout_height="0dp"
                         android:layout_marginTop="5dp"
                         android:layout_weight="1"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
                         android:orientation="horizontal"
                         android:weightSum="7">
 
@@ -240,7 +255,7 @@
                             android:layout_weight="3"
                             android:gravity="left|center"
                             android:text="Payment Timeout"
-                            android:textSize="25dp" />
+                            android:textSize="20dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -264,7 +279,7 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="3"
                                 android:gravity="left|center"
-                                android:text="Min"
+                                android:text="Sec"
                                 android:textSize="25dp" />
 
                         </LinearLayout>
@@ -276,6 +291,9 @@
                         android:layout_height="0dp"
                         android:layout_marginTop="5dp"
                         android:layout_weight="1"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="10dp"
                         android:orientation="horizontal"
                         android:weightSum="7">
 
@@ -285,7 +303,7 @@
                             android:layout_weight="3"
                             android:gravity="left|center"
                             android:text="Payment Type"
-                            android:textSize="25dp" />
+                            android:textSize="20dp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -301,16 +319,10 @@
                                 android:background="@android:color/transparent"
                                 android:gravity="right|center"
                                 android:inputType="number"
+                                android:layout_marginRight="30dp"
                                 android:text="111"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="3"
-                                android:gravity="left|center"
-                                android:text="Min"
-                                android:textSize="25dp" />
 
                         </LinearLayout>
 

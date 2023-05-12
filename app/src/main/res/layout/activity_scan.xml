@@ -3,44 +3,40 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="16dp"
         tools:context=".ScanActivity">
 
-        <ListView
-            android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
-
-        <EditText
-            android:id="@+id/editTextMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/listView"
-            android:hint="Enter message to send"
-            android:inputType="text" />
-
-        <Button
-            android:id="@+id/button_send"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/editTextMessage"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
-            android:text="Send" />
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:text="Bluetooth"/>
 
         <TextView
-            android:id="@+id/textView_received_data"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/button_send"
-            android:layout_marginTop="16dp"
-            android:padding="8dp"
-            android:text="@string/received_data"
-            android:textSize="18sp" />
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:textSize="20dp"
+            android:text="Available Devices"/>
 
-    </RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/black" />
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
 </layout>

@@ -18,38 +18,135 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="2">
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/status_menu_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/menu" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="left">
+                    android:layout_gravity="center"
+                    android:background="@drawable/blank_rounded">
 
-                    <ImageView
-                        android:id="@+id/status_menu_iv"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/menu" />
+                        android:orientation="vertical">
 
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/socketBssIdTv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="15dp"
+                                android:textSize="18dp"
+                                android:gravity="center"
+                                android:text="OS10121051000018"
+                                android:textStyle="bold" />
+
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/statusTempTv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:textSize="18dp"
+                                    android:text="28" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/statusFanTv"
+                                    android:text="FAN"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/statusHeaterTv"
+                                    android:text="HEATER"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/statusDoorTv"
+                                    android:text="DOOR"/>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="15dp"
+                                android:layout_marginTop="5dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/statusHumidityTv"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textStyle="bold"
+                                    android:textSize="18dp"
+                                    android:text="20" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/statusMqttTv"
+                                    android:text="MQTT"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/statusRestTv"
+                                    android:text="REST"/>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:id="@+id/statusLocalTv"
+                                    android:text="LOCAL"/>
+
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="right">
+                <ImageView
+                    android:id="@+id/statusRefreshIv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:background="@drawable/refresh" />
 
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/rounded_button"
-                        android:text="SET" />
 
-                </LinearLayout>
+
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -61,7 +158,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout1"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="120dp"
                     android:background="@drawable/rounded_button"
@@ -86,18 +183,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -115,7 +212,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout2"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/rounded_button"
                     android:gravity="center"
@@ -139,18 +236,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -177,9 +274,9 @@
 
                 <LinearLayout
                     android:id="@+id/layout3"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
-                    android:layout_marginRight="32dp"
+                    android:layout_marginRight="30dp"
                     android:background="@drawable/rounded_button"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -202,18 +299,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -231,9 +328,9 @@
 
                 <LinearLayout
                     android:id="@+id/layout4"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
-                    android:layout_marginRight="32dp"
+                    android:layout_marginRight="30dp"
                     android:background="@drawable/rounded_button"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -256,18 +353,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -285,9 +382,9 @@
 
                 <LinearLayout
                     android:id="@+id/layout5"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
-                    android:layout_marginRight="32dp"
+                    android:layout_marginRight="30dp"
                     android:background="@drawable/rounded_button"
                     android:gravity="center"
                     android:orientation="vertical">
@@ -310,18 +407,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -339,9 +436,10 @@
 
                 <LinearLayout
                     android:id="@+id/layout6"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/rounded_button"
+
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -363,18 +461,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -402,7 +500,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout7"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -427,18 +525,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -456,7 +554,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout8"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -481,18 +579,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -510,7 +608,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout9"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -535,18 +633,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -564,7 +662,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout10"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -589,18 +687,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -618,7 +716,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout11"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:background="@drawable/rounded_button"
                     android:gravity="center"
@@ -642,18 +740,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -681,7 +779,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout12"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -706,18 +804,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -735,7 +833,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout13"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -760,18 +858,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -789,7 +887,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout14"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -814,18 +912,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -843,7 +941,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout15"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -868,18 +966,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>
@@ -897,7 +995,7 @@
 
                 <LinearLayout
                     android:id="@+id/layout16"
-                    android:layout_width="75dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
                     android:background="@drawable/rounded_button"
@@ -922,18 +1020,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
+                            android:focusable="true"
+                            android:focusableInTouchMode="true"
                             android:inputType="text"
                             android:text="100"
-                            android:textSize="20dp"
                             android:textColor="@color/white"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true" />
+                            android:textSize="20dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="@color/white"
                             android:text="%"
+                            android:textColor="@color/white"
                             android:textSize="20dp" />
 
                     </LinearLayout>

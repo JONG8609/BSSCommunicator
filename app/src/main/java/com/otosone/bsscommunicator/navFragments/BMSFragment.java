@@ -62,15 +62,23 @@ public class BMSFragment extends Fragment {
                 Log.d("BMSFragment", "MessageReceivedListener called");
                 getActivity().runOnUiThread(() -> {
 
-                    Toast.makeText(getActivity(), "Received JSON: " + completeJsonString, Toast.LENGTH_LONG).show();
-                    Log.d("BMSFragment", "Complete JSON: " + completeJsonString);
-
-                    // Parse the received JSON string
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
-                        if (receivedJson.has("type") && receivedJson.getString("type").equals("CTRL_BMS")) {
-                            // Update your BMS items here
+                        if (receivedJson.has("response") && receivedJson.getString("response").equals("CTRL_BMS")) {
+                            String result = receivedJson.getString("result");
+                            int errorCode = receivedJson.getInt("error_code");
+
+                            if (result.equals("ok") && errorCode == 0) {
+                                JSONObject responseJson = new JSONObject();
+                                responseJson.put("response", "CTRL_BMS");
+                                responseJson.put("result", "ok");
+                                responseJson.put("error_code", 0);
+                                // Handle success case here
+                            } else {
+                                // Handle error case here
+                                Log.e("BMSFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                            }
                         }
 
                     } catch (JSONException e) {
@@ -78,7 +86,6 @@ public class BMSFragment extends Fragment {
                     }
                 });
 
-                Log.d("BMSFragment", "Complete JSON: " + completeJsonString);
             });
         }
 
@@ -118,7 +125,7 @@ public class BMSFragment extends Fragment {
             public void onClick(View view) {
                 JSONObject json = new JSONObject();
                 try {
-                    json.put("type", "CTRL_BMS");
+                    json.put("request", "CTRL_BMS");
 
                     JSONArray bmsJsonArray = new JSONArray();
                     int checkedCount = 0;
@@ -135,14 +142,13 @@ public class BMSFragment extends Fragment {
                     json.put("count", checkedCount);
                     json.put("bmsList", bmsJsonArray);
                 } catch (JSONException e) {
-                    Log.e("BMSFragment", "Error creating JSON object", e);
+
                 }
 
                 if (isBound && bluetoothConnectionService != null) {
                     String jsonString = json.toString();
                     bluetoothConnectionService.sendMessage(jsonString);
-                    Toast.makeText(getActivity(), "Sent JSON: " + jsonString, Toast.LENGTH_LONG).show();
-                    Log.d("BMSFragment", "Sent JSON: " + jsonString);
+
                 } else {
                     Toast.makeText(getActivity(), "Not connected to a device", Toast.LENGTH_SHORT).show();
                 }
