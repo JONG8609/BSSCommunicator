@@ -62,7 +62,6 @@ public class ScanFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_scan, container, false);
         View root = binding.getRoot();
 
-
         return root;
     }
 

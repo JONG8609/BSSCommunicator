@@ -1,6 +1,7 @@
 package com.otosone.bsscommunicator;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.viewbinding.ViewBinding;
@@ -24,12 +25,14 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         dataBinding();
         initialize();
-
+        username_et.setText("admin");
+        password_et.setText("otosone");
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -39,7 +42,9 @@ public class LoginActivity extends AppCompatActivity {
                 if(authenticateUser(username, password) == 1){
                     Intent intent = new Intent(LoginActivity.this, ScanActivity.class);
                     startActivity(intent);
+                    overridePendingTransition(0, 0);
                     finish();
+
                 }else {
                     Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                 }
@@ -58,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         login_btn = binding.loginBtn;
     }
     private int authenticateUser(String username, String password) {
-        if (username.equals("1") && password.equals("1")) {
+        if (username.equals("admin") && password.equals("otosone")) {
             return 1;
         } else {
             return 0;

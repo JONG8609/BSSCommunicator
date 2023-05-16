@@ -16,17 +16,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.databinding.FragmentStatusBinding;
+import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 
 public class StatusFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
@@ -49,13 +52,9 @@ public class StatusFragment extends Fragment {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
-            isBound = true;
-            sendBssStatusRequest();
+            isBound = true;;
             setDefaultStatus();
             Log.d("StationFragment", "Service connected");
-            for (int index = 0; index <= 15; index++) {
-                sendSocketStatusRequest(index);
-            }
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
                 Log.d("StationFragment", "MessageReceivedListener called");
@@ -69,10 +68,10 @@ public class StatusFragment extends Fragment {
                             String requestType = receivedJson.getString("request");
                             switch (requestType) {
                                 case "BSS_STATUS":
-                                    bssStatus(completeJsonString);
+                                    //bssStatus(completeJsonString);
                                     break;
                                 case "SOCKET_STATUS":
-                                    socketStatus(completeJsonString);
+                                    //socketStatus(completeJsonString);
                                     break;
                                 // Add more cases as needed
                             }
@@ -86,10 +85,10 @@ public class StatusFragment extends Fragment {
                             if (result.equals("ok") && errorCode == 0) {
                                 switch (responseType) {
                                     case "BSS_STATUS":
-                                        bssStatus(completeJsonString);
+                                        //bssStatus(completeJsonString);
                                         break;
                                     case "SOCKET_STATUS":
-                                        socketStatus(completeJsonString);
+                                        //socketStatus(completeJsonString);
                                         break;
                                     // Add more cases as needed
                                 }
@@ -103,7 +102,6 @@ public class StatusFragment extends Fragment {
                     }
                 });
             });
-
 
         }
 
@@ -176,6 +174,27 @@ public class StatusFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Observe the bssStatus LiveData
+        DataHolder.getInstance().getBssStatus().observe(getViewLifecycleOwner(), bssStatus -> {
+            if (bssStatus != null) {
+                bssStatus(bssStatus);
+            }
+        });
+
+        // Observe the socketStatusMap LiveData
+        DataHolder.getInstance().getSocketStatusMap().observe(getViewLifecycleOwner(), socketStatusMap -> {
+            if (socketStatusMap != null) {
+                for (Map.Entry<String, JSONObject> entry : socketStatusMap.entrySet()) {
+                    socketStatus(entry.getValue());
+                }
+            }
+        });
+    }
+
     private void Databind() {
         layout1 = binding.layout1; layout2 = binding.layout2; layout3 = binding.layout3; layout4 = binding.layout4; layout5 = binding.layout5; layout6 = binding.layout6; layout7 = binding.layout7; layout8 = binding.layout8; layout9 = binding.layout9;
         layout10 = binding.layout10; layout11 = binding.layout11; layout12 = binding.layout12; layout13 = binding.layout13; layout14 = binding.layout14; layout15 = binding.layout15; layout16 = binding.layout16;
@@ -217,56 +236,9 @@ public class StatusFragment extends Fragment {
         statusLocalTv.setTextColor(Color.GRAY);
     }
 
-    private void sendSocketStatusRequest(int index) {
-        // Create a JSON object
-        JSONObject json = new JSONObject();
-        JSONObject dataJson = new JSONObject();
+    private void bssStatus(JSONObject bssStatus) {
         try {
-            dataJson.put("index", index);
-
-            json.put("request", "SOCKET_STATUS");
-            json.put("data", dataJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String jsonString = json.toString();
-        Log.d("UTF-8", jsonString);
-
-        // Call the sendAsciiMessage method with the string as an argument
-        if (isBound && bluetoothConnectionService != null) {
-            bluetoothConnectionService.sendMessage(jsonString);
-            Log.d("json11", jsonString);
-        } else {
-            Log.e("StatusFragment","Cannot send message, service is not bound or null");
-        }
-    }
-
-    private void sendBssStatusRequest() {
-        // Create a JSON object
-        JSONObject json = new JSONObject();
-
-        try {
-            json.put("request", "BSS_STATUS");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String jsonString = json.toString();
-        Log.d("UTF-8", jsonString);
-
-        // Call the sendAsciiMessage method with the string as an argument
-        if (isBound && bluetoothConnectionService != null) {
-            bluetoothConnectionService.sendMessage(jsonString);
-
-        } else {
-            Log.e("StatusFragment","Cannot send message, service is not bound or null");
-        }
-    }
-
-    private void bssStatus(String jsonData) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonData);
-            JSONObject dataObject = jsonObject.getJSONObject("data");
+            JSONObject dataObject = bssStatus;
 
             String stationId = dataObject.getString("stationId");
             int fan = dataObject.getInt("fan");
@@ -315,10 +287,9 @@ public class StatusFragment extends Fragment {
 
 
 
-    private void socketStatus(String jsonData) {
+    private void socketStatus(JSONObject socketStatus) {
         try {
-            JSONObject jsonObject = new JSONObject(jsonData);
-            JSONObject dataObject = jsonObject.getJSONObject("data");
+            JSONObject dataObject = socketStatus;
             int index = dataObject.getInt("index");
 
             LinearLayout[] layouts = {layout1, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9, layout10, layout11, layout12, layout13, layout14, layout15, layout16};

@@ -1,6 +1,7 @@
 package com.otosone.bsscommunicator;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.otosone.bsscommunicator.adapter.ExpandableListAdapter;
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.bluetooth.BluetoothStateReceiver;
 import com.otosone.bsscommunicator.bluetooth.ConnectionFailedListener;
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -249,6 +252,12 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                 bluetoothConnectionService = null;
             }
         };
+        mainBtn.setVisibility(View.GONE);
+        StatusFragment statusFragment = new StatusFragment();
+        statusFragment.setBluetoothConnectionService(bluetoothConnectionService);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, statusFragment)
+                .commit();
     }
 
     @Override
@@ -270,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
     protected void onStop() {
         super.onStop();
         if (isBound) {
+            bluetoothConnectionService.disconnect();
             unbindService(serviceConnection);
             isBound = false;
         }

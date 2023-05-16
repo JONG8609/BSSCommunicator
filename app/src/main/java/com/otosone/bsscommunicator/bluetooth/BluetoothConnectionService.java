@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.ScanActivity;
+import com.otosone.bsscommunicator.utils.DataHolder;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -137,10 +138,14 @@ public class BluetoothConnectionService extends Service {
     private void onDeviceConnected(RxBleConnection connection) {
         this.connection = connection;
         setupNotification(connection);
-        requestInfo();
+        sendrequestInfo();
+        sendBssStatusRequest();
+        for (int index = 0; index <= 15; index++) {
+            sendSocketStatusRequest(index);
+        }
     }
 
-    public void requestInfo() {
+    public void sendrequestInfo() {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("request", "INFO");
@@ -148,6 +153,36 @@ public class BluetoothConnectionService extends Service {
             e.printStackTrace();
         }
         sendMessage(jsonObject.toString());
+    }
+
+    public void sendBssStatusRequest(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("request", "BSS_STATUS");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        sendMessage(jsonObject.toString());
+    }
+
+    public void sendSocketStatusRequest(int index){
+        // Create a JSON object
+        JSONObject json = new JSONObject();
+        JSONObject dataJson = new JSONObject();
+        try {
+            dataJson.put("index", index);
+
+            json.put("request", "SOCKET_STATUS");
+            json.put("data", dataJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        String jsonString = json.toString();
+        Log.d("UTF-8", jsonString);
+
+        // Call the sendAsciiMessage method with the string as an argument
+        sendMessage(jsonString);
+
     }
 
     public void sendMessage(String message) {
@@ -236,17 +271,13 @@ public class BluetoothConnectionService extends Service {
                                 JSONObject data = receivedJson.getJSONObject("data");
 
                                 if (type.equals("BSS_STATUS")) {
-                                    bssStatus = data;
+                                    DataHolder.getInstance().setBssStatus(data); // Store BSS_STATUS
                                 } else {
                                     String index = data.getString("index");
-                                    socketStatusMap.put(index, data);
+                                    Map<String, JSONObject> currentMap = DataHolder.getInstance().getSocketStatusMap().getValue();
+                                    currentMap.put(index, data);
+                                    DataHolder.getInstance().setSocketStatusMap(currentMap); // Store SOCKET_STATUS
                                     Log.d("BluetoothConnService", "Added SOCKET_STATUS for index " + index);
-                                }
-
-                                // Check if you've received all SOCKET_STATUS messages
-                                if (socketStatusMap.size() == 16) {
-                                    Log.d("BluetoothConnService", "All SOCKET_STATUS messages processed. Creating log file.");
-                                    createLogFile();
                                 }
                             }
                         }

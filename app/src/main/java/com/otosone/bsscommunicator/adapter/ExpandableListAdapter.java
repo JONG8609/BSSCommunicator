@@ -1,4 +1,4 @@
-package com.otosone.bsscommunicator;
+package com.otosone.bsscommunicator.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
