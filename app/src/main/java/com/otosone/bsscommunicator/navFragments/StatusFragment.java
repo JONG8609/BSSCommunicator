@@ -47,7 +47,9 @@ public class StatusFragment extends Fragment {
     private ImageView statusRefreshIv;
     private Queue<JSONObject> requestQueue;
     private int retryCount = 0;
-    private static final int MAX_RETRY = 3;
+    private static final int MAX_RETRY = 2;
+    private Handler retryHandler = new Handler();
+    private Runnable retryRunnable;
     public static StatusFragment newInstance(String param1, String param2) {
         StatusFragment fragment = new StatusFragment();
         Bundle args = new Bundle();
@@ -146,10 +148,34 @@ public class StatusFragment extends Fragment {
         if (!requestQueue.isEmpty() && isBound && bluetoothConnectionService != null) {
             JSONObject nextRequest = requestQueue.peek();
             bluetoothConnectionService.sendMessage(nextRequest.toString());
-            retryCount = 0; // Reset retry count for a new request
+            startRetryTimer();
         } else {
             Log.e("StationFragment", "BluetoothConnectionService is not bound or the queue is empty");
         }
+    }
+
+    private void startRetryTimer() {
+        retryCount = 0;
+        retryRunnable = new Runnable() {
+            @Override
+            public void run() {
+                retryCount++;
+                if (retryCount > MAX_RETRY) {
+                    Log.e("StationFragment", "Maximum retries reached for request: " + requestQueue.peek().toString());
+                    requestQueue.poll(); // Remove the failed request from the queue
+                    //sendNextRequest(); // Send the next request
+                } else {
+                    JSONObject currentRequest = requestQueue.peek();
+                    bluetoothConnectionService.sendMessage(currentRequest.toString());
+                    //retryHandler.postDelayed(this, 1000); // Retry after 1 second
+                }
+            }
+        };
+        //retryHandler.postDelayed(retryRunnable, 1000); // Start the retry timer
+    }
+
+    private void cancelRetryTimer() {
+        retryHandler.removeCallbacks(retryRunnable); // Stop the retry timer
     }
 
     private void retryCurrentRequest() {
@@ -173,10 +199,11 @@ public class StatusFragment extends Fragment {
             if (response.has("response")) {
                 String result = response.getString("result");
                 if ("ok".equals(result)) {
+                    cancelRetryTimer();
                     requestQueue.poll(); // Remove the handled request from the queue
                     sendNextRequest(); // Send the next request
                 } else {
-                    retryCurrentRequest(); // Retry the current request
+                    retryCurrentRequest();
                 }
             }
         } catch (JSONException e) {
@@ -363,6 +390,7 @@ public class StatusFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        cancelRetryTimer(); // Stop the retry timer when the fragment is paused
         unbindBluetoothConnectionService();
     }
 
