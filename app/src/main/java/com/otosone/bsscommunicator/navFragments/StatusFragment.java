@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,7 +30,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 public class StatusFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
@@ -40,6 +45,9 @@ public class StatusFragment extends Fragment {
     private TextView isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv;
     private TextView socketBssIdTv, statusTempTv, statusFanTv, statusHeaterTv, statusDoorTv, statusHumidityTv, statusMqttTv, statusRestTv, statusLocalTv;
     private ImageView statusRefreshIv;
+    private Queue<JSONObject> requestQueue;
+    private int retryCount = 0;
+    private static final int MAX_RETRY = 3;
     public static StatusFragment newInstance(String param1, String param2) {
         StatusFragment fragment = new StatusFragment();
         Bundle args = new Bundle();
@@ -52,8 +60,7 @@ public class StatusFragment extends Fragment {
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
-            isBound = true;;
-            setDefaultStatus();
+            isBound = true;
             Log.d("StationFragment", "Service connected");
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
@@ -62,47 +69,12 @@ public class StatusFragment extends Fragment {
                     // Parse the received JSON string
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
-
-                        // Check if it's a request
-                        if(receivedJson.has("request")) {
-                            String requestType = receivedJson.getString("request");
-                            switch (requestType) {
-                                case "BSS_STATUS":
-                                    //bssStatus(completeJsonString);
-                                    break;
-                                case "SOCKET_STATUS":
-                                    //socketStatus(completeJsonString);
-                                    break;
-                                // Add more cases as needed
-                            }
-                        }
-
-                        // Check if it's a response
-                        else if(receivedJson.has("response")) {
-                            String responseType = receivedJson.getString("response");
-                            String result = receivedJson.getString("result");
-                            int errorCode = receivedJson.getInt("error_code");
-                            if (result.equals("ok") && errorCode == 0) {
-                                switch (responseType) {
-                                    case "BSS_STATUS":
-                                        //bssStatus(completeJsonString);
-                                        break;
-                                    case "SOCKET_STATUS":
-                                        //socketStatus(completeJsonString);
-                                        break;
-                                    // Add more cases as needed
-                                }
-                            }else {
-                                // Handle error case here
-                                Log.e("StatusFragment", "Received error: result = " + result + ", error_code = " + errorCode);
-                            }
-                        }
+                        processResponse(receivedJson);
                     } catch (JSONException e) {
-                        Log.e("StatusFragment", "Error parsing received JSON", e);
+                        Log.e("StationFragment", "Error parsing received JSON", e);
                     }
                 });
             });
-
         }
 
         @Override
@@ -112,6 +84,8 @@ public class StatusFragment extends Fragment {
             Log.d("StationFragment", "Service disconnected");
         }
     };
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -125,53 +99,89 @@ public class StatusFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_status, container, false);
         View root = binding.getRoot();
         Databind();
+        setDefaultStatus();
+        statusRefreshIv.setOnClickListener(view -> initiateRequests());
+        return root;
+    }
 
-        statusRefreshIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Extract values from EditText views
+    private void initiateRequests() {
+        requestQueue = new LinkedList<>();
 
-                // Create a JSON object for BSS status
-                JSONObject bssJson = new JSONObject();
-                try {
-                    bssJson.put("request", "BSS_STATUS");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        // Add the requests to the queue
+        addRequestToQueue("INFO");
+        addRequestToQueue("BSS_STATUS");
 
-                // Call the sendAsciiMessage method with the string as an argument
-                if (isBound && bluetoothConnectionService != null) {
-                    bluetoothConnectionService.sendMessage(bssJson.toString());
+        for (int i = 0; i < 16; i++) {
+            JSONObject dataJson = new JSONObject();
+            try {
+                dataJson.put("index", i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            addRequestToQueue("SOCKET_STATUS", dataJson);
+        }
+
+        // Send the first request
+        sendNextRequest();
+    }
+
+    private void addRequestToQueue(String requestType) {
+        addRequestToQueue(requestType, null);
+    }
+
+    private void addRequestToQueue(String requestType, @Nullable JSONObject data) {
+        JSONObject requestJson = new JSONObject();
+        try {
+            requestJson.put("request", requestType);
+            if (data != null) {
+                requestJson.put("data", data);
+            }
+            requestQueue.add(requestJson);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendNextRequest() {
+        if (!requestQueue.isEmpty() && isBound && bluetoothConnectionService != null) {
+            JSONObject nextRequest = requestQueue.peek();
+            bluetoothConnectionService.sendMessage(nextRequest.toString());
+            retryCount = 0; // Reset retry count for a new request
+        } else {
+            Log.e("StationFragment", "BluetoothConnectionService is not bound or the queue is empty");
+        }
+    }
+
+    private void retryCurrentRequest() {
+        if (!requestQueue.isEmpty() && isBound && bluetoothConnectionService != null) {
+            if (retryCount < MAX_RETRY) {
+                new Handler().postDelayed(() -> {
+                    JSONObject currentRequest = requestQueue.peek();
+                    bluetoothConnectionService.sendMessage(currentRequest.toString());
+                    retryCount++;
+                }, 1000); // 1000 ms delay before retrying the request
+            } else {
+                Log.e("StationFragment", "Maximum retries reached for request: " + requestQueue.peek().toString());
+            }
+        } else {
+            Log.e("StationFragment", "BluetoothConnectionService is not bound or the queue is empty");
+        }
+    }
+
+    private void processResponse(JSONObject response) {
+        try {
+            if (response.has("response")) {
+                String result = response.getString("result");
+                if ("ok".equals(result)) {
+                    requestQueue.poll(); // Remove the handled request from the queue
+                    sendNextRequest(); // Send the next request
                 } else {
-                    Log.e("StationFragment", "BluetoothConnectionService is not bound");
-                    return;
-                }
-
-                // Create a JSON object for SOCKET status
-                JSONObject socketJson = new JSONObject();
-                try {
-                    socketJson.put("request", "SOCKET_STATUS");
-                    JSONObject dataJson = new JSONObject();
-                    for (int i = 0; i < 16; i++) {
-                        dataJson.put("index", i);
-                        socketJson.put("data", dataJson);
-                        String socketString = socketJson.toString();
-
-                        // Call the sendAsciiMessage method with the string as an argument
-                        if (isBound && bluetoothConnectionService != null) {
-                            bluetoothConnectionService.sendMessage(socketString);
-                        } else {
-                            Log.e("StationFragment", "BluetoothConnectionService is not bound");
-                            return;
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    retryCurrentRequest(); // Retry the current request
                 }
             }
-        });
-
-        return root;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -180,15 +190,21 @@ public class StatusFragment extends Fragment {
 
         // Observe the bssStatus LiveData
         DataHolder.getInstance().getBssStatus().observe(getViewLifecycleOwner(), bssStatus -> {
+            Log.d("bssinfo", "Observer triggered");
             if (bssStatus != null) {
+                Log.d("bssinfo", bssStatus.toString());
                 bssStatus(bssStatus);
             }
         });
 
         // Observe the socketStatusMap LiveData
         DataHolder.getInstance().getSocketStatusMap().observe(getViewLifecycleOwner(), socketStatusMap -> {
+            Log.d("statusinfo", "Observer triggered");
             if (socketStatusMap != null) {
-                for (Map.Entry<String, JSONObject> entry : socketStatusMap.entrySet()) {
+                // Create a copy of the map entries
+                Set<Map.Entry<String, JSONObject>> entriesCopy = new HashSet<>(socketStatusMap.entrySet());
+                Log.d("statusinfo", socketStatusMap.toString());
+                for (Map.Entry<String, JSONObject> entry : entriesCopy) {
                     socketStatus(entry.getValue());
                 }
             }

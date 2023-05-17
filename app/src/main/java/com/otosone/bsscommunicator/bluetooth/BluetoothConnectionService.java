@@ -16,6 +16,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.LiveData;
 
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.ScanActivity;
@@ -272,13 +273,26 @@ public class BluetoothConnectionService extends Service {
 
                                 if (type.equals("BSS_STATUS")) {
                                     DataHolder.getInstance().setBssStatus(data); // Store BSS_STATUS
+                                    bssStatus = data;
                                 } else {
                                     String index = data.getString("index");
-                                    Map<String, JSONObject> currentMap = DataHolder.getInstance().getSocketStatusMap().getValue();
-                                    currentMap.put(index, data);
-                                    DataHolder.getInstance().setSocketStatusMap(currentMap); // Store SOCKET_STATUS
+                                    LiveData<Map<String, JSONObject>> liveData = DataHolder.getInstance().getSocketStatusMap();
+                                    Map<String, JSONObject> currentMap = liveData != null ? liveData.getValue() : null;
+                                    if (currentMap == null) {
+                                        currentMap = new HashMap<>();
+                                    }
+                                    Map<String, JSONObject> newMap = new HashMap<>(currentMap);
+                                    newMap.put(index, data);
+                                    DataHolder.getInstance().setSocketStatusMap(newMap); // Store SOCKET_STATUS
                                     Log.d("BluetoothConnService", "Added SOCKET_STATUS for index " + index);
+
+                                    // Update the socketStatusMap reference
+                                    socketStatusMap = newMap;
                                 }
+                            }
+                            if (socketStatusMap.size() == 16) {
+                                Log.d("BluetoothConnService", "All SOCKET_STATUS messages processed. Creating log file.");
+                                createLogFile();
                             }
                         }
                     } catch (JSONException e) {
