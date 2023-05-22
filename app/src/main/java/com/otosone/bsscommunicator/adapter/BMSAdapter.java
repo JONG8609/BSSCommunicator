@@ -3,13 +3,16 @@ package com.otosone.bsscommunicator.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -63,9 +66,9 @@ public class BMSAdapter extends BaseAdapter {
         TextView bms2_et = convertView.findViewById(R.id.bms2_et);
         TextView bms_spinner_tv = convertView.findViewById(R.id.bms_spinner_tv);
 
-        bms1_tv.setText(Integer.toString(bmsItem.getId()));
+        bms1_tv.setText(bmsItem.getId());
         bms2_et.setText(Integer.toString(bmsItem.getValue()));
-        bms2_et.setFilters(new InputFilter[] {new InputFilterMinMax(0, 100)});
+        bms2_et.setFilters(new InputFilter[]{new InputFilterMinMax(0, 100)});
 
         checkBox.setOnCheckedChangeListener(null); // Remove any existing listeners
         checkBox.setChecked(bmsItem.isChecked()); // Set the initial state of the checkbox
@@ -97,30 +100,46 @@ public class BMSAdapter extends BaseAdapter {
     private void showToggleDialog(int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        // Inflate custom title view
+        // Inflate custom layout
         LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogView = inflater.inflate(R.layout.bms_custom_dialog, null);
 
-        // Inflate custom layout containing a Spinner and an EditText
-        View dialogView = inflater.inflate(R.layout.bms_dialog_spinner, null);
-        Spinner dialogSpinner = dialogView.findViewById(R.id.dialog_spinner);
-        EditText valueEditText = dialogView.findViewById(R.id.dialog_value_edit_text);
-        valueEditText.setFilters(new InputFilter[] {new InputFilterMinMax(0, 100)});
-        TextView bmsid_tv = dialogView.findViewById(R.id.bmsid_tv);
-        bmsid_tv.setText(String.valueOf(getItem(position).getId()));
+        Spinner dialogSpinner = dialogView.findViewById(R.id.spinner);  // Update with correct ID
+        EditText valueEditText = dialogView.findViewById(R.id.value);   // Update with correct ID
+        TextView titleId = dialogView.findViewById(R.id.title_id);
+
+        // Set TextView
+        titleId.setText(getItem(position).getId());
+
+        // Spinner setup
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, R.array.spinner_choices, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dialogSpinner.setAdapter(adapter);
+        dialogSpinner.setSelection(getItem(position).getCmd());
 
-        // Set the selected index of the Spinner based on the current value
-        int currentValue = getItem(position).getCmd();
-        dialogSpinner.setSelection(currentValue);
+        // EditText setup
+        valueEditText.setText(String.valueOf(getItem(position).getValue()) + "%");
+        valueEditText.setSelection(valueEditText.getText().length() - 1); // Set cursor position before "%"
+        valueEditText.setEnabled(dialogSpinner.getSelectedItemPosition() == 0);
 
-        // Set the current value of the EditText
-        valueEditText.setText(String.valueOf(getItem(position).getValue()));
+        valueEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-        // Enable or disable the EditText based on the Spinner value
-        valueEditText.setEnabled(currentValue == 0);
-        // Update the EditText state when the Spinner value changes
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().endsWith("%")) {
+                    valueEditText.removeTextChangedListener(this); // remove to prevent stackOverflow
+                    valueEditText.setText(s.toString() + "%");
+                    valueEditText.setSelection(s.toString().length());  // set cursor position
+                    valueEditText.addTextChangedListener(this); // add it back
+                }
+            }
+        });
+
         dialogSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -132,22 +151,21 @@ public class BMSAdapter extends BaseAdapter {
             }
         });
 
-        builder.setView(dialogView);
+        AlertDialog dialog = builder.setView(dialogView).create();
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        Button okButton = dialogView.findViewById(R.id.ok_button);
+        okButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int id) {
+            public void onClick(View v) {
                 BMSItem bmsItem = getItem(position);
-
-                // Set the selected value from the Spinner
                 int selectedValue = dialogSpinner.getSelectedItemPosition();
                 bmsItem.setCmd(selectedValue);
 
-                // Set the value from the EditText, if it is enabled
                 if (valueEditText.isEnabled()) {
                     int newValue;
                     try {
-                        newValue = Integer.parseInt(valueEditText.getText().toString());
+                        String valueText = valueEditText.getText().toString().replace("%", "");
+                        newValue = Integer.parseInt(valueText);
                         if (newValue >= 0 && newValue <= 100) {
                             bmsItem.setValue(newValue);
                         } else {
@@ -158,17 +176,23 @@ public class BMSAdapter extends BaseAdapter {
                     }
                 }
                 notifyDataSetChanged();
+                // Dismiss the dialog
+                dialog.dismiss();
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // Do nothing, just close the dialog
-                dialog.cancel();
+        Button cancelButton = dialogView.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Close the dialog
+                dialog.dismiss();
             }
         });
 
-        AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+
+
 }

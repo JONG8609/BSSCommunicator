@@ -6,8 +6,11 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.otosone.bsscommunicator.listItem.DoorItem;
@@ -78,25 +81,28 @@ public class DoorAdapter extends BaseAdapter {
     private void showToggleDialog(int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        // Inflate custom title view
+        // Inflate custom layout
         LayoutInflater inflater = LayoutInflater.from(context);
-        View titleView = inflater.inflate(R.layout.door_dialog_title, null);
-        TextView titleId = titleView.findViewById(R.id.title_id);
-        titleId.setText("ID: " + getItem(position).getId());
-        builder.setCustomTitle(titleView);
+        View dialogView = inflater.inflate(R.layout.door_dialog_title, null);
+        TextView titleId = dialogView.findViewById(R.id.title_id);
+        titleId.setText(getItem(position).getId());
 
         String[] choices = {"LOCK", "UNLOCK"};
         int[] selectedIndex = new int[]{getItem(position).getDoorStatus().equals("LOCK") ? 0 : 1};
-        builder.setSingleChoiceItems(choices, selectedIndex[0], new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                selectedIndex[0] = which;
-            }
-        });
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        ListView listView = dialogView.findViewById(R.id.listView);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_single_choice, choices);
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        listView.setItemChecked(selectedIndex[0], true);
+        listView.setOnItemClickListener((parent, view, position1, id) -> selectedIndex[0] = position1);
+
+        AlertDialog dialog = builder.setView(dialogView).create();
+
+        Button okButton = dialogView.findViewById(R.id.ok_button);
+        okButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int id) {
+            public void onClick(View v) {
                 DoorItem doorItem = getItem(position);
 
                 if (selectedIndex[0] == 0) {
@@ -106,17 +112,20 @@ public class DoorAdapter extends BaseAdapter {
                 }
 
                 notifyDataSetChanged();
+                // Dismiss the dialog
+                dialog.dismiss();
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // Do nothing, just close the dialog
-                dialog.cancel();
+        Button cancelButton = dialogView.findViewById(R.id.cancel_button);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Close the dialog
+                dialog.dismiss();
             }
         });
 
-        AlertDialog dialog = builder.create();
         dialog.show();
     }
 

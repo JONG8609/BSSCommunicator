@@ -21,6 +21,7 @@ import androidx.lifecycle.LiveData;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.ScanActivity;
 import com.otosone.bsscommunicator.utils.DataHolder;
+import com.otosone.bsscommunicator.utils.HexToBinUtil;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleDevice;
@@ -66,7 +67,9 @@ public class BluetoothConnectionService extends Service {
     private ConnectionFailedListener connectionFailedListener;
 
     private Disposable notificationDisposable;
+    private DeviceConnectedListener deviceConnectedListener;
     private StringBuilder receivedMessageBuilder = new StringBuilder();
+    private RxBleConnection deviceConnectedCallback = null;
     public interface MessageReceivedListener {
         void onMessageReceived(String message);
     }
@@ -139,51 +142,27 @@ public class BluetoothConnectionService extends Service {
     private void onDeviceConnected(RxBleConnection connection) {
         this.connection = connection;
         setupNotification(connection);
-        sendrequestInfo();
-        sendBssStatusRequest();
-        for (int index = 0; index <= 15; index++) {
-            sendSocketStatusRequest(index);
+        Log.d("11233", "12325");
+        if (deviceConnectedListener != null) {
+            Log.d("11233", "12324");
+            deviceConnectedListener.onDeviceConnected(connection);
+        } else {
+            Log.d("11233", "Listener not set, queuing callback");
+            deviceConnectedCallback = connection;  // Save the connection
         }
     }
 
-    public void sendrequestInfo() {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("request", "INFO");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        sendMessage(jsonObject.toString());
+    public interface DeviceConnectedListener {
+        void onDeviceConnected(RxBleConnection connection);
     }
 
-    public void sendBssStatusRequest(){
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("request", "BSS_STATUS");
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public void setDeviceConnectedListener(DeviceConnectedListener listener) {
+        this.deviceConnectedListener = listener;
+        if (deviceConnectedCallback != null) {
+            Log.d("11233", "Calling queued callback");
+            listener.onDeviceConnected(deviceConnectedCallback);
+            deviceConnectedCallback = null;
         }
-        sendMessage(jsonObject.toString());
-    }
-
-    public void sendSocketStatusRequest(int index){
-        // Create a JSON object
-        JSONObject json = new JSONObject();
-        JSONObject dataJson = new JSONObject();
-        try {
-            dataJson.put("index", index);
-
-            json.put("request", "SOCKET_STATUS");
-            json.put("data", dataJson);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        String jsonString = json.toString();
-        Log.d("UTF-8", jsonString);
-
-        // Call the sendAsciiMessage method with the string as an argument
-        sendMessage(jsonString);
-
     }
 
     public void sendMessage(String message) {
@@ -262,32 +241,42 @@ public class BluetoothConnectionService extends Service {
                             saveApkVersion(apkVersion);
                         }
 
-                        // Check both "request" and "response"
                         if (receivedJson.has("request") || receivedJson.has("response")) {
                             String messageType = receivedJson.has("request") ? "request" : "response";
                             String type = receivedJson.getString(messageType);
 
-                            // Check if type is "BSS_STATUS" or "SOCKET_STATUS"
                             if (type.equals("BSS_STATUS") || type.equals("SOCKET_STATUS")) {
                                 JSONObject data = receivedJson.getJSONObject("data");
-
                                 if (type.equals("BSS_STATUS")) {
-                                    DataHolder.getInstance().setBssStatus(data); // Store BSS_STATUS
+                                    DataHolder.getInstance().setBssStatus(data);
                                     bssStatus = data;
                                 } else {
                                     String index = data.getString("index");
-                                    LiveData<Map<String, JSONObject>> liveData = DataHolder.getInstance().getSocketStatusMap();
-                                    Map<String, JSONObject> currentMap = liveData != null ? liveData.getValue() : null;
-                                    if (currentMap == null) {
-                                        currentMap = new HashMap<>();
+                                    String status = data.getString("status");
+                                    String binaryStatus = HexToBinUtil.hexToBin(status);
+
+                                    LiveData<Map<String, JSONObject>> liveDataSocketStatus = DataHolder.getInstance().getSocketStatusMap();
+                                    Map<String, JSONObject> currentSocketStatusMap = liveDataSocketStatus != null ? liveDataSocketStatus.getValue() : null;
+                                    if (currentSocketStatusMap == null) {
+                                        currentSocketStatusMap = new HashMap<>();
                                     }
-                                    Map<String, JSONObject> newMap = new HashMap<>(currentMap);
-                                    newMap.put(index, data);
-                                    DataHolder.getInstance().setSocketStatusMap(newMap); // Store SOCKET_STATUS
+                                    Map<String, JSONObject> newSocketStatusMap = new HashMap<>(currentSocketStatusMap);
+                                    newSocketStatusMap.put(index, data);
+                                    DataHolder.getInstance().setSocketStatusMap(newSocketStatusMap);
                                     Log.d("BluetoothConnService", "Added SOCKET_STATUS for index " + index);
 
-                                    // Update the socketStatusMap reference
-                                    socketStatusMap = newMap;
+                                    LiveData<Map<String, String>> liveDataBinaryStatus = DataHolder.getInstance().getBinaryStatusMap();
+                                    Map<String, String> currentBinaryStatusMap = liveDataBinaryStatus != null ? liveDataBinaryStatus.getValue() : null;
+                                    if (currentBinaryStatusMap == null) {
+                                        currentBinaryStatusMap = new HashMap<>();
+                                    }
+                                    Map<String, String> newBinaryStatusMap = new HashMap<>(currentBinaryStatusMap);
+                                    newBinaryStatusMap.put(index, binaryStatus);
+                                    DataHolder.getInstance().setBinaryStatusMap(newBinaryStatusMap);
+                                    Log.d("BluetoothConnService", "Added binary status for index " + index);
+
+                                    // Make a copy of the map from DataHolder to socketStatusMap
+                                    socketStatusMap = new HashMap<>(newSocketStatusMap);
                                 }
                             }
                             if (socketStatusMap.size() == 16) {
@@ -310,6 +299,7 @@ public class BluetoothConnectionService extends Service {
             openBraceIndex = receivedMessageBuilder.indexOf("{");
         }
     }
+
 
     private void saveApkVersion(String apkVersion) {
         SharedPreferences sharedPref = getSharedPreferences("apkVersion", Context.MODE_PRIVATE);

@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
@@ -26,6 +27,7 @@ import com.otosone.bsscommunicator.listItem.DoorItem;
 import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.adapter.DoorAdapter;
 import com.otosone.bsscommunicator.databinding.FragmentDoorBinding;
+import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +36,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class DoorFragment extends Fragment {
@@ -44,12 +47,7 @@ public class DoorFragment extends Fragment {
     private DoorAdapter doorAdapter;
     private List<DoorItem> doorItems;
     private Button doorBtn;
-    public static DoorFragment newInstance(String param1, String param2) {
-        DoorFragment fragment = new DoorFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
+
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -113,20 +111,7 @@ public class DoorFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_door, container, false);
-
-        // Create a list of DoorItems
         doorBtn = binding.doorBtn;
-        doorItems = new ArrayList<>();
-        for (int i = 1; i <= 16; i++) {
-            doorItems.add(new DoorItem(false, String.format("%02d", i), "UNLOCK"));
-        }
-
-        doorAdapter = new DoorAdapter(requireContext(), doorItems);
-
-        ListView listView = binding.doorListView;
-        listView.setAdapter(doorAdapter);
-
-
         //프로토콜 변경 해야됨
         doorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,15 +151,88 @@ public class DoorFragment extends Fragment {
             }
         });
 
-
-
         return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Initialize chargingItems here
+        doorItems = new ArrayList<>();
+        for (int i = 0; i <= 15; i++) {
+            String id = String.format("%02d", i);
+            DoorItem item = new DoorItem(false, id, "LOCK");
+            doorItems.add(item);
+        }
+
+        // Set adapter to the listView
+        doorAdapter = new DoorAdapter(requireContext(), doorItems);
+        ListView listView = binding.doorListView;
+        listView.setAdapter(doorAdapter);
+
+        Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
+        if (binaryStatusMap != null) {
+            Log.d("statusinfo", binaryStatusMap.toString());
+            for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
+                String socketId = entry.getKey();
+                String binaryStatus = entry.getValue();
+                // Update ChargingItem status based on the 7th char in binaryStatus
+                if (binaryStatus.length() > 6) {
+                    char chargingStatusChar = binaryStatus.charAt(5);
+                    String doorStatus = (chargingStatusChar == '1') ? "UNLOCK" : "LOCK";
+                    for (DoorItem item : doorItems) {
+                        if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
+                            item.setDoorStatus(doorStatus);
+                            break;
+                        }
+                    }
+                }
+            }
+            // Notify the adapter about the change in chargingItems
+            doorAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         bindBluetoothConnectionService();
+
+        // Initialize chargingItems here
+        doorItems = new ArrayList<>();
+        for (int i = 0; i <= 15; i++) {
+            String id = String.format("%02d", i);
+            DoorItem item = new DoorItem(false, id, "LOCK");
+            doorItems.add(item);
+        }
+
+        // Set adapter to the listView
+        doorAdapter = new DoorAdapter(requireContext(), doorItems);
+        ListView listView = binding.doorListView;
+        listView.setAdapter(doorAdapter);
+
+        Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
+        if (binaryStatusMap != null) {
+            Log.d("statusinfo", binaryStatusMap.toString());
+            for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
+                String socketId = entry.getKey();
+                String binaryStatus = entry.getValue();
+                // Update ChargingItem status based on the 7th char in binaryStatus
+                if (binaryStatus.length() > 6) {
+                    char chargingStatusChar = binaryStatus.charAt(5);
+                    String doorStatus = (chargingStatusChar == '1') ? "UNLOCK" : "LOCK";
+                    for (DoorItem item : doorItems) {
+                        if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
+                            item.setDoorStatus(doorStatus);
+                            break;
+                        }
+                    }
+                }
+            }
+            // Notify the adapter about the change in chargingItems
+            doorAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

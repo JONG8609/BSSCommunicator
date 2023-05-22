@@ -25,6 +25,7 @@ import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.databinding.FragmentStatusBinding;
 import com.otosone.bsscommunicator.utils.DataHolder;
+import com.otosone.bsscommunicator.utils.HexToBinUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,6 +78,12 @@ public class StatusFragment extends Fragment {
                     }
                 });
             });
+
+            bluetoothConnectionService.setDeviceConnectedListener(connection -> {
+                Log.d("StatusFragment", "DeviceConnectedListener triggered");
+                initiateRequests();
+            });
+
         }
 
         @Override
@@ -86,6 +93,8 @@ public class StatusFragment extends Fragment {
             Log.d("StationFragment", "Service disconnected");
         }
     };
+
+
 
 
 
@@ -107,6 +116,7 @@ public class StatusFragment extends Fragment {
     }
 
     private void initiateRequests() {
+        Log.d("StatusFragment", "initiateRequests...");
         requestQueue = new LinkedList<>();
 
         // Add the requests to the queue
@@ -343,8 +353,8 @@ public class StatusFragment extends Fragment {
             int soc = dataObject.getJSONObject("bms").getInt("soc");
 
             String status = dataObject.getString("status");
-            String binaryStatus = Integer.toBinaryString(Integer.parseInt(status, 16));
-            char lockBit = binaryStatus.length() >= 4 ? binaryStatus.charAt(binaryStatus.length() - 4) : '0';
+            String binaryStatus = HexToBinUtil.hexToBin(status);
+            char lockBit = binaryStatus.length() >= 5 ? binaryStatus.charAt(4) : '0'; // remember indices start from 0
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
             // Set background color
@@ -365,7 +375,12 @@ public class StatusFragment extends Fragment {
                     }
                     break;
                 case 6:
-                    layouts[index].setBackgroundColor(Color.YELLOW);
+                    char yellowBackground = binaryStatus.charAt(3);
+                    if(yellowBackground == '1'){
+                        layouts[index].setBackgroundColor(Color.YELLOW);
+                    } else {
+                        layouts[index].setBackgroundColor(Color.YELLOW); // You can change this to whatever color you want when yellowBackground is not '1'
+                    }
                     break;
                 default:
                     layouts[index].setBackgroundColor(Color.GRAY);

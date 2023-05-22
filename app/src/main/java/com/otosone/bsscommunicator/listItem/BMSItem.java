@@ -2,11 +2,11 @@ package com.otosone.bsscommunicator.listItem;
 
 public class BMSItem {
     private boolean isChecked;
-    private int id;
+    private String id;
     private int cmd;
     private int value;
 
-    public BMSItem(boolean isChecked, int id, int cmd, int value) {
+    public BMSItem(boolean isChecked, String id, int cmd, int value) {
         this.isChecked = isChecked;
         this.id = id;
         this.cmd = cmd;
@@ -21,11 +21,11 @@ public class BMSItem {
         isChecked = checked;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

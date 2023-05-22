@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
@@ -26,6 +27,7 @@ import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.adapter.BMSAdapter;
 import com.otosone.bsscommunicator.databinding.FragmentBmsBinding;
 import com.otosone.bsscommunicator.listItem.ChargingItem;
+import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +36,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class BMSFragment extends Fragment {
@@ -109,17 +112,6 @@ public class BMSFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bms, container, false);
         bmsBtn = binding.bmsBtn;
 
-        // Initialize bmsItems
-        bmsItems = new ArrayList<>();
-        for (int i = 1; i <= 16; i++) {
-            bmsItems.add(new BMSItem(false, i, 0, 0));
-        }
-
-        bmsAdapter = new BMSAdapter(requireContext(), bmsItems);
-
-        ListView listView = binding.bmsListView;
-        listView.setAdapter(bmsAdapter);
-
         bmsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -155,16 +147,95 @@ public class BMSFragment extends Fragment {
             }
         });
 
-
-
-
         return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Initialize bmsItems here
+        bmsItems = new ArrayList<>();
+        for (int i = 0; i <= 15; i++) {
+            String id = String.format("%02d", i);
+            BMSItem item = new BMSItem(false, id, 0, 0);
+            bmsItems.add(item);
+        }
+
+        // Set adapter to the listView
+        bmsAdapter = new BMSAdapter(requireContext(), bmsItems);
+        ListView listView = binding.bmsListView;
+        listView.setAdapter(bmsAdapter);
+
+        Map<String, JSONObject> binaryStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
+        if (binaryStatusMap != null) {
+            Log.d("statusinfo", binaryStatusMap.toString());
+            for (Map.Entry<String, JSONObject> entry : binaryStatusMap.entrySet()) {
+                String socketId = entry.getKey();
+                JSONObject socketData = entry.getValue();
+                try {
+                    JSONObject bms = socketData.getJSONObject("bms"); // Here's the change
+                    int soc = bms.getInt("soc");
+
+                    // Assume you want to set soc to your BMSItem's value
+                    for (BMSItem item : bmsItems) {
+                        if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
+                            item.setValue(soc);  // Note: you may need to modify this depending on the type of the 'value' in your BMSItem class
+                            break;
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Notify the adapter about the change in bmsItems
+            bmsAdapter.notifyDataSetChanged();
+        }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
         bindBluetoothConnectionService();
+
+        bmsItems = new ArrayList<>();
+        for (int i = 0; i <= 15; i++) {
+            String id = String.format("%02d", i);
+            BMSItem item = new BMSItem(false, id, 0, 0);
+            bmsItems.add(item);
+        }
+
+        // Set adapter to the listView
+        bmsAdapter = new BMSAdapter(requireContext(), bmsItems);
+        ListView listView = binding.bmsListView;
+        listView.setAdapter(bmsAdapter);
+
+        Map<String, JSONObject> binaryStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
+        if (binaryStatusMap != null) {
+            Log.d("statusinfo", binaryStatusMap.toString());
+            for (Map.Entry<String, JSONObject> entry : binaryStatusMap.entrySet()) {
+                String socketId = entry.getKey();
+                JSONObject socketData = entry.getValue();
+                try {
+                    JSONObject bms = socketData.getJSONObject("bms"); // Here's the change
+                    int soc = bms.getInt("soc");
+
+                    // Assume you want to set soc to your BMSItem's value
+                    for (BMSItem item : bmsItems) {
+                        if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
+                            item.setValue(soc);  // Note: you may need to modify this depending on the type of the 'value' in your BMSItem class
+                            break;
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Notify the adapter about the change in bmsItems
+            bmsAdapter.notifyDataSetChanged();
+        }
+
     }
 
     @Override

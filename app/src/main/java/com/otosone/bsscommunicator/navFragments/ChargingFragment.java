@@ -15,12 +15,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.listItem.ChargingItem;
 import com.otosone.bsscommunicator.adapter.ChargingAdapter;
 import com.otosone.bsscommunicator.databinding.FragmentChargingBinding;
+import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +31,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ChargingFragment extends Fragment {
 
@@ -39,12 +42,6 @@ public class ChargingFragment extends Fragment {
     private ChargingAdapter chargingAdapter;
     private List<ChargingItem> chargingItems;
     private Button chargingBtn;
-    public static ChargingFragment newInstance() {
-        ChargingFragment fragment = new ChargingFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -107,15 +104,6 @@ public class ChargingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentChargingBinding.inflate(inflater, container, false);
         chargingBtn = binding.chargingBtn;
-        chargingItems = new ArrayList<>();
-        for (int i = 1; i <= 16; i++) {
-            chargingItems.add(new ChargingItem(false, String.format("%02d", i), "STOP"));
-        }
-
-        chargingAdapter = new ChargingAdapter(requireContext(), chargingItems);
-
-        ListView listView = binding.chargingListView;
-        listView.setAdapter(chargingAdapter);
 
         chargingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,9 +146,84 @@ public class ChargingFragment extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Initialize chargingItems here
+        chargingItems = new ArrayList<>();
+        for (int i = 0; i <= 15; i++) {
+            String id = String.format("%02d", i);
+            ChargingItem item = new ChargingItem(false, id, "STOP");
+            chargingItems.add(item);
+        }
+
+        // Set adapter to the listView
+        chargingAdapter = new ChargingAdapter(requireContext(), chargingItems);
+        ListView listView = binding.chargingListView;
+        listView.setAdapter(chargingAdapter);
+
+        Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
+        if (binaryStatusMap != null) {
+            Log.d("statusinfo", binaryStatusMap.toString());
+            for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
+                String socketId = entry.getKey();
+                String binaryStatus = entry.getValue();
+                // Update ChargingItem status based on the 7th char in binaryStatus
+                if (binaryStatus.length() > 6) {
+                    char chargingStatusChar = binaryStatus.charAt(6);
+                    String chargingStatus = (chargingStatusChar == '1') ? "START" : "STOP";
+                    for (ChargingItem item : chargingItems) {
+                        if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
+                            item.setCharging(chargingStatus);
+                            break;
+                        }
+                    }
+                }
+            }
+            // Notify the adapter about the change in chargingItems
+            chargingAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         bindBluetoothConnectionService();
+
+        // Initialize chargingItems here
+        chargingItems = new ArrayList<>();
+        for (int i = 1; i <= 16; i++) {
+            String id = String.format("%02d", i);
+            ChargingItem item = new ChargingItem(false, id, "STOP");
+            chargingItems.add(item);
+        }
+
+        // Set adapter to the listView
+        chargingAdapter = new ChargingAdapter(requireContext(), chargingItems);
+        ListView listView = binding.chargingListView;
+        listView.setAdapter(chargingAdapter);
+
+        Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
+        if (binaryStatusMap != null) {
+            Log.d("statusinfo", binaryStatusMap.toString());
+            for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
+                String socketId = entry.getKey();
+                String binaryStatus = entry.getValue();
+                // Update ChargingItem status based on the 7th char in binaryStatus
+                if (binaryStatus.length() > 6) {
+                    char chargingStatusChar = binaryStatus.charAt(6);
+                    String chargingStatus = (chargingStatusChar == '1') ? "START" : "STOP";
+                    for (ChargingItem item : chargingItems) {
+                        if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
+                            item.setCharging(chargingStatus);
+                            break;
+                        }
+                    }
+                }
+            }
+            // Notify the adapter about the change in chargingItems
+            chargingAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

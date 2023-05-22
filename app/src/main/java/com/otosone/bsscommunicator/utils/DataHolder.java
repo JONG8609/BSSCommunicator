@@ -13,9 +13,11 @@ public class DataHolder {
     private static DataHolder instance;
     private MutableLiveData<JSONObject> bssStatus;
     private MutableLiveData<Map<String, JSONObject>> socketStatusMap;
+    private MutableLiveData<Map<String, String>> binaryStatusMap;
 
     private DataHolder() {
         socketStatusMap = new MutableLiveData<>(new HashMap<>());
+        binaryStatusMap = new MutableLiveData<>(new HashMap<>());
         bssStatus = new MutableLiveData<>();
     }
 
@@ -40,5 +42,13 @@ public class DataHolder {
 
     public LiveData<Map<String, JSONObject>> getSocketStatusMap() {
         return socketStatusMap;
+    }
+
+    public void setBinaryStatusMap(Map<String, String> binaryStatusMap) {
+        this.binaryStatusMap.postValue(binaryStatusMap);
+    }
+
+    public LiveData<Map<String, String>> getBinaryStatusMap() {
+        return binaryStatusMap;
     }
 }
