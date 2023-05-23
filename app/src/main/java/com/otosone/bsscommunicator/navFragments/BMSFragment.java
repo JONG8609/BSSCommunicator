@@ -119,6 +119,7 @@ public class BMSFragment extends Fragment {
                 try {
                     json.put("request", "CTRL_BMS");
 
+                    JSONObject data = new JSONObject(); // Create a nested JSON object for data
                     JSONArray bmsJsonArray = new JSONArray();
                     int checkedCount = 0;
                     for (BMSItem bmsItem : bmsItems) {
@@ -131,16 +132,17 @@ public class BMSFragment extends Fragment {
                             checkedCount++;
                         }
                     }
-                    json.put("count", checkedCount);
-                    json.put("bmsList", bmsJsonArray);
-                } catch (JSONException e) {
+                    data.put("count", checkedCount);
+                    data.put("bmsList", bmsJsonArray);
 
+                    json.put("data", data);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
                 if (isBound && bluetoothConnectionService != null) {
                     String jsonString = json.toString();
                     bluetoothConnectionService.sendMessage(jsonString);
-
                 } else {
                     Toast.makeText(getActivity(), "Not connected to a device", Toast.LENGTH_SHORT).show();
                 }

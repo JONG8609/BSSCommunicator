@@ -112,6 +112,8 @@ public class ChargingFragment extends Fragment {
                 JSONObject json = new JSONObject();
                 try {
                     json.put("request", "CTRL_CHG");
+
+                    JSONObject data = new JSONObject(); // Create a nested JSON object for data
                     JSONArray chgList = new JSONArray();
 
                     int checkedCount = 0;
@@ -124,8 +126,10 @@ public class ChargingFragment extends Fragment {
                             checkedCount++;
                         }
                     }
-                    json.put("count", checkedCount);
-                    json.put("chgList", chgList);
+                    data.put("count", checkedCount);
+                    data.put("chgList", chgList);
+
+                    json.put("data", data);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

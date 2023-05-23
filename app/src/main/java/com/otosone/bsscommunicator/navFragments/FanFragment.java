@@ -156,16 +156,18 @@ public class FanFragment extends Fragment {
         int fanStartTemp = sharedPreferences.getInt("fanStartTemp", 35);
         int fanStopTemp = sharedPreferences.getInt("fanStopTemp", 30);
 
-        fanStartTempEt.setText(String.valueOf(fanStartTemp));
-        fanStopTempEt.setText(String.valueOf(fanStopTemp));
+        fanStartTempEt.setText(String.valueOf(fanStartTemp) + " ℃");
+        fanStopTempEt.setText(String.valueOf(fanStopTemp)+ " ℃");
 
         fanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Extract values from EditText views
-                int fanStartTemp = Integer.parseInt(fanStartTempEt.getText().toString());
-                int fanStopTemp = Integer.parseInt(fanStopTempEt.getText().toString());
+                String fanStartTempStr = fanStartTempEt.getText().toString().replace("℃", "");
+                String fanStopTempStr = fanStopTempEt.getText().toString().replace("℃", "");
+                int fanStartTemp = Integer.parseInt(fanStartTempStr);
+                int fanStopTemp = Integer.parseInt(fanStopTempStr);
 
                 // Save the values to SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -195,7 +197,6 @@ public class FanFragment extends Fragment {
                 } else {
                     Log.e("FanFragment", "BluetoothConnectionService is not bound");
                 }
-
             }
         });
 
