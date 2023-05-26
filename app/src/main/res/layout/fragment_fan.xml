@@ -6,8 +6,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".navFragments.FanAndHeaterFragment">
+        android:layout_height="match_parent">
 
         <!-- TODO: Update blank fragment layout -->
         <LinearLayout
@@ -18,10 +17,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="5dp"
+                android:orientation="horizontal"
                 android:weightSum="2">
 
                 <LinearLayout
@@ -64,84 +63,81 @@
                 android:weightSum="8">
 
                 <LinearLayout
-                    android:id="@+id/thislayout"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="3"
                     android:layout_margin="10dp"
+                    android:layout_weight="3"
                     android:background="@drawable/blank_rounded"
                     android:orientation="vertical"
+                    android:padding="10dp"
                     android:weightSum="3">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:orientation="horizontal"
                         android:layout_marginLeft="10dp"
-                        android:weightSum="2"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="FAN"
-                            android:textSize="25dp"
+                            android:layout_weight="1"
                             android:gravity="left|center"
-                            android:layout_weight="1"/>
+                            android:text="FAN"
+                            android:textSize="25dp" />
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="1"/>
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:orientation="horizontal"
-                        android:weightSum="2"
-                        android:hint="Start Temperature"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:hint="   Start Temperature   "
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/fanStartTempEt"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/fanStartTempEt"
-                            android:text="℃"
+                            android:layout_weight="1"
+                            android:gravity="right|center"
                             android:inputType="number"
-                            android:gravity="right"
-                            android:textSize="25dp"
-                            android:layout_weight="1"/>
+                            android:textSize="25dp" />
 
 
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:orientation="horizontal"
-                        android:weightSum="2"
-                        android:hint="stop Temperature"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginTop="20dp"
                         android:layout_marginRight="10dp"
-
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:hint="   Stop Temperature   "
+                        android:orientation="vertical"
+                        android:weightSum="2">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/fanStopTempEt"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:id="@+id/fanStopTempEt"
-                            android:text="℃"
+                            android:layout_weight="1"
+                            android:gravity="right|center"
                             android:inputType="number"
-                            android:gravity="right"
-                            android:textSize="25dp"
-                            android:layout_weight="1"/>
+                            android:textSize="25dp" />
 
 
                     </com.google.android.material.textfield.TextInputLayout>

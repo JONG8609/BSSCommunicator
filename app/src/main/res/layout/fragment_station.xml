@@ -60,13 +60,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:weightSum="2">
+                android:weightSum="3">
 
                 <LinearLayout
                     android:id="@+id/thislayout"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
+                    android:padding="10dp"
                     android:layout_margin="10dp"
                     android:background="@drawable/blank_rounded"
                     android:orientation="vertical"
@@ -76,8 +77,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="2"
-                        android:orientation="horizontal"
-                        android:weightSum="7">
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="match_parent"
@@ -85,248 +85,114 @@
                             android:text="Station"
                             android:layout_marginLeft="10dp"
                             android:gravity="left|center"
-                            android:textSize="25dp"
-                            android:layout_weight="3" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4" />
+                            android:textSize="25dp" />
 
                     </LinearLayout>
 
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:hint="   Report Period   "
                         android:orientation="horizontal"
-                        android:weightSum="7">
+                        android:weightSum="2">
 
-                        <TextView
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/reportPeriodEt"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Report period"
-                            android:textSize="20dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4"
-                            android:focusable="true"
-                            android:background="@drawable/blank_rounded">
-
-                            <EditText
-                                android:id="@+id/reportPeriodEt"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:gravity="right|center"
-                                android:inputType="number"
-                                android:text="111"
-                                android:textSize="25dp"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="3"
-                                android:gravity="left|center"
-                                android:text="Min"
-                                android:textSize="25dp" />
-
-                        </LinearLayout>
+                            android:layout_weight="1"
+                            android:gravity="right|center"
+                            android:inputType="number"
+                            android:textSize="25dp" />
 
 
-                    </LinearLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1"
-                        android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:hint="   Battery In Timeout   "
                         android:orientation="horizontal"
-                        android:weightSum="7">
+                        android:weightSum="2">
 
-                        <TextView
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/batteryInTimeoutEt"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Battery In Timeout"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:gravity="right|center"
+                            android:inputType="number"
+                            android:textSize="25dp" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4"
-                            android:background="@drawable/blank_rounded">
 
-                            <EditText
-                                android:id="@+id/batteryInTimeoutEt"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:gravity="right|center"
-                                android:inputType="number"
-                                android:text="111"
-                                android:textSize="25dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="3"
-                                android:gravity="left|center"
-                                android:text="Sec"
-                                android:textSize="25dp" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1"
-                        android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:hint="   Battery Out Timeout   "
                         android:orientation="horizontal"
-                        android:weightSum="7">
+                        android:weightSum="2">
 
-                        <TextView
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/batteryOutTimeoutEt"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Battery Out Timeout"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:gravity="right|center"
+                            android:inputType="number"
+                            android:textSize="25dp" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4"
-                            android:background="@drawable/blank_rounded">
 
-                            <EditText
-                                android:id="@+id/batteryOutTimeoutEt"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:gravity="right|center"
-                                android:inputType="number"
-                                android:text="111"
-                                android:textSize="25dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="3"
-                                android:gravity="left|center"
-                                android:text="Sec"
-                                android:textSize="25dp" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1"
-                        android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:hint="   Payment Timeout   "
                         android:orientation="horizontal"
-                        android:weightSum="7">
+                        android:weightSum="2">
 
-                        <TextView
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/paymentTimeoutEt"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Payment Timeout"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:gravity="right|center"
+                            android:inputType="number"
+                            android:textSize="25dp" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4"
-                            android:background="@drawable/blank_rounded">
 
-                            <EditText
-                                android:id="@+id/paymentTimeoutEt"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:gravity="right|center"
-                                android:inputType="number"
-                                android:text="111"
-                                android:textSize="25dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="3"
-                                android:gravity="left|center"
-                                android:text="Sec"
-                                android:textSize="25dp" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <Spinner
+                        android:id="@+id/paymentTypeSpinner"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="1"
-                        android:layout_marginRight="10dp"
                         android:layout_marginLeft="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:orientation="horizontal"
-                        android:weightSum="7">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Payment Type"
-                            android:textSize="20dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="4"
-                            android:background="@drawable/blank_rounded">
-
-                            <EditText
-                                android:id="@+id/paymentTypeEt"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:gravity="right|center"
-                                android:inputType="number"
-                                android:layout_marginRight="30dp"
-                                android:text="111"
-                                android:textSize="25dp" />
-
-
-                        </LinearLayout>
-
-                    </LinearLayout>
+                        android:layout_marginRight="10dp"
+                        android:layout_weight="1"
+                        android:hint="Payment Type"
+                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:textSize="25sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
 
                 </LinearLayout>

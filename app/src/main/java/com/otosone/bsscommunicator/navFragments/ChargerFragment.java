@@ -12,6 +12,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ChargerFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
@@ -37,18 +41,6 @@ public class ChargerFragment extends Fragment {
     private StringBuilder jsonStringBuilder = new StringBuilder();
     private Button chargerBtn;
     private EditText preChargerRefVoltageEt, preChargerCurrentEt, preChargerTempEt, preChargerTimeoutEt, chargerVoltageEt, chargerCurrentEt, chargerLimitTempEt, ChargerCutoffVoltageEt, ChargerCutoffCurrentEt, chargingTimeoutEt, cellDeltaVEt;
-
-
-    public ChargerFragment() {
-        // Required empty public constructor
-    }
-
-    public static ChargerFragment newInstance(String param1, String param2) {
-        ChargerFragment fragment = new ChargerFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -174,6 +166,45 @@ public class ChargerFragment extends Fragment {
         View root = binding.getRoot();
         Databind();
 
+        Map<EditText, String> editTextUnitMap = new HashMap<EditText, String>() {{
+            put(preChargerRefVoltageEt, " V");
+            put(preChargerCurrentEt, " A");
+            put(preChargerTempEt, " ℃");
+            put(preChargerTimeoutEt, " Min");
+            put(chargerVoltageEt, " V");
+            put(chargerCurrentEt, " A");
+            put(chargerLimitTempEt, " ℃");
+            put(ChargerCutoffVoltageEt, " V");
+            put(ChargerCutoffCurrentEt, " A");
+            put(chargingTimeoutEt, " Min");
+            put(cellDeltaVEt, " mV");
+        }};
+
+        for (Map.Entry<EditText, String> entry : editTextUnitMap.entrySet()) {
+            EditText editText = entry.getKey();
+            String unit = entry.getValue();
+
+            editText.addTextChangedListener(new TextWatcher() {
+                public void afterTextChanged(Editable s) {
+                    String text = editText.getText().toString();
+                    if (!text.endsWith(unit)) {
+                        editText.setText(text + unit);
+                        editText.setSelection(text.length());
+                    }
+                }
+
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    String str = s.toString();
+                    if (!str.endsWith(unit)) {
+                        editText.setText(str + unit);
+                        editText.setSelection(str.length());
+                    }
+                }
+            });
+        }
+
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("stationValue", Context.MODE_PRIVATE);
         float preChgRefVol = sharedPreferences.getFloat("preChgRefVol", 31.0F);
         float preChgCur = sharedPreferences.getFloat("preChgCur", 5.0F);
@@ -188,34 +219,55 @@ public class ChargerFragment extends Fragment {
         int cellDeltaV = sharedPreferences.getInt("cellDeltaV", 150);
 
 
-        preChargerRefVoltageEt.setText(String.valueOf(preChgRefVol));
-        preChargerCurrentEt.setText(String.valueOf(preChgCur));
-        preChargerTempEt.setText(String.valueOf(preChgTemp));
-        preChargerTimeoutEt.setText(String.valueOf(preChgTimeout));
-        chargerVoltageEt.setText(String.valueOf(chgVol));
-        chargerCurrentEt.setText(String.valueOf(chgCur));
-        chargerLimitTempEt.setText(String.valueOf(chgLimitTemp));
-        ChargerCutoffVoltageEt.setText(String.valueOf(chgCutoffVol));
-        ChargerCutoffCurrentEt.setText(String.valueOf(chgCutoffCur));
-        chargingTimeoutEt.setText(String.valueOf(chgTimeout));
-        cellDeltaVEt.setText(String.valueOf(cellDeltaV));
+        preChargerRefVoltageEt.setText(String.valueOf(preChgRefVol) + " V");
+        preChargerCurrentEt.setText(String.valueOf(preChgCur) + " A");
+        preChargerTempEt.setText(String.valueOf(preChgTemp) + " ℃");
+        preChargerTimeoutEt.setText(String.valueOf(preChgTimeout) + " Min");
+        chargerVoltageEt.setText(String.valueOf(chgVol) + " V");
+        chargerCurrentEt.setText(String.valueOf(chgCur) + " A");
+        chargerLimitTempEt.setText(String.valueOf(chgLimitTemp) + " ℃");
+        ChargerCutoffVoltageEt.setText(String.valueOf(chgCutoffVol) + " V");
+        ChargerCutoffCurrentEt.setText(String.valueOf(chgCutoffCur) + " A");
+        chargingTimeoutEt.setText(String.valueOf(chgTimeout) + " Min");
+        cellDeltaVEt.setText(String.valueOf(cellDeltaV) + " mV");
 
         chargerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Extract values from EditText views
-                float preChgRefVol = Float.parseFloat(preChargerRefVoltageEt.getText().toString());
-                float preChgCur = Float.parseFloat(preChargerCurrentEt.getText().toString());
-                int preChgTemp = Integer.parseInt(preChargerTempEt.getText().toString());
-                int preChgTimeout = Integer.parseInt(preChargerTimeoutEt.getText().toString());
-                float chgVol = Float.parseFloat(chargerVoltageEt.getText().toString());
-                float chgCur = Float.parseFloat(chargerCurrentEt.getText().toString());
-                int chgLimitTemp = Integer.parseInt(chargerLimitTempEt.getText().toString());
-                float chgCutoffVol = Float.parseFloat(ChargerCutoffVoltageEt.getText().toString());
-                float chgCutoffCur = Float.parseFloat(ChargerCutoffCurrentEt.getText().toString());
-                int chgTimeout = Integer.parseInt(chargingTimeoutEt.getText().toString());
-                int cellDeltaV = Integer.parseInt(cellDeltaVEt.getText().toString());
+                String[] preChgRefVolParts = preChargerRefVoltageEt.getText().toString().split(" ");
+                float preChgRefVol = Float.parseFloat(preChgRefVolParts[0]);
+
+                String[] preChgCurParts = preChargerCurrentEt.getText().toString().split(" ");
+                float preChgCur = Float.parseFloat(preChgCurParts[0]);
+
+                String[] preChgTempParts = preChargerTempEt.getText().toString().split(" ");
+                int preChgTemp = Integer.parseInt(preChgTempParts[0]);
+
+                String[] preChgTimeoutParts = preChargerTimeoutEt.getText().toString().split(" ");
+                int preChgTimeout = Integer.parseInt(preChgTimeoutParts[0]);
+
+                String[] chgVolParts = chargerVoltageEt.getText().toString().split(" ");
+                float chgVol = Float.parseFloat(chgVolParts[0]);
+
+                String[] chgCurParts = chargerCurrentEt.getText().toString().split(" ");
+                float chgCur = Float.parseFloat(chgCurParts[0]);
+
+                String[] chgLimitTempParts = chargerLimitTempEt.getText().toString().split(" ");
+                int chgLimitTemp = Integer.parseInt(chgLimitTempParts[0]);
+
+                String[] chgCutoffVolParts = ChargerCutoffVoltageEt.getText().toString().split(" ");
+                float chgCutoffVol = Float.parseFloat(chgCutoffVolParts[0]);
+
+                String[] chgCutoffCurParts = ChargerCutoffCurrentEt.getText().toString().split(" ");
+                float chgCutoffCur = Float.parseFloat(chgCutoffCurParts[0]);
+
+                String[] chgTimeoutParts = chargingTimeoutEt.getText().toString().split(" ");
+                int chgTimeout = Integer.parseInt(chgTimeoutParts[0]);
+
+                String[] cellDeltaVParts = cellDeltaVEt.getText().toString().split(" ");
+                int cellDeltaV = Integer.parseInt(cellDeltaVParts[0]);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putFloat("preChgRefVol", preChgRefVol);

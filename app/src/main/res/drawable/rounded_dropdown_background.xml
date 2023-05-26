@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <layer-list>
+            <item android:drawable="@drawable/custom_dropdown_arrow" android:gravity="end" />
+        </layer-list>
+    </item>
+</selector>

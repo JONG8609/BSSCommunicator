@@ -7,8 +7,11 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -121,9 +124,10 @@ public class HeaterFragment extends Fragment {
                 bluetoothConnectionService.sendMessage(jsonString);
 
             } else {
-                Log.e("StatusFragment","Cannot send message, service is not bound or null");
+                Log.e("StatusFragment", "Cannot send message, service is not bound or null");
             }
         }
+
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
@@ -144,16 +148,23 @@ public class HeaterFragment extends Fragment {
         int heaterStartTemp = sharedPreferences.getInt("heaterStartTemp", 15);
         int heaterStopTemp = sharedPreferences.getInt("heaterStopTemp", 25);
 
-        heaterStartTempEt.setText(String.valueOf(heaterStartTemp));
-        heaterStopTempEt.setText(String.valueOf(heaterStopTemp));
+        heaterStartTempEt.setText(String.valueOf(heaterStartTemp) + " ℃");
+        heaterStopTempEt.setText(String.valueOf(heaterStopTemp) + " ℃");
+
+        setupTemperatureEditText(heaterStartTempEt);
+        setupTemperatureEditText(heaterStopTempEt);
 
         heaterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Extract values from EditText views
-                int heaterStartTemp = Integer.parseInt(heaterStartTempEt.getText().toString());
-                int heaterStopTemp = Integer.parseInt(heaterStopTempEt.getText().toString());
+
+                String heaterStartTempStr = heaterStartTempEt.getText().toString().replace("℃", "").trim();
+                String heaterStopTempStr = heaterStopTempEt.getText().toString().replace("℃", "").trim();
+
+                int heaterStartTemp = Integer.parseInt(heaterStartTempStr);
+                int heaterStopTemp = Integer.parseInt(heaterStopTempStr);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt("heaterStartTemp", heaterStartTemp);
@@ -206,6 +217,38 @@ public class HeaterFragment extends Fragment {
     public void onPause() {
         super.onPause();
         unbindBluetoothConnectionService();
+    }
+
+    private void setupTemperatureEditText(EditText editText) {
+        editText.setSelection(editText.getText().length() - 2);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Not required
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.toString().endsWith(" ℃")) {
+                    editText.setText(s.toString() + " ℃");
+                    editText.setSelection(editText.getText().length() - 2);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Not required
+            }
+        });
+
+        editText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                editText.setSelection(editText.getText().length() - 2);
+                return false;
+            }
+        });
     }
 
     public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {

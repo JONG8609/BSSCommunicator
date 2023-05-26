@@ -12,8 +12,11 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,11 +30,6 @@ import com.otosone.bsscommunicator.databinding.FragmentFanBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FanFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class FanFragment extends Fragment {
 
     FragmentFanBinding binding;
@@ -110,6 +108,7 @@ public class FanFragment extends Fragment {
             });
 
         }
+
         private void sendFanRequest() {
             // Create a JSON object
             JSONObject json = new JSONObject();
@@ -127,7 +126,7 @@ public class FanFragment extends Fragment {
                 bluetoothConnectionService.sendMessage(jsonString);
 
             } else {
-                Log.e("StatusFragment","Cannot send message, service is not bound or null");
+                Log.e("StatusFragment", "Cannot send message, service is not bound or null");
             }
         }
 
@@ -157,15 +156,21 @@ public class FanFragment extends Fragment {
         int fanStopTemp = sharedPreferences.getInt("fanStopTemp", 30);
 
         fanStartTempEt.setText(String.valueOf(fanStartTemp) + " ℃");
-        fanStopTempEt.setText(String.valueOf(fanStopTemp)+ " ℃");
+        fanStopTempEt.setText(String.valueOf(fanStopTemp) + " ℃");
+
+        // Adding TextWatchers and OnTouchListeners
+        setupTemperatureEditText(fanStartTempEt);
+        setupTemperatureEditText(fanStopTempEt);
 
         fanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                // Extract values from EditText views
-                String fanStartTempStr = fanStartTempEt.getText().toString().replace("℃", "");
-                String fanStopTempStr = fanStopTempEt.getText().toString().replace("℃", "");
+                // Extract values from EditText views and remove any spaces
+                String fanStartTempStr = fanStartTempEt.getText().toString().replace("℃", "").trim();
+                String fanStopTempStr = fanStopTempEt.getText().toString().replace("℃", "").trim();
+
+                // Now convert them to integers. This should no longer throw a NumberFormatException
                 int fanStartTemp = Integer.parseInt(fanStartTempStr);
                 int fanStopTemp = Integer.parseInt(fanStopTempStr);
 
@@ -199,9 +204,6 @@ public class FanFragment extends Fragment {
                 }
             }
         });
-
-
-
         return root;
     }
 
@@ -222,6 +224,43 @@ public class FanFragment extends Fragment {
         super.onPause();
         unbindBluetoothConnectionService();
     }
+
+    private void setupTemperatureEditText(EditText editText) {
+        final TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // no operation
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // no operation
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().endsWith(" ℃")) {
+                    editText.removeTextChangedListener(this); // remove to prevent stackOverflow
+                    String updatedString = s.toString() + " ℃";
+                    editText.setText(updatedString);
+                    editText.setSelection(updatedString.length() - 2);  // set cursor position before "℃"
+                    editText.addTextChangedListener(this); // add it back
+                }
+            }
+        };
+
+        editText.addTextChangedListener(textWatcher);
+
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus && editText.getText().toString().contains(" ℃")) {
+                    editText.setSelection(editText.getText().toString().indexOf(" ℃")); // place the cursor right before " ℃"
+                }
+            }
+        });
+    }
+
 
     public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
         this.bluetoothConnectionService = bluetoothConnectionService;

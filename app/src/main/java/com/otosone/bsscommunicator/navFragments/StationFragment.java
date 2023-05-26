@@ -7,12 +7,17 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,6 +32,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StationFragment extends Fragment {
 
@@ -35,9 +42,10 @@ public class StationFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
     private boolean isBound = false;
 
-    private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt, paymentTypeEt;
+    private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt;
     private Button stationBtn;
-
+    private Spinner paymentTypeSpinner;
+    private int paymentType = 3; // Default is NFC
     public StationFragment() {
         // Required empty public constructor
     }
@@ -77,7 +85,6 @@ public class StationFragment extends Fragment {
                             dataObject.put("batInTimeout", Integer.parseInt(batteryInTimeoutEt.getText().toString()));
                             dataObject.put("batOutTimeout", Integer.parseInt(batteryOutTimeoutEt.getText().toString()));
                             dataObject.put("payTimeout", Integer.parseInt(paymentTimeoutEt.getText().toString()));
-                            dataObject.put("payType", Integer.parseInt(paymentTypeEt.getText().toString()));
 
                             responseJson.put("data", dataObject);
 
@@ -130,18 +137,88 @@ public class StationFragment extends Fragment {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_station, container, false);
         View root = binding.getRoot();
         Databind();
+
+        Map<EditText, String> editTextUnitMap = new HashMap<EditText, String>() {{
+            put(reportPeriodEt, " Min");
+            put(batteryInTimeoutEt, " Sec");
+            put(batteryOutTimeoutEt, " Sec");
+            put(paymentTimeoutEt, " Sec");
+
+        }};
+
+        for (Map.Entry<EditText, String> entry : editTextUnitMap.entrySet()) {
+            EditText editText = entry.getKey();
+            String unit = entry.getValue();
+
+            editText.addTextChangedListener(new TextWatcher() {
+                public void afterTextChanged(Editable s) {
+                    String text = editText.getText().toString();
+                    if (!text.endsWith(unit)) {
+                        editText.setText(text + unit);
+                        editText.setSelection(text.length());
+                    }
+                }
+
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    String str = s.toString();
+                    if (!str.endsWith(unit)) {
+                        editText.setText(str + unit);
+                        editText.setSelection(str.length());
+                    }
+                }
+            });
+        }
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
+                R.array.payment_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        paymentTypeSpinner.setAdapter(adapter);
+
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("stationValue", Context.MODE_PRIVATE);
         int reportPeriod = sharedPreferences.getInt("reportPeriod", 60);
         int batteryInTimeout = sharedPreferences.getInt("batteryInTimeout", 60);
         int batteryOutTimeout = sharedPreferences.getInt("batteryOutTimeout", 60);
         int paymentTimeout = sharedPreferences.getInt("paymentTimeout", 60);
-        int paymentType = sharedPreferences.getInt("paymentType", 3);
+        int spinnerPosition = sharedPreferences.getInt("spinnerPosition", 2);
 
-        reportPeriodEt.setText(String.valueOf(reportPeriod));
-        batteryInTimeoutEt.setText(String.valueOf(batteryInTimeout));
-        batteryOutTimeoutEt.setText(String.valueOf(batteryOutTimeout));
-        paymentTimeoutEt.setText(String.valueOf(paymentTimeout));
-        paymentTypeEt.setText(String.valueOf(paymentType));
+        reportPeriodEt.setText(String.valueOf(reportPeriod) + " Min");
+        batteryInTimeoutEt.setText(String.valueOf(batteryInTimeout) + " Sec");
+        batteryOutTimeoutEt.setText(String.valueOf(batteryOutTimeout) + " Sec");
+        paymentTimeoutEt.setText(String.valueOf(paymentTimeout) + " Sec");
+
+        paymentTypeSpinner.setSelection(spinnerPosition);
+
+        paymentTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        paymentType = 1; // QR
+                        break;
+                    case 1:
+                        paymentType = 2; // T-Money
+                        break;
+                    case 2:
+                        paymentType = 3; // NFC
+                        break;
+                    default:
+                        paymentType = 3; // NFC by default
+                }
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("spinnerPosition", position);
+                editor.apply();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                paymentType = 3; // NFC by default
+            }
+        });
+
+
+
         stationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -151,7 +228,6 @@ public class StationFragment extends Fragment {
                 int batteryInTimeout = Integer.parseInt(batteryInTimeoutEt.getText().toString());
                 int batteryOutTimeout = Integer.parseInt(batteryOutTimeoutEt.getText().toString());
                 int paymentTimeout = Integer.parseInt(paymentTimeoutEt.getText().toString());
-                int paymentType = Integer.parseInt(paymentTypeEt.getText().toString());
 
                 // Save the values to SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -159,7 +235,6 @@ public class StationFragment extends Fragment {
                 editor.putInt("batteryInTimeout", batteryInTimeout);
                 editor.putInt("batteryOutTimeout", batteryOutTimeout);
                 editor.putInt("paymentTimeout", paymentTimeout);
-                editor.putInt("paymentType", paymentType);
                 editor.apply();
 
                 // Create a JSON object
@@ -200,7 +275,7 @@ public class StationFragment extends Fragment {
         batteryInTimeoutEt = binding.batteryInTimeoutEt;
         batteryOutTimeoutEt = binding.batteryOutTimeoutEt;
         paymentTimeoutEt = binding.paymentTimeoutEt;
-        paymentTypeEt = binding.paymentTypeEt;
+        paymentTypeSpinner = binding.paymentTypeSpinner;
     }
 
     @Override

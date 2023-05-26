@@ -281,6 +281,7 @@ public class BluetoothConnectionService extends Service {
                             }
                             if (socketStatusMap.size() == 16) {
                                 Log.d("BluetoothConnService", "All SOCKET_STATUS messages processed. Creating log file.");
+                                DataHolder.getInstance().setAllDataReceived(true);
                                 createLogFile();
                             }
                         }

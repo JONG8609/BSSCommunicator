@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
@@ -82,7 +83,18 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
 
 
 
-        navigationMenuButton.setOnClickListener(v -> openNavigationDrawer());
+        navigationMenuButton.setOnClickListener(v -> {
+            // Add this code to close the soft keyboard if it's open
+            View view = getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+
+            openNavigationDrawer();
+        });
 
         expandableListView = navigationView.findViewById(R.id.expandableListView);
 
@@ -105,6 +117,15 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
 
 
         expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+
+            View view = getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+
             Fragment selectedFragment = null;
 
             switch (groupPosition) {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="payment_array">
+        <item>QR</item>
+        <item>T-Money</item>
+        <item>NFC</item>
+    </string-array>
+</resources>

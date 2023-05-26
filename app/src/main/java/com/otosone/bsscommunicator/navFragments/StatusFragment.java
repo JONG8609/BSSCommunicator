@@ -225,28 +225,37 @@ public class StatusFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Observe the bssStatus LiveData
-        DataHolder.getInstance().getBssStatus().observe(getViewLifecycleOwner(), bssStatus -> {
-            Log.d("bssinfo", "Observer triggered");
-            if (bssStatus != null) {
-                Log.d("bssinfo", bssStatus.toString());
-                bssStatus(bssStatus);
-            }
-        });
+        // Observe the allDataReceived LiveData
+        DataHolder.getInstance().getAllDataReceived().observe(getViewLifecycleOwner(), allDataReceived -> {
+            if (allDataReceived != null && allDataReceived) {
+                Log.d("allDataReceived", "All data received. Updating UI.");
 
-        // Observe the socketStatusMap LiveData
-        DataHolder.getInstance().getSocketStatusMap().observe(getViewLifecycleOwner(), socketStatusMap -> {
-            Log.d("statusinfo", "Observer triggered");
-            if (socketStatusMap != null) {
-                // Create a copy of the map entries
-                Set<Map.Entry<String, JSONObject>> entriesCopy = new HashSet<>(socketStatusMap.entrySet());
-                Log.d("statusinfo", socketStatusMap.toString());
-                for (Map.Entry<String, JSONObject> entry : entriesCopy) {
-                    socketStatus(entry.getValue());
+                // Get the latest bssStatus and socketStatusMap
+                JSONObject bssStatus = DataHolder.getInstance().getBssStatus().getValue();
+                Map<String, JSONObject> socketStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
+
+                if (bssStatus != null) {
+                    Log.d("bssinfo", bssStatus.toString());
+                    bssStatus(bssStatus);
                 }
+
+                if (socketStatusMap != null) {
+                    // Create a copy of the map entries
+                    Set<Map.Entry<String, JSONObject>> entriesCopy = new HashSet<>(socketStatusMap.entrySet());
+                    Log.d("statusinfo", socketStatusMap.toString());
+                    for (Map.Entry<String, JSONObject> entry : entriesCopy) {
+                        socketStatus(entry.getValue());
+                    }
+                }
+
+                // Reset allDataReceived and other data after updating the UI
+                DataHolder.getInstance().resetData();
             }
         });
     }
+
+
+
 
     private void Databind() {
         layout1 = binding.layout1; layout2 = binding.layout2; layout3 = binding.layout3; layout4 = binding.layout4; layout5 = binding.layout5; layout6 = binding.layout6; layout7 = binding.layout7; layout8 = binding.layout8; layout9 = binding.layout9;

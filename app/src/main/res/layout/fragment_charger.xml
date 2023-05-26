@@ -21,7 +21,7 @@
                 android:orientation="horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:weightSum="2">
+                android:weightSum="3">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -42,6 +42,21 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginRight="15dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Charger Config"
+                        android:textStyle="bold"
+                        android:textSize="18sp"/>
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
@@ -56,585 +71,377 @@
                 </LinearLayout>
             </LinearLayout>
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="30dp"
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/thislayout"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/blank_rounded"
-                    android:orientation="vertical"
-                    android:weightSum="13">
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:text="Pre-Charge"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="2"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="3">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
-                            android:gravity="left|center"
-                            android:text="Charger"
-                            android:textSize="30dp" />
+                            android:layout_marginRight="10dp"
+                            android:hint="   Ref Voltage   ">
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="2" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="9">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Pre-Charge Ref Voltage"
-                            android:textSize="20dp" />
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/preChargerRefVoltageEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="numberDecimal"
-                                android:text="31.0"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="V"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="9">
-
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Pre-Charge Current"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:hint="   Current   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/preChargerCurrentEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="numberDecimal"
-                                android:text="5.0"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="A"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="9">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Pre-Charge Temp."
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:layout_marginRight="10dp"
+                            android:hint="   Temperature   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/preChargerTempEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="number"
-                                android:text="5"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="℃"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="9">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Pre-Charge Timeout"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:hint="   Timeout   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/preChargerTimeoutEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="number"
-                                android:text="15"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="Min"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
 
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="0"
+                    android:background="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:text="Charge"/>
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="9">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Charger Voltage"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:layout_marginRight="10dp"
+                            android:hint="   Voltage   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/chargerVoltageEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="numberDecimal"
-                                android:text="41.2"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="V"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="9">
-
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Charger Current"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:hint="   Current   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/chargerCurrentEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="numberDecimal"
-                                android:text="12.0"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="A"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="9">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Charger Limit Temp."
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:layout_marginRight="10dp"
+                            android:hint="   Limit Temperature   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/chargerLimitTempEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="number"
-                                android:text="45"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="℃"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="9">
-
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Charger Cut-off Voltage"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:hint="   Cut-Off Voltage   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ChargerCutoffVoltageEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="numberDecimal"
-                                android:text="41.0"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="V"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="9">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Charger Cut-off Current"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:layout_marginRight="10dp"
+                            android:hint="   Cut-Off Current   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/ChargerCutoffCurrentEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="numberDecimal"
-                                android:text="4.0"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="A"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1"
-                        android:orientation="horizontal"
-                        android:weightSum="9">
-
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Charging Timeout"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:hint="   Timeout   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/chargingTimeoutEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="number"
-                                android:text="240"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="Min"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="0"
+                    android:background="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="15dp"
+                        android:textStyle="bold"
+                        android:text="Cell"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="9">
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="match_parent"
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
-                            android:layout_weight="3"
-                            android:gravity="left|center"
-                            android:text="Cell Delta-V"
-                            android:textSize="20dp" />
+                            android:layout_weight="1"
+                            android:layout_marginRight="10dp"
+                            android:hint="   Delta-V   ">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="6"
-                            android:background="@drawable/blank_rounded"
-                            android:focusable="true">
-
-                            <EditText
+                            <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/cellDeltaVEt"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_weight="2"
-                                android:background="@android:color/transparent"
-                                android:focusable="true"
-                                android:focusableInTouchMode="true"
+                                android:layout_weight="1"
                                 android:gravity="right|center"
                                 android:inputType="number"
-                                android:text="150"
                                 android:textSize="25dp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginRight="10dp"
-                                android:gravity="right|center"
-                                android:text="mV"
-                                android:textSize="25dp" />
 
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
+
 
                     </LinearLayout>
-
 
                 </LinearLayout>
 

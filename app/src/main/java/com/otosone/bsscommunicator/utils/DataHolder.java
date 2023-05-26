@@ -14,10 +14,12 @@ public class DataHolder {
     private MutableLiveData<JSONObject> bssStatus;
     private MutableLiveData<Map<String, JSONObject>> socketStatusMap;
     private MutableLiveData<Map<String, String>> binaryStatusMap;
+    private MutableLiveData<Boolean> allDataReceived;
 
     private DataHolder() {
         socketStatusMap = new MutableLiveData<>(new HashMap<>());
         binaryStatusMap = new MutableLiveData<>(new HashMap<>());
+        allDataReceived = new MutableLiveData<>(false);
         bssStatus = new MutableLiveData<>();
     }
 
@@ -30,6 +32,7 @@ public class DataHolder {
 
     public void setBssStatus(JSONObject bssStatus) {
         this.bssStatus.postValue(bssStatus);
+        checkAllDataReceived();
     }
 
     public LiveData<JSONObject> getBssStatus() {
@@ -38,6 +41,7 @@ public class DataHolder {
 
     public void setSocketStatusMap(Map<String, JSONObject> socketStatusMap) {
         this.socketStatusMap.postValue(socketStatusMap);
+        checkAllDataReceived();
     }
 
     public LiveData<Map<String, JSONObject>> getSocketStatusMap() {
@@ -50,5 +54,26 @@ public class DataHolder {
 
     public LiveData<Map<String, String>> getBinaryStatusMap() {
         return binaryStatusMap;
+    }
+
+    public LiveData<Boolean> getAllDataReceived() {
+        return allDataReceived;
+    }
+
+    public void setAllDataReceived(boolean value) {
+        this.allDataReceived.postValue(value);
+    }
+
+    public void resetData() {
+        // Reset LiveData values for next round of data
+        bssStatus.postValue(null);
+        socketStatusMap.postValue(new HashMap<>());
+    }
+
+    private void checkAllDataReceived() {
+        if (bssStatus.getValue() != null && socketStatusMap.getValue() != null && socketStatusMap.getValue().size() == 16) {
+            // Only emit when all data is ready
+            allDataReceived.postValue(true);
+        }
     }
 }
