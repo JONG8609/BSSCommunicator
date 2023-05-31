@@ -224,10 +224,10 @@ public class StationFragment extends Fragment {
             public void onClick(View view) {
 
                 // Extract values from EditText views
-                int reportPeriod = Integer.parseInt(reportPeriodEt.getText().toString());
-                int batteryInTimeout = Integer.parseInt(batteryInTimeoutEt.getText().toString());
-                int batteryOutTimeout = Integer.parseInt(batteryOutTimeoutEt.getText().toString());
-                int paymentTimeout = Integer.parseInt(paymentTimeoutEt.getText().toString());
+                int reportPeriod = Integer.parseInt(reportPeriodEt.getText().toString().replace(" Min", ""));
+                int batteryInTimeout = Integer.parseInt(batteryInTimeoutEt.getText().toString().replace(" Sec", ""));
+                int batteryOutTimeout = Integer.parseInt(batteryOutTimeoutEt.getText().toString().replace(" Sec", ""));
+                int paymentTimeout = Integer.parseInt(paymentTimeoutEt.getText().toString().replace(" Sec", ""));
 
                 // Save the values to SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -253,11 +253,10 @@ public class StationFragment extends Fragment {
                     e.printStackTrace();
                 }
                 String jsonString = json.toString();
-                Log.d("UTF=8", jsonString);
+                Log.d("UTF-8", jsonString);
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
-                    Log.d("json11", jsonString);
                 } else {
                     Log.e("StationFragment", "BluetoothConnectionService is not bound");
                 }

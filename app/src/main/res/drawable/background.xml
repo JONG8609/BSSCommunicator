@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" >
+        <shape>
+            <solid android:color="#808080" /> <!-- You can replace the color value with any gray you prefer -->
+            <corners android:radius="10dp" /> <!-- If you want rounded corners -->
+        </shape>
+    </item>
+    <item android:drawable="@drawable/blank_rounded" />
+</selector>

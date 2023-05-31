@@ -18,7 +18,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:orientation="horizontal">
@@ -33,36 +33,49 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:background="@drawable/blank_rounded">
+                    android:gravity="center"
+                    android:layout_gravity="center">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:weightSum="7"
                         android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:orientation="vertical">
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/blank_rounded"
+                            android:layout_marginBottom="5dp"
+                            android:layout_weight="2">
 
                             <TextView
                                 android:id="@+id/socketBssIdTv"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="15dp"
+                                android:layout_height="match_parent"
                                 android:textSize="18dp"
-                                android:gravity="center"
                                 android:text="OS10121051000018"
                                 android:textStyle="bold" />
 
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:weightSum="7"
+                            android:layout_weight="5">
 
                             <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:orientation="horizontal">
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:layout_marginRight="5dp"
+                                android:background="@drawable/blank_rounded"
+                                android:layout_weight="5">
 
                                 <TextView
                                     android:id="@+id/statusTempTv"
@@ -73,34 +86,6 @@
                                     android:text="28" />
 
                                 <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/statusFanTv"
-                                    android:text="FAN"/>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/statusHeaterTv"
-                                    android:text="HEATER"/>
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/statusDoorTv"
-                                    android:text="DOOR"/>
-
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="15dp"
-                                android:layout_marginTop="5dp"
-                                android:orientation="horizontal">
-
-                                <TextView
                                     android:id="@+id/statusHumidityTv"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
@@ -108,23 +93,73 @@
                                     android:textSize="18dp"
                                     android:text="20" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/statusMqttTv"
-                                    android:text="MQTT"/>
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/statusRestTv"
-                                    android:text="REST"/>
+                            </LinearLayout>
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:id="@+id/statusLocalTv"
-                                    android:text="LOCAL"/>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:weightSum="2"
+
+                                android:background="@drawable/blank_rounded"
+                                android:layout_weight="2">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:layout_weight="1"
+                                    android:paddingTop="10dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/statusFanTv"
+                                        android:text="FAN"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/statusHeaterTv"
+                                        android:text="HEATER"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/statusDoorTv"
+                                        android:text="DOOR"/>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:layout_weight="1"
+                                    android:paddingBottom="10dp"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/statusMqttTv"
+                                        android:text="MQTT"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/statusRestTv"
+                                        android:text="REST"/>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:id="@+id/statusLocalTv"
+                                        android:text="LOCAL"/>
+
+                                </LinearLayout>
 
 
                             </LinearLayout>
@@ -132,16 +167,18 @@
                         </LinearLayout>
 
 
+
                     </LinearLayout>
 
                 </LinearLayout>
 
-                <ImageView
+                <ImageButton
                     android:id="@+id/statusRefreshIv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:background="@drawable/refresh" />
+                    android:background="@drawable/background_selector"
+                    android:src="@drawable/refresh" />
 
 
 

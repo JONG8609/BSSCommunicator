@@ -127,7 +127,7 @@ public class DoorFragment extends Fragment {
                         if (item.isChecked()) {
                             JSONObject doorObj = new JSONObject();
                             doorObj.put("id", Integer.parseInt(item.getId()));
-                            doorObj.put("lock", item.getDoorStatus().equals("UNLOCK") ? 1 : 0);
+                            doorObj.put("lock", item.getDoorStatus().equals("LOCK") ? 1 : 0);
                             doorList.put(doorObj);
                             checkedCount++;
                         }
@@ -180,7 +180,7 @@ public class DoorFragment extends Fragment {
                 // Update ChargingItem status based on the 7th char in binaryStatus
                 if (binaryStatus.length() > 6) {
                     char chargingStatusChar = binaryStatus.charAt(5);
-                    String doorStatus = (chargingStatusChar == '1') ? "UNLOCK" : "LOCK";
+                    String doorStatus = (chargingStatusChar == '0') ? "UNLOCK" : "LOCK";
                     for (DoorItem item : doorItems) {
                         if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
                             item.setDoorStatus(doorStatus);
@@ -221,7 +221,7 @@ public class DoorFragment extends Fragment {
                 // Update ChargingItem status based on the 7th char in binaryStatus
                 if (binaryStatus.length() > 6) {
                     char chargingStatusChar = binaryStatus.charAt(5);
-                    String doorStatus = (chargingStatusChar == '1') ? "UNLOCK" : "LOCK";
+                    String doorStatus = (chargingStatusChar == '0') ? "UNLOCK" : "LOCK";
                     for (DoorItem item : doorItems) {
                         if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
                             item.setDoorStatus(doorStatus);

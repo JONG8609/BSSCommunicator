@@ -11,7 +11,7 @@ import java.util.Map;
 public class DataHolder {
 
     private static DataHolder instance;
-    private MutableLiveData<JSONObject> bssStatus;
+    private MutableLiveData<JSONObject> bssStatus, info;
     private MutableLiveData<Map<String, JSONObject>> socketStatusMap;
     private MutableLiveData<Map<String, String>> binaryStatusMap;
     private MutableLiveData<Boolean> allDataReceived;
@@ -21,6 +21,7 @@ public class DataHolder {
         binaryStatusMap = new MutableLiveData<>(new HashMap<>());
         allDataReceived = new MutableLiveData<>(false);
         bssStatus = new MutableLiveData<>();
+        info = new MutableLiveData<>();
     }
 
     public static synchronized DataHolder getInstance() {
@@ -37,6 +38,15 @@ public class DataHolder {
 
     public LiveData<JSONObject> getBssStatus() {
         return bssStatus;
+    }
+
+    public void setInfo(JSONObject info) {
+        this.info.postValue(info);
+        checkAllDataReceived();
+    }
+
+    public LiveData<JSONObject> getInfo() {
+        return info;
     }
 
     public void setSocketStatusMap(Map<String, JSONObject> socketStatusMap) {

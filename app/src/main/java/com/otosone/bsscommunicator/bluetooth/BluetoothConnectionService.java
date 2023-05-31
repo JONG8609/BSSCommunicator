@@ -237,8 +237,15 @@ public class BluetoothConnectionService extends Service {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
                         if (receivedJson.has("response") && receivedJson.getString("response").equals("INFO")) {
-                            String apkVersion = receivedJson.getJSONObject("data").getString("apkVersion");
-                            saveApkVersion(apkVersion);
+                            JSONObject data = receivedJson.getJSONObject("data");
+                            if(data.has("stationId") && data.has("apkVersion")) {
+                                DataHolder.getInstance().setInfo(data);
+                                String stationId = data.getString("stationId");
+                                String apkVersion = data.getString("apkVersion");
+                                // Now you have stationId and apkVersion. You can do whatever you want with these.
+
+                                // If you want to save the apkVersion using your service, call that method
+                            }
                         }
 
                         if (receivedJson.has("request") || receivedJson.has("response")) {
@@ -302,12 +309,6 @@ public class BluetoothConnectionService extends Service {
     }
 
 
-    private void saveApkVersion(String apkVersion) {
-        SharedPreferences sharedPref = getSharedPreferences("apkVersion", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("apkVersion", apkVersion);
-        editor.apply();
-    }
 
     private void createLogFile() {
         new Thread(() -> {

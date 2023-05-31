@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
 
         // Set the version name
         SharedPreferences sharedPreferences = getSharedPreferences("apkVersion", Context.MODE_PRIVATE);
-        String apkVersion = sharedPreferences.getString("apkVersion", "1.2.4");
+        String apkVersion = sharedPreferences.getString("apkVersion", "1.2.7");
         versionNameTextView.setText("V" + apkVersion);
 
         // Add the footer view to the expandable list view

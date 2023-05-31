@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -45,7 +46,7 @@ public class StatusFragment extends Fragment {
     private TextView charger1Tv, charger2Tv, charger3Tv, charger4Tv, charger5Tv, charger6Tv, charger7Tv, charger8Tv, charger9Tv, charger10Tv, charger11Tv, charger12Tv, charger13Tv, charger14Tv, charger15Tv, charger16Tv;
     private TextView isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv;
     private TextView socketBssIdTv, statusTempTv, statusFanTv, statusHeaterTv, statusDoorTv, statusHumidityTv, statusMqttTv, statusRestTv, statusLocalTv;
-    private ImageView statusRefreshIv;
+    private ImageButton statusRefreshIv;
     private Queue<JSONObject> requestQueue;
     private int retryCount = 0;
     private static final int MAX_RETRY = 2;
@@ -195,7 +196,7 @@ public class StatusFragment extends Fragment {
                     JSONObject currentRequest = requestQueue.peek();
                     bluetoothConnectionService.sendMessage(currentRequest.toString());
                     retryCount++;
-                }, 1000); // 1000 ms delay before retrying the request
+                },0);
             } else {
                 Log.e("StationFragment", "Maximum retries reached for request: " + requestQueue.peek().toString());
             }
@@ -232,11 +233,21 @@ public class StatusFragment extends Fragment {
 
                 // Get the latest bssStatus and socketStatusMap
                 JSONObject bssStatus = DataHolder.getInstance().getBssStatus().getValue();
+                JSONObject info = DataHolder.getInstance().getInfo().getValue();
                 Map<String, JSONObject> socketStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
 
-                if (bssStatus != null) {
-                    Log.d("bssinfo", bssStatus.toString());
-                    bssStatus(bssStatus);
+                if (info != null) {
+                    Log.d("info", info.toString());
+                }
+
+                if (bssStatus != null && info != null) {
+                    try {
+                        String apkVersion = info.getString("apkVersion");
+                        Log.d("bssinfo", bssStatus.toString());
+                        bssStatus(bssStatus, apkVersion);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (socketStatusMap != null) {
@@ -249,7 +260,50 @@ public class StatusFragment extends Fragment {
                 }
 
                 // Reset allDataReceived and other data after updating the UI
-                DataHolder.getInstance().resetData();
+                //DataHolder.getInstance().resetData();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        bindBluetoothConnectionService();
+
+        DataHolder.getInstance().getAllDataReceived().observe(getViewLifecycleOwner(), allDataReceived -> {
+            if (allDataReceived != null && allDataReceived) {
+                Log.d("allDataReceived", "All data received. Updating UI.");
+
+                // Get the latest bssStatus and socketStatusMap
+                JSONObject bssStatus = DataHolder.getInstance().getBssStatus().getValue();
+                JSONObject info = DataHolder.getInstance().getInfo().getValue();
+                Map<String, JSONObject> socketStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
+
+                if (info != null) {
+                    Log.d("info", info.toString());
+                }
+
+                if (bssStatus != null && info != null) {
+                    try {
+                        String apkVersion = info.getString("apkVersion");
+                        Log.d("bssinfo", bssStatus.toString());
+                        bssStatus(bssStatus, apkVersion);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (socketStatusMap != null) {
+                    // Create a copy of the map entries
+                    Set<Map.Entry<String, JSONObject>> entriesCopy = new HashSet<>(socketStatusMap.entrySet());
+                    Log.d("statusinfo", socketStatusMap.toString());
+                    for (Map.Entry<String, JSONObject> entry : entriesCopy) {
+                        socketStatus(entry.getValue());
+                    }
+                }
+
+                // Reset allDataReceived and other data after updating the UI
+                //DataHolder.getInstance().resetData();
             }
         });
     }
@@ -279,7 +333,7 @@ public class StatusFragment extends Fragment {
 
         socketBssIdTv.setText(defaultStationId);
         statusTempTv.setText(String.valueOf(defaultTemperature) + "\r°C\r");
-        statusHumidityTv.setText(String.valueOf(defaultHumidity) + "\r%\r");
+        statusHumidityTv.setText(String.valueOf(defaultHumidity) + "\r\r%\r");
 
         // Set status text and color
         statusFanTv.setText("FAN\r");
@@ -298,7 +352,7 @@ public class StatusFragment extends Fragment {
         statusLocalTv.setTextColor(Color.GRAY);
     }
 
-    private void bssStatus(JSONObject bssStatus) {
+    private void bssStatus(JSONObject bssStatus, String apkVersion) {
         try {
             JSONObject dataObject = bssStatus;
 
@@ -321,9 +375,9 @@ public class StatusFragment extends Fragment {
             int local = commObject.getInt("local");
 
             // Update TextViews
-            socketBssIdTv.setText(stationId);
+            socketBssIdTv.setText(stationId + "(" + "V" + apkVersion + ")");
             statusTempTv.setText(String.valueOf(averageTemperature) + "\r°C\r");
-            statusHumidityTv.setText(String.valueOf(humidity) + "\r%\r");
+            statusHumidityTv.setText(String.valueOf(humidity) + "\r\r%\r");
 
             // Set status text and color
             statusFanTv.setText("FAN\r");
@@ -359,7 +413,7 @@ public class StatusFragment extends Fragment {
             TextView[] lockTextViews = {isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv};
             JSONObject chargerObject = dataObject.getJSONObject("charger");
             int charging = chargerObject.getInt("charging");
-            int soc = dataObject.getJSONObject("bms").getInt("soc");
+            int soc = Math.round((float)dataObject.getJSONObject("bms").getInt("soc") / 10);
 
             String status = dataObject.getString("status");
             String binaryStatus = HexToBinUtil.hexToBin(status);
@@ -367,33 +421,37 @@ public class StatusFragment extends Fragment {
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
             // Set background color
-            switch (charging) {
-                case 0:
-                    layouts[index].setBackgroundColor(Color.GRAY);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                    layouts[index].setBackgroundColor(Color.RED);
-                    break;
-                case 4:
-                    if (soc > 95) {
-                        layouts[index].setBackgroundColor(Color.parseColor("#87CEEB")); // Skyblue
-                    } else {
-                        layouts[index].setBackgroundColor(Color.RED);
-                    }
-                    break;
-                case 6:
-                    char yellowBackground = binaryStatus.charAt(3);
-                    if(yellowBackground == '1'){
-                        layouts[index].setBackgroundColor(Color.YELLOW);
-                    } else {
-                        layouts[index].setBackgroundColor(Color.YELLOW); // You can change this to whatever color you want when yellowBackground is not '1'
-                    }
-                    break;
-                default:
-                    layouts[index].setBackgroundColor(Color.GRAY);
-                    break;
+            if (binaryStatus.charAt(0) == '0' || binaryStatus.charAt(1) == '0') {
+                layouts[index].setBackgroundColor(Color.parseColor("#202124"));
+            } else {
+                switch (charging) {
+                    case 0:
+                        layouts[index].setBackgroundColor(Color.parseColor("#BFBEBD"));
+                        break;
+                    case 1:
+                    case 2:
+                    case 3:
+                        layouts[index].setBackgroundColor(Color.parseColor("#FE423E"));
+                        break;
+                    case 4:
+                        if (soc > 95) {
+                            layouts[index].setBackgroundColor(Color.parseColor("#27B6FF"));
+                        } else {
+                            layouts[index].setBackgroundColor(Color.parseColor("#FE423E"));
+                        }
+                        break;
+                    case 6:
+                        char yellowBackground = binaryStatus.charAt(3);
+                        if(yellowBackground == '1'){
+                            layouts[index].setBackgroundColor(Color.parseColor("#FFC20A"));
+                        } else {
+                            layouts[index].setBackgroundColor(Color.parseColor("#FFC20A"));
+                        }
+                        break;
+                    default:
+                        layouts[index].setBackgroundColor(Color.parseColor("#BFBEBD"));
+                        break;
+                }
             }
 
             // Set charger info and lock status
@@ -405,11 +463,7 @@ public class StatusFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        bindBluetoothConnectionService();
-    }
+
 
     @Override
     public void onPause() {
