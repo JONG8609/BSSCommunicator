@@ -80,6 +80,11 @@ public class ScanFragment extends Fragment {
                     requireActivity().runOnUiThread(() -> {
                         Toast.makeText(getActivity(), "connection done", Toast.LENGTH_LONG).show();
 
+                        StatusFragment statusFragment = new StatusFragment(); // Create instance of StatusFragment
+                        getFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragment_container, statusFragment) // Replace current Fragment with StatusFragment
+                                .commit();
                     });
                 }
 

@@ -196,7 +196,7 @@ public class StatusFragment extends Fragment {
                     JSONObject currentRequest = requestQueue.peek();
                     bluetoothConnectionService.sendMessage(currentRequest.toString());
                     retryCount++;
-                },0);
+                },1000);
             } else {
                 Log.e("StationFragment", "Maximum retries reached for request: " + requestQueue.peek().toString());
             }

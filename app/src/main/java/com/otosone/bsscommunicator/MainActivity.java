@@ -271,6 +271,11 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
             public void onServiceDisconnected(ComponentName componentName) {
                 isBound = false;
                 bluetoothConnectionService = null;
+                ScanFragment scanFragment = new ScanFragment();
+                scanFragment.setBluetoothConnectionService(bluetoothConnectionService);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, scanFragment)
+                        .commit();
             }
         };
         mainBtn.setVisibility(View.GONE);
@@ -296,15 +301,16 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                 .commit();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (isBound) {
-            bluetoothConnectionService.disconnect();
-            unbindService(serviceConnection);
-            isBound = false;
-        }
-    }
+//  @Override
+//  protected void onStop() {
+//      super.onStop();
+//      if (isBound) {
+//          bluetoothConnectionService.disconnect();
+//          unbindService(serviceConnection);
+//          isBound = false;
+//      }
+//  }
+
 
     private void prepareListData() {
         listDataHeader = new ArrayList<>();

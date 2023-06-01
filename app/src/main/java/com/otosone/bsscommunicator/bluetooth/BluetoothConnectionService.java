@@ -177,7 +177,7 @@ public class BluetoothConnectionService extends Service {
 
         byte[] data = message.getBytes(StandardCharsets.UTF_8);
         String dataAsString = new String(data, StandardCharsets.UTF_8);
-        Log.d("SendData", dataAsString);
+        //Log.d("SendData", dataAsString);
 
         // Determine the chunk size
         int chunkSize = 10; // You can adjust this value depending on your needs
@@ -187,16 +187,14 @@ public class BluetoothConnectionService extends Service {
             byte[] chunk = Arrays.copyOfRange(data, i, endIndex);
 
             connection.writeCharacteristic(UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), chunk)
-                    .delay(50, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(
                             bytes -> {
-                                Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
+                                //Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
                             },
                             throwable -> {
                                 Log.e("SendDataError", "Error sending data", throwable);
                             }
                     );
-
         }
     }
 
@@ -208,7 +206,7 @@ public class BluetoothConnectionService extends Service {
                 .subscribe(
                         bytes -> {
                             String receivedMessage = new String(bytes, StandardCharsets.UTF_8);
-                            Log.d("Received UTF-8 Message", receivedMessage);
+                            //Log.d("Received UTF-8 Message", receivedMessage);
                             processReceivedData(receivedMessage);
                         },
                         throwable -> {
@@ -218,7 +216,6 @@ public class BluetoothConnectionService extends Service {
     }
 
     private void processReceivedData(String receivedMessage) {
-        Log.d("ProcessReceivedData", "Received message: " + receivedMessage);
 
         receivedMessageBuilder.append(receivedMessage);
 
@@ -228,7 +225,6 @@ public class BluetoothConnectionService extends Service {
 
             if (closeBraceIndex != -1) {
                 String completeJsonString = receivedMessageBuilder.substring(openBraceIndex, closeBraceIndex + 1);
-                Log.d("ProcessReceivedData", "Complete JSON String: " + completeJsonString);
 
                 if (messageReceivedListener != null) {
                     messageReceivedListener.onMessageReceived(completeJsonString);
@@ -240,11 +236,7 @@ public class BluetoothConnectionService extends Service {
                             JSONObject data = receivedJson.getJSONObject("data");
                             if(data.has("stationId") && data.has("apkVersion")) {
                                 DataHolder.getInstance().setInfo(data);
-                                String stationId = data.getString("stationId");
-                                String apkVersion = data.getString("apkVersion");
-                                // Now you have stationId and apkVersion. You can do whatever you want with these.
 
-                                // If you want to save the apkVersion using your service, call that method
                             }
                         }
 
@@ -270,7 +262,6 @@ public class BluetoothConnectionService extends Service {
                                     Map<String, JSONObject> newSocketStatusMap = new HashMap<>(currentSocketStatusMap);
                                     newSocketStatusMap.put(index, data);
                                     DataHolder.getInstance().setSocketStatusMap(newSocketStatusMap);
-                                    Log.d("BluetoothConnService", "Added SOCKET_STATUS for index " + index);
 
                                     LiveData<Map<String, String>> liveDataBinaryStatus = DataHolder.getInstance().getBinaryStatusMap();
                                     Map<String, String> currentBinaryStatusMap = liveDataBinaryStatus != null ? liveDataBinaryStatus.getValue() : null;
@@ -280,7 +271,6 @@ public class BluetoothConnectionService extends Service {
                                     Map<String, String> newBinaryStatusMap = new HashMap<>(currentBinaryStatusMap);
                                     newBinaryStatusMap.put(index, binaryStatus);
                                     DataHolder.getInstance().setBinaryStatusMap(newBinaryStatusMap);
-                                    Log.d("BluetoothConnService", "Added binary status for index " + index);
 
                                     // Make a copy of the map from DataHolder to socketStatusMap
                                     socketStatusMap = new HashMap<>(newSocketStatusMap);
