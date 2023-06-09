@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -14,27 +15,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
-import com.otosone.bsscommunicator.adapter.ExpandableListAdapter;
+import com.otosone.bsscommunicator.adapter.NavigationDrawerAdapter;
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.bluetooth.BluetoothStateReceiver;
 import com.otosone.bsscommunicator.bluetooth.ConnectionFailedListener;
 import com.otosone.bsscommunicator.databinding.ActivityMainBinding;
+import com.otosone.bsscommunicator.listItem.NavigationDrawerItem;
 import com.otosone.bsscommunicator.navFragments.BMSFragment;
 import com.otosone.bsscommunicator.navFragments.ChargerFragment;
-import com.otosone.bsscommunicator.navFragments.ChargingFragment;
 import com.otosone.bsscommunicator.navFragments.DoorFragment;
 import com.otosone.bsscommunicator.navFragments.FanFragment;
 import com.otosone.bsscommunicator.navFragments.HeaterFragment;
@@ -42,21 +43,14 @@ import com.otosone.bsscommunicator.navFragments.ResetFragment;
 import com.otosone.bsscommunicator.navFragments.ScanFragment;
 import com.otosone.bsscommunicator.navFragments.StationFragment;
 import com.otosone.bsscommunicator.navFragments.StatusFragment;
+import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements ConnectionFailedListener {
 
     private ActivityMainBinding binding;
-    private ExpandableListAdapter expandableListAdapter;
-    private ExpandableListView expandableListView;
-    private List<String> listDataHeader;
-    private HashMap<String, List<String>> listDataChild;
     private DrawerLayout drawer;
     private NavigationView navigationView;
     private ImageButton navigationMenuButton;
@@ -65,6 +59,28 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
     private BluetoothConnectionService bluetoothConnectionService;
     private ServiceConnection serviceConnection;
     private TextView versionNameTextView;
+    private String apkVersion;
+    private ListView listView;
+    private NavigationDrawerAdapter adapter;
+
+    NavigationDrawerItem[] drawerItems = new NavigationDrawerItem[]{
+            new NavigationDrawerItem.NavigationHeader("OTOS BSS APP", true),
+            new NavigationDrawerItem.NavigationDivider(), // New divider
+            new NavigationDrawerItem.NavigationItem("Bluetooth Scan", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Socket Status", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationDivider(), // New divider
+            new NavigationDrawerItem.NavigationHeader("Control", false),
+            new NavigationDrawerItem.NavigationItem("Station reset", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Socket door", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Charger", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("BMS", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationDivider(), // New divider
+            new NavigationDrawerItem.NavigationHeader("Setting", false),
+            new NavigationDrawerItem.NavigationItem("Station", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Fan", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Heater", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Charger", R.drawable.bookmark),
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,15 +92,31 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
         navigationView = binding.navView;
         navigationMenuButton = binding.navigationMenuButton;
         mainBtn = binding.mainBtn;
+        listView = binding.listView;
+
+        adapter = new NavigationDrawerAdapter(this, drawerItems);
+        listView.setAdapter(adapter);
+        listView.setDivider(null);
+        listView.setDividerHeight(0);
+        DataHolder dataHolder = DataHolder.getInstance();
+        dataHolder.getInfo().observe(this, new Observer<JSONObject>() {
+            @Override
+            public void onChanged(JSONObject info) {
+                try {
+                    String apkVersion = info.getString("apkVersion");
+                    versionNameTextView.setText("V" + apkVersion);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         BluetoothStateReceiver bluetoothStateReceiver = new BluetoothStateReceiver(this);
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(bluetoothStateReceiver, filter);
 
-
-
         navigationMenuButton.setOnClickListener(v -> {
-            // Add this code to close the soft keyboard if it's open
+
             View view = getCurrentFocus();
             if (view != null) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -92,136 +124,11 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
             }
-
             openNavigationDrawer();
         });
 
-        expandableListView = navigationView.findViewById(R.id.expandableListView);
-
         View footerView = getLayoutInflater().inflate(R.layout.footer, null);
-        TextView versionNameTextView = footerView.findViewById(R.id.version_name);
-
-        // Set the version name
-        SharedPreferences sharedPreferences = getSharedPreferences("apkVersion", Context.MODE_PRIVATE);
-        String apkVersion = sharedPreferences.getString("apkVersion", "1.2.7");
-        versionNameTextView.setText("V" + apkVersion);
-
-        // Add the footer view to the expandable list view
-        expandableListView.addFooterView(footerView);
-
-        prepareListData();
-
-        expandableListAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
-        expandableListView.setAdapter(expandableListAdapter);
-
-
-
-        expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
-
-            View view = getCurrentFocus();
-            if (view != null) {
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                if (imm != null) {
-                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                }
-            }
-
-            Fragment selectedFragment = null;
-
-            switch (groupPosition) {
-                case 0:
-                    if (childPosition == 0) {
-                        ScanFragment scanFragment = new ScanFragment();
-                        scanFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                        selectedFragment = scanFragment;
-                    }
-                    // Other cases here...
-                    break;
-                case 1:
-                    if (childPosition == 0) {
-                        StatusFragment statusFragment = new StatusFragment();
-                        statusFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                        selectedFragment = new StatusFragment();
-                        navigationView.setVisibility(View.GONE);
-                        mainBtn.setVisibility(View.GONE);
-                    }
-                    break;
-                case 2:
-                    switch (childPosition) {
-                        case 0:
-                            ResetFragment resetFragment = new ResetFragment();
-                            resetFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new ResetFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                        case 1:
-                            ChargingFragment chargingFragment = new ChargingFragment();
-                            chargingFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new ChargingFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                        case 2:
-                            DoorFragment doorFragment = new DoorFragment();
-                            doorFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new DoorFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                        case 3:
-                            BMSFragment bmsFragment = new BMSFragment();
-                            bmsFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new BMSFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                    }
-                    break;
-                case 3:
-                    switch (childPosition) {
-                        case 0:
-                            StationFragment stationFragment = new StationFragment();
-                            stationFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new StationFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                        case 1:
-                            FanFragment fanFragment = new FanFragment();
-                            fanFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new FanFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                        case 2:
-                            HeaterFragment heaterFragment = new HeaterFragment();
-                            heaterFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new HeaterFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                        case 3:
-                            ChargerFragment chargerFragment = new ChargerFragment();
-                            chargerFragment.setBluetoothConnectionService(bluetoothConnectionService);
-                            selectedFragment = new ChargerFragment();
-                            mainBtn.setVisibility(View.GONE);
-                            break;
-                    }
-                    break;
-                case 4:
-                    if (childPosition == 0) {
-                        //selectedFragment = new StatusFragment();
-                    }
-                    break;
-                case 5:
-                    if (childPosition == 0) {
-                        //selectedFragment = new StatusFragment();
-                    }
-                    break;
-            }
-
-            if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selectedFragment)
-                        .commit();
-                drawer.closeDrawers();
-            }
-            return false;
-        });
+        versionNameTextView = footerView.findViewById(R.id.version_name);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
@@ -239,20 +146,21 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                             // Extract stationId and apkVersion from the received JSON
                             JSONObject dataObject = receivedJson.getJSONObject("data");
                             String stationId = dataObject.getString("stationId");
-                            String apkVersion = dataObject.getString("apkVersion");
-
-                            // Save the extracted values as SharedPreferences
-                            SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("your_preferences_name", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("stationId", stationId);
-                            editor.putString("apkVersion", apkVersion);
-                            editor.apply();
+                            apkVersion = dataObject.getString("apkVersion");
+                            // Update versionNameTextView directly here
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    versionNameTextView.setText("V" + apkVersion);
+                                }
+                            });
 
                             // Create a response JSON object
                             JSONObject responseJson = new JSONObject();
                             responseJson.put("response", "INFO");
                             responseJson.put("result", "ok");
                             responseJson.put("error_code", 0);
+
 
                             // Send the response to the server
                             bluetoothConnectionService.sendMessage(responseJson.toString());
@@ -284,13 +192,78 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, statusFragment)
                 .commit();
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                NavigationDrawerItem selectedItem = adapter.getItem(position);
+                if(selectedItem.isHeader()){
+                    // Header was clicked, we can choose to do nothing
+                    // Or you can handle it accordingly.
+                } else {
+                    // NavigationItem was clicked, proceed as usual
+                    NavigationDrawerItem.NavigationItem navigationItem = (NavigationDrawerItem.NavigationItem) selectedItem;
+                    Fragment selectedFragment = null;
+
+                    switch (navigationItem.getTitle()) {
+                        case "Bluetooth Scan":
+                            // Disconnect bluetooth before scanning again
+                            if (bluetoothConnectionService.isConnected()) {
+                                bluetoothConnectionService.disconnect();
+                            }
+                            selectedFragment = new ScanFragment();
+                            ((ScanFragment) selectedFragment).setBluetoothConnectionService(bluetoothConnectionService);
+                            break;
+                        case "Socket Status":
+                            selectedFragment = new StatusFragment();
+                            break;
+                        case "Station reset":
+                            selectedFragment = new ResetFragment();
+                            break;
+                        case "Socket door":
+                            selectedFragment = new DoorFragment();
+                            break;
+                        case "Charger":
+                            selectedFragment = new ChargerFragment();
+                            break;
+                        case "BMS":
+                            selectedFragment = new BMSFragment();
+                            break;
+                        case "Station":
+                            selectedFragment = new StationFragment();
+                            break;
+                        case "Fan":
+                            selectedFragment = new FanFragment();
+                            break;
+                        case "Heater":
+                            selectedFragment = new HeaterFragment();
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid item title " + navigationItem.getTitle());
+                    }
+
+                    if (selectedFragment != null) {
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, selectedFragment)
+                                .commit();
+                    }
+
+                    drawer.closeDrawer(GravityCompat.START); // Close the drawer
+                }
+            }
+        });
     }
+
 
     @Override
     protected void onStart() {
         super.onStart();
         Intent intent = new Intent(this, BluetoothConnectionService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        if (apkVersion != null) {
+            versionNameTextView.setText("V" + apkVersion);
+        }
     }
 
     public void switchToScanFragment() {
@@ -299,58 +272,6 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, scanFragment)
                 .commit();
-    }
-
-//  @Override
-//  protected void onStop() {
-//      super.onStop();
-//      if (isBound) {
-//          bluetoothConnectionService.disconnect();
-//          unbindService(serviceConnection);
-//          isBound = false;
-//      }
-//  }
-
-
-    private void prepareListData() {
-        listDataHeader = new ArrayList<>();
-        listDataChild = new HashMap<>();
-
-        listDataHeader.add("Scan");
-        listDataHeader.add("Monitoring");
-        listDataHeader.add("Control");
-        listDataHeader.add("Preferences");
-        listDataHeader.add("Management");
-        listDataHeader.add("Update");
-
-        List<String> scanMenu = new ArrayList<>();
-        scanMenu.add("Scan");
-
-        List<String> monitoringMenu = new ArrayList<>();
-        monitoringMenu.add("Socket Status");
-
-        List<String> controlMenu = new ArrayList<>();
-        controlMenu.add("BSS Reset");
-        controlMenu.add("Charging");
-        controlMenu.add("Door");
-        controlMenu.add("BMS");
-
-        List<String> preferencesMenu = new ArrayList<>();
-        preferencesMenu.add("Station");
-        preferencesMenu.add("Fan");
-        preferencesMenu.add("Heater");
-        preferencesMenu.add("Charger");
-
-        List<String> managementMenu = new ArrayList<>();
-
-        List<String> updateMenu = new ArrayList<>();
-
-        listDataChild.put(listDataHeader.get(0), scanMenu);
-        listDataChild.put(listDataHeader.get(1), monitoringMenu);
-        listDataChild.put(listDataHeader.get(2), controlMenu);
-        listDataChild.put(listDataHeader.get(3), preferencesMenu);
-        listDataChild.put(listDataHeader.get(4), managementMenu);
-        listDataChild.put(listDataHeader.get(5), updateMenu);
     }
 
     protected void openNavigationDrawer() {

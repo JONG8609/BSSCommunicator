@@ -53,7 +53,6 @@
                         android:id="@+id/mainBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/rounded_button"
                         android:text="SET" />
 
                 </LinearLayout>
@@ -70,13 +69,10 @@
             android:layout_gravity="start"
             >
 
-            <ExpandableListView
-                android:id="@+id/expandableListView"
+            <ListView
+                android:id="@+id/listView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:divider="@android:color/darker_gray"
-                android:dividerHeight="0.5dp"
-                android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
+                android:layout_height="match_parent" />
 
         </com.google.android.material.navigation.NavigationView>
 

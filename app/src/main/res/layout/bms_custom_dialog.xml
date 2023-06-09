@@ -66,12 +66,17 @@
             android:id="@+id/ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_button"
+            android:layout_marginBottom="10dp"
             android:text="OK" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_button"
             android:text="Cancel" />
 
     </LinearLayout>

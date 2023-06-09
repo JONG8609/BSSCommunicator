@@ -1,13 +1,19 @@
 package com.otosone.bsscommunicator.navFragments;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
@@ -17,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,6 +34,7 @@ import com.otosone.bsscommunicator.R;
 import com.otosone.bsscommunicator.adapter.BMSAdapter;
 import com.otosone.bsscommunicator.databinding.FragmentBmsBinding;
 import com.otosone.bsscommunicator.listItem.ChargingItem;
+import com.otosone.bsscommunicator.listItem.DoorItem;
 import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONArray;
@@ -47,6 +55,7 @@ public class BMSFragment extends Fragment {
     private BMSAdapter bmsAdapter;
     private List<BMSItem> bmsItems;
     private Button bmsBtn;
+    private CheckBox bms_checkbox;
     public static BMSFragment newInstance() {
         return new BMSFragment();
     }
@@ -63,27 +72,26 @@ public class BMSFragment extends Fragment {
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
                 Log.d("BMSFragment", "MessageReceivedListener called");
-                getActivity().runOnUiThread(() -> {
 
+                getActivity().runOnUiThread(() -> {
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
                         if (receivedJson.has("response") && receivedJson.getString("response").equals("CTRL_BMS")) {
+                            Log.d("231441", "221");
                             String result = receivedJson.getString("result");
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "CTRL_BMS");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
-                                // Handle success case here
+                                Log.d("231441", "222");
+                                // Show a notification here when the success case is met
+                                showNotification("Success!");
                             } else {
-                                // Handle error case here
                                 Log.e("BMSFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                // Show a notification here when the error case is met
+                                showNotification("Error: result = " + result + ", error_code = " + errorCode);
                             }
                         }
-
                     } catch (JSONException e) {
                         Log.e("BMSFragment", "Error parsing received JSON", e);
                     }
@@ -100,6 +108,22 @@ public class BMSFragment extends Fragment {
         }
     };
 
+    private void showNotification(String message) {
+        NotificationManager notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("channel_id", "channel_name", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), "channel_id")
+                .setSmallIcon(R.drawable.rounded_button)
+                .setContentTitle("Notification from App")
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        notificationManager.notify(1, builder.build());
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,6 +135,18 @@ public class BMSFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bms, container, false);
         bmsBtn = binding.bmsBtn;
+        bms_checkbox = binding.bmsCheckbox;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            bms_checkbox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
+        }
+        bms_checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            for (BMSItem item : bmsItems) {
+                item.setChecked(isChecked);
+            }
+            // Notify the adapter about the change in doorItems
+            bmsAdapter.notifyDataSetChanged();
+        });
 
         bmsBtn.setOnClickListener(new View.OnClickListener() {
             @Override

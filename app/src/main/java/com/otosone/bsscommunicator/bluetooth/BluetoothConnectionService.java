@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -62,11 +63,8 @@ public class BluetoothConnectionService extends Service {
     private ConnectionStateListener connectionStateListener;
     private JSONObject bssStatus;
     private Map<String, JSONObject> socketStatusMap = new HashMap<>();
-
     private static final String CHANNEL_ID = "BluetoothConnectionServiceChannel";
     private ConnectionFailedListener connectionFailedListener;
-
-    private Disposable notificationDisposable;
     private DeviceConnectedListener deviceConnectedListener;
     private StringBuilder receivedMessageBuilder = new StringBuilder();
     private RxBleConnection deviceConnectedCallback = null;
@@ -142,12 +140,9 @@ public class BluetoothConnectionService extends Service {
     private void onDeviceConnected(RxBleConnection connection) {
         this.connection = connection;
         setupNotification(connection);
-        Log.d("11233", "12325");
         if (deviceConnectedListener != null) {
-            Log.d("11233", "12324");
             deviceConnectedListener.onDeviceConnected(connection);
         } else {
-            Log.d("11233", "Listener not set, queuing callback");
             deviceConnectedCallback = connection;  // Save the connection
         }
     }
@@ -159,16 +154,13 @@ public class BluetoothConnectionService extends Service {
     public void setDeviceConnectedListener(DeviceConnectedListener listener) {
         this.deviceConnectedListener = listener;
         if (deviceConnectedCallback != null) {
-            Log.d("11233", "Calling queued callback");
             listener.onDeviceConnected(deviceConnectedCallback);
             deviceConnectedCallback = null;
         }
     }
 
     public void sendMessage(String message) {
-        if (connection == null || message
-                == null) {
-            Log.e("SendAsciiMessageError", "Connection is null or message is null");
+        if (connection == null || message == null) {
             return;
         }
 
@@ -176,7 +168,6 @@ public class BluetoothConnectionService extends Service {
         message += "\r\n";
 
         byte[] data = message.getBytes(StandardCharsets.UTF_8);
-        String dataAsString = new String(data, StandardCharsets.UTF_8);
         //Log.d("SendData", dataAsString);
 
         // Determine the chunk size

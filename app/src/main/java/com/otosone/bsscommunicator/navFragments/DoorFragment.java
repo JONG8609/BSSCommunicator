@@ -4,6 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -47,6 +51,7 @@ public class DoorFragment extends Fragment {
     private DoorAdapter doorAdapter;
     private List<DoorItem> doorItems;
     private Button doorBtn;
+    private CheckBox door_checkbox;
 
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -112,7 +117,18 @@ public class DoorFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_door, container, false);
         doorBtn = binding.doorBtn;
-        //프로토콜 변경 해야됨
+        door_checkbox = binding.doorCheckbox;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            door_checkbox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
+        }
+        door_checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            for (DoorItem item : doorItems) {
+                item.setChecked(isChecked);
+            }
+            // Notify the adapter about the change in doorItems
+            doorAdapter.notifyDataSetChanged();
+        });
+
         doorBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -148,6 +164,7 @@ public class DoorFragment extends Fragment {
                 } else {
                     Log.e("DoorFragment", "BluetoothConnectionService is not bound");
                 }
+                Toast.makeText(getActivity(),"sampl", Toast.LENGTH_SHORT).show();
             }
         });
 

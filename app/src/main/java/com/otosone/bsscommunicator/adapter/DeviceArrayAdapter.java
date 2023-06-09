@@ -24,6 +24,9 @@ public class DeviceArrayAdapter extends ArrayAdapter<RxBleDevice> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_device, parent, false);
         }
 
+        // Set the background of the item to the selector drawable
+        convertView.setBackgroundResource(R.drawable.list_item_selector);
+
         RxBleDevice device = getItem(position);
 
         TextView tvName = (TextView) convertView.findViewById(R.id.device_name);

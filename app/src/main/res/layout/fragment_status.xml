@@ -18,9 +18,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -32,31 +32,31 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:layout_gravity="center">
+                    android:gravity="center">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:weightSum="7"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:weightSum="7">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:gravity="center"
                             android:layout_marginTop="5dp"
-                            android:background="@drawable/blank_rounded"
                             android:layout_marginBottom="5dp"
-                            android:layout_weight="2">
+                            android:layout_weight="2"
+                            android:background="@drawable/blank_rounded"
+                            android:gravity="center">
 
                             <TextView
                                 android:id="@+id/socketBssIdTv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
-                                android:textSize="18dp"
                                 android:text="OS10121051000018"
+                                android:textSize="18dp"
                                 android:textStyle="bold" />
 
                         </LinearLayout>
@@ -64,34 +64,34 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_weight="5"
                             android:orientation="horizontal"
-                            android:weightSum="7"
-                            android:layout_weight="5">
+                            android:weightSum="7">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:gravity="center"
                                 android:layout_marginRight="5dp"
+                                android:layout_weight="5"
                                 android:background="@drawable/blank_rounded"
-                                android:layout_weight="5">
+                                android:gravity="center"
+                                android:orientation="vertical">
 
                                 <TextView
                                     android:id="@+id/statusTempTv"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textStyle="bold"
+                                    android:text="28"
                                     android:textSize="18dp"
-                                    android:text="28" />
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/statusHumidityTv"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textStyle="bold"
+                                    android:text="20"
                                     android:textSize="18dp"
-                                    android:text="20" />
+                                    android:textStyle="bold" />
 
 
                             </LinearLayout>
@@ -99,73 +99,71 @@
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:weightSum="2"
-
+                                android:layout_weight="2"
                                 android:background="@drawable/blank_rounded"
-                                android:layout_weight="2">
+
+                                android:orientation="vertical"
+                                android:weightSum="2">
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:gravity="center"
                                     android:layout_weight="1"
-                                    android:paddingTop="10dp"
-                                    android:orientation="horizontal">
+                                    android:gravity="center"
+                                    android:orientation="horizontal"
+                                    android:paddingTop="10dp">
 
                                     <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
                                         android:id="@+id/statusFanTv"
-                                        android:text="FAN"/>
-
-                                    <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:text="FAN" />
+
+                                    <TextView
                                         android:id="@+id/statusHeaterTv"
-                                        android:text="HEATER"/>
-
-                                    <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:text="HEATER" />
+
+                                    <TextView
                                         android:id="@+id/statusDoorTv"
-                                        android:text="DOOR"/>
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="DOOR" />
 
                                 </LinearLayout>
 
                                 <LinearLayout
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:gravity="center"
                                     android:layout_weight="1"
-                                    android:paddingBottom="10dp"
-                                    android:orientation="horizontal">
+                                    android:gravity="center"
+                                    android:orientation="horizontal"
+                                    android:paddingBottom="10dp">
 
                                     <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
                                         android:id="@+id/statusMqttTv"
-                                        android:text="MQTT"/>
-
-                                    <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:text="MQTT" />
+
+                                    <TextView
                                         android:id="@+id/statusRestTv"
-                                        android:text="REST"/>
-
-                                    <TextView
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
+                                        android:text="REST" />
+
+                                    <TextView
                                         android:id="@+id/statusLocalTv"
-                                        android:text="LOCAL"/>
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="LOCAL" />
 
                                 </LinearLayout>
-
 
                             </LinearLayout>
 
                         </LinearLayout>
-
 
 
                     </LinearLayout>
@@ -179,8 +177,6 @@
                     android:layout_gravity="right"
                     android:background="@drawable/background_selector"
                     android:src="@drawable/refresh" />
-
-
 
             </LinearLayout>
 
@@ -198,7 +194,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="120dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -220,8 +216,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -230,6 +226,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -251,7 +249,7 @@
                     android:id="@+id/layout2"
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -273,8 +271,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -283,6 +281,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -314,7 +314,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="30dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -336,8 +336,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -346,6 +346,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -368,7 +370,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="30dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -390,8 +392,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -400,6 +402,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -422,7 +426,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="30dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -444,8 +448,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -454,6 +458,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -475,8 +481,7 @@
                     android:id="@+id/layout6"
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/rounded_button"
-
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -498,8 +503,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -508,6 +513,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -540,7 +547,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -562,8 +569,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -572,6 +579,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -594,7 +603,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -616,8 +625,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -626,6 +635,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -648,7 +659,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -670,8 +681,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -680,6 +691,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -702,7 +715,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -724,8 +737,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -734,6 +747,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -755,7 +770,7 @@
                     android:id="@+id/layout11"
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -777,8 +792,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -787,6 +802,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -819,7 +836,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -841,8 +858,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -851,6 +868,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -873,7 +892,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -895,8 +914,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -905,6 +924,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -927,7 +948,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -949,8 +970,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -959,6 +980,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -981,7 +1004,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -1003,8 +1026,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -1013,6 +1036,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />
@@ -1035,7 +1060,7 @@
                     android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:layout_marginRight="5dp"
-                    android:background="@drawable/rounded_button"
+                    android:background="@drawable/rounded_socket"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -1057,8 +1082,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:background="@android:color/transparent"
-                            android:focusable="true"
-                            android:focusableInTouchMode="true"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:inputType="text"
                             android:text="100"
                             android:textColor="@color/white"
@@ -1067,6 +1092,8 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
                             android:text="%"
                             android:textColor="@color/white"
                             android:textSize="20dp" />

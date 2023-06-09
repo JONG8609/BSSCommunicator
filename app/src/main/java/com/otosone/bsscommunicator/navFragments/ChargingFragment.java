@@ -4,6 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -11,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,6 +26,7 @@ import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.listItem.ChargingItem;
 import com.otosone.bsscommunicator.adapter.ChargingAdapter;
 import com.otosone.bsscommunicator.databinding.FragmentChargingBinding;
+import com.otosone.bsscommunicator.listItem.DoorItem;
 import com.otosone.bsscommunicator.utils.DataHolder;
 
 import org.json.JSONArray;
@@ -42,6 +47,7 @@ public class ChargingFragment extends Fragment {
     private ChargingAdapter chargingAdapter;
     private List<ChargingItem> chargingItems;
     private Button chargingBtn;
+    private CheckBox charging_checkbox;
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -104,6 +110,18 @@ public class ChargingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentChargingBinding.inflate(inflater, container, false);
         chargingBtn = binding.chargingBtn;
+        charging_checkbox = binding.chargingCheckbox;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            charging_checkbox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#FFFFFF")));
+        }
+        charging_checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            for (ChargingItem item : chargingItems) {
+                item.setChecked(isChecked);
+            }
+            // Notify the adapter about the change in doorItems
+            chargingAdapter.notifyDataSetChanged();
+        });
 
         chargingBtn.setOnClickListener(new View.OnClickListener() {
             @Override

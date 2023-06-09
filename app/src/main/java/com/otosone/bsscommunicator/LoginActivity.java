@@ -42,9 +42,9 @@ public class LoginActivity extends AppCompatActivity {
                 if(authenticateUser(username, password) == 1){
                     Intent intent = new Intent(LoginActivity.this, ScanActivity.class);
                     startActivity(intent);
-                    overridePendingTransition(0, 0);
+// Here, R.anim.enter_anim and R.anim.exit_anim are your custom animations
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
-
                 }else {
                     Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                 }

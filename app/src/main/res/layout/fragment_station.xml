@@ -51,7 +51,9 @@
                         android:id="@+id/stationBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/rounded_button"
+                        android:textColor="@color/white"
                         android:text="SET" />
                 </LinearLayout>
             </LinearLayout>
@@ -169,6 +171,7 @@
                         android:orientation="horizontal"
                         android:weightSum="2">
 
+
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/paymentTimeoutEt"
                             android:layout_width="match_parent"
@@ -180,6 +183,13 @@
 
 
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:layout_marginRight="35dp"
+                        android:text="PaymentType"/>
 
                     <Spinner
                         android:id="@+id/paymentTypeSpinner"

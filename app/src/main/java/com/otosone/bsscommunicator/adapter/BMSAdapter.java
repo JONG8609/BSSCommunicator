@@ -3,6 +3,9 @@ package com.otosone.bsscommunicator.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -62,6 +65,9 @@ public class BMSAdapter extends BaseAdapter {
         BMSItem bmsItem = getItem(position);
 
         CheckBox checkBox = convertView.findViewById(R.id.bms_checkbox);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            checkBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
+        }
         TextView bms1_tv = convertView.findViewById(R.id.bms1_tv);
         TextView bms2_et = convertView.findViewById(R.id.bms2_et);
         TextView bms_spinner_tv = convertView.findViewById(R.id.bms_spinner_tv);
@@ -192,7 +198,5 @@ public class BMSAdapter extends BaseAdapter {
 
         dialog.show();
     }
-
-
 
 }

@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelUuid;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import com.otosone.bsscommunicator.adapter.DeviceArrayAdapter;
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.bluetooth.ConnectionFailedListener;
 import com.otosone.bsscommunicator.R;
@@ -38,7 +40,7 @@ public class ScanFragment extends Fragment {
     private FragmentScanBinding binding;
     private BluetoothConnectionService bluetoothConnectionService;
     private List<RxBleDevice> foundDevices;
-    private ArrayAdapter<RxBleDevice> arrayAdapter;
+    private DeviceArrayAdapter arrayAdapter;
     private BluetoothAdapter bluetoothAdapter;
     private ConnectionFailedListener connectionFailedListener;
     private static final int REQUEST_ENABLE_BT = 101;
@@ -68,9 +70,9 @@ public class ScanFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Toast.makeText(getActivity(), "disconnected", Toast.LENGTH_SHORT).show();
         foundDevices = new ArrayList<>();
-        arrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, foundDevices);
+        arrayAdapter = new DeviceArrayAdapter(requireContext(), foundDevices); // <-- Changed here
         binding.listView.setAdapter(arrayAdapter);
         binding.listView.setOnItemClickListener((parent, itemView, position, id) -> {
             RxBleDevice selectedDevice = foundDevices.get(position);
@@ -78,13 +80,20 @@ public class ScanFragment extends Fragment {
                 @Override
                 public void onDeviceConnected() {
                     requireActivity().runOnUiThread(() -> {
-                        Toast.makeText(getActivity(), "connection done", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getActivity(), "connection done", Toast.LENGTH_LONG).show();
 
                         StatusFragment statusFragment = new StatusFragment(); // Create instance of StatusFragment
                         getFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.fragment_container, statusFragment) // Replace current Fragment with StatusFragment
                                 .commit();
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                statusFragment.executeRefresh();
+                            }
+                        }, 500); // Adjust this delay as per your needs
                     });
                 }
 

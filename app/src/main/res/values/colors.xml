@@ -8,4 +8,19 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#808080</color>
+    <color name="color_when_pressed">#A9A9A9</color> <!--Dark Gray when pressed-->
+    <color name="color_when_selected">#D3D3D3</color><!--Light Gray when selected-->
+    <color name="purple">#6200EE</color>
+    <color name="blue_50">#E3F2FD</color>
+    <color name="blue_100">#BBDEFB</color>
+    <color name="blue_200">#90CAF9</color>
+    <color name="blue_300">#64B5F6</color>
+    <color name="blue_400">#42A5F5</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="colorPrimary">#2196F3</color>
+
+    <color name="selected_color">#64B5F6</color> <!-- Red when selected -->
+    <color name="pressed_color">#64B5F6</color> <!-- Green when pressed -->
+    <color name="default_color">#FFFFFFFF</color> <!-- Blue by default -->
+
 </resources>

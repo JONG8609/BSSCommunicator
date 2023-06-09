@@ -3,6 +3,9 @@ package com.otosone.bsscommunicator.adapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +57,9 @@ public class DoorAdapter extends BaseAdapter {
         DoorItem doorItem = getItem(position);
 
         CheckBox checkBox = convertView.findViewById(R.id.door_checkbox);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            checkBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
+        }
         TextView door1_tv = convertView.findViewById(R.id.door1_tv);
         TextView door2_tv = convertView.findViewById(R.id.door2_tv);
 
@@ -91,7 +97,7 @@ public class DoorAdapter extends BaseAdapter {
         int[] selectedIndex = new int[]{getItem(position).getDoorStatus().equals("LOCK") ? 0 : 1};
 
         ListView listView = dialogView.findViewById(R.id.listView);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_single_choice, choices);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.my_list_item_single_choice, choices);
         listView.setAdapter(adapter);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         listView.setItemChecked(selectedIndex[0], true);

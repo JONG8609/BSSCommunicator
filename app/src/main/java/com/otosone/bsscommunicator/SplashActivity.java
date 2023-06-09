@@ -9,8 +9,6 @@ import android.os.Handler;
 
 public class SplashActivity extends AppCompatActivity {
 
-    // Splash screen timer
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -21,8 +19,6 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                // This method will be executed once the timer is over
-                // Start your app main activity
                 Intent i = new Intent(SplashActivity.this, LoginActivity.class);
                 overridePendingTransition(0, 0);
                 startActivity(i);
@@ -30,6 +26,6 @@ public class SplashActivity extends AppCompatActivity {
                 // close this activity
                 finish();
             }
-        },100);
+        },3000);
     }
 }

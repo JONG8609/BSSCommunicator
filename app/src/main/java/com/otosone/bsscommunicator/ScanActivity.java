@@ -70,6 +70,7 @@ public class ScanActivity extends AppCompatActivity {
         arrayAdapter = new DeviceArrayAdapter(this,foundDevices);
         binding.listView.setAdapter(arrayAdapter);
         binding.listView.setOnItemClickListener((parent, view, position, id) -> {
+            binding.listView.setItemChecked(position, true);
             RxBleDevice selectedDevice = foundDevices.get(position);
             bluetoothConnectionService.setConnectionStateListener(new BluetoothConnectionService.ConnectionStateListener() {
                 @Override

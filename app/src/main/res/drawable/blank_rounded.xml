@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="rectangle">
-            <corners android:radius="10dp" />
-            <stroke android:color="@color/black" android:width="2dp"/>
-        </shape>
-    </item>
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#ffffff" /> <!-- white color fill -->
+    <corners android:radius="10dp" /> <!-- rounded corners -->
+
+    <!-- light gray shadow -->
+    <stroke android:color="#d3d3d3" android:width="2dp"/> <!-- light gray color stroke -->
+
+    <!-- shadow effect -->
+    <padding android:left="1dp" android:top="1dp"
+        android:right="1dp" android:bottom="1dp" />
+
+</shape>

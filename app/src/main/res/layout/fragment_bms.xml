@@ -18,9 +18,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:orientation="horizontal"
                 android:weightSum="2">
 
                 <LinearLayout
@@ -38,7 +38,6 @@
                 </LinearLayout>
 
 
-
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -49,11 +48,12 @@
                         android:id="@+id/bmsBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/rounded_button"
-                        android:text="SET" />
+                        android:text="SET"
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
-
 
 
             </LinearLayout>
@@ -64,36 +64,36 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/black">
 
-                <TextView
+                <CheckBox
                     android:id="@+id/bms_checkbox"
-                    android:layout_width="40dp"
-                    android:textColor="@color/white"
-                    android:layout_height="match_parent"
+                    android:layout_width="55dp"
+                    android:layout_height="25dp"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/white" />
 
                 <TextView
-                    android:layout_width="20dp"
-                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="8dp"
                     android:gravity="center"
                     android:text="ID"
+                    android:textColor="@color/white"
                     android:textSize="16sp" />
 
                 <TextView
-                    android:text="CMD"
                     android:layout_width="220dp"
-                    android:textColor="@color/white"
                     android:layout_height="match_parent"
-                    android:gravity="center" />
+                    android:gravity="center"
+                    android:text="CMD"
+                    android:textColor="@color/white" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:textColor="@color/white"
                     android:text="Value"
+                    android:textColor="@color/white"
                     android:textSize="14sp" />
             </LinearLayout>
 

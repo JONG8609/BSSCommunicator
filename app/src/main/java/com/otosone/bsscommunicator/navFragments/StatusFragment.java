@@ -1,10 +1,13 @@
 package com.otosone.bsscommunicator.navFragments;
 
+import android.animation.ObjectAnimator;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -47,7 +50,7 @@ public class StatusFragment extends Fragment {
     private TextView isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv;
     private TextView socketBssIdTv, statusTempTv, statusFanTv, statusHeaterTv, statusDoorTv, statusHumidityTv, statusMqttTv, statusRestTv, statusLocalTv;
     private ImageButton statusRefreshIv;
-    private Queue<JSONObject> requestQueue;
+    public Queue<JSONObject> requestQueue;
     private int retryCount = 0;
     private static final int MAX_RETRY = 2;
     private Handler retryHandler = new Handler();
@@ -96,8 +99,10 @@ public class StatusFragment extends Fragment {
     };
 
 
-
-
+    public void executeRefresh() {
+        //rotateImageButton(statusRefreshIv);
+        initiateRequests();
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,11 +117,24 @@ public class StatusFragment extends Fragment {
         View root = binding.getRoot();
         Databind();
         setDefaultStatus();
-        statusRefreshIv.setOnClickListener(view -> initiateRequests());
+
+        statusRefreshIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rotateImageButton(statusRefreshIv);
+                initiateRequests();
+            }
+        });
         return root;
     }
 
-    private void initiateRequests() {
+    private void rotateImageButton(ImageButton imageButton) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(imageButton, "rotation", 0f, 360f);
+        objectAnimator.setDuration(1000); // Set duration to 1 second
+        objectAnimator.start();
+    }
+
+    public void initiateRequests() {
         Log.d("StatusFragment", "initiateRequests...");
         requestQueue = new LinkedList<>();
 
@@ -225,7 +243,6 @@ public class StatusFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         // Observe the allDataReceived LiveData
         DataHolder.getInstance().getAllDataReceived().observe(getViewLifecycleOwner(), allDataReceived -> {
             if (allDataReceived != null && allDataReceived) {
@@ -235,7 +252,6 @@ public class StatusFragment extends Fragment {
                 JSONObject bssStatus = DataHolder.getInstance().getBssStatus().getValue();
                 JSONObject info = DataHolder.getInstance().getInfo().getValue();
                 Map<String, JSONObject> socketStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
-
                 if (info != null) {
                     Log.d("info", info.toString());
                 }
@@ -259,8 +275,6 @@ public class StatusFragment extends Fragment {
                     }
                 }
 
-                // Reset allDataReceived and other data after updating the UI
-                //DataHolder.getInstance().resetData();
             }
         });
     }
@@ -420,36 +434,38 @@ public class StatusFragment extends Fragment {
             char lockBit = binaryStatus.length() >= 5 ? binaryStatus.charAt(4) : '0'; // remember indices start from 0
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
+
+
             // Set background color
             if (binaryStatus.charAt(0) == '0' || binaryStatus.charAt(1) == '0') {
-                layouts[index].setBackgroundColor(Color.parseColor("#202124"));
+                layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#202124"), 60));
             } else {
                 switch (charging) {
                     case 0:
-                        layouts[index].setBackgroundColor(Color.parseColor("#BFBEBD"));
+                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));
                         break;
                     case 1:
                     case 2:
                     case 3:
-                        layouts[index].setBackgroundColor(Color.parseColor("#FE423E"));
+                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));
                         break;
                     case 4:
                         if (soc > 95) {
-                            layouts[index].setBackgroundColor(Color.parseColor("#27B6FF"));
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#27B6FF"), 60));
                         } else {
-                            layouts[index].setBackgroundColor(Color.parseColor("#FE423E"));
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));
                         }
                         break;
                     case 6:
                         char yellowBackground = binaryStatus.charAt(3);
                         if(yellowBackground == '1'){
-                            layouts[index].setBackgroundColor(Color.parseColor("#FFC20A"));
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));
                         } else {
-                            layouts[index].setBackgroundColor(Color.parseColor("#FFC20A"));
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));
                         }
                         break;
                     default:
-                        layouts[index].setBackgroundColor(Color.parseColor("#BFBEBD"));
+                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));
                         break;
                 }
             }
@@ -463,8 +479,12 @@ public class StatusFragment extends Fragment {
         }
     }
 
-
-
+    Drawable getRoundedCornerDrawable(int color, float radius) {
+        GradientDrawable gradientDrawable = new GradientDrawable();
+        gradientDrawable.setColor(color);
+        gradientDrawable.setCornerRadius(radius);
+        return gradientDrawable;
+    }
     @Override
     public void onPause() {
         super.onPause();

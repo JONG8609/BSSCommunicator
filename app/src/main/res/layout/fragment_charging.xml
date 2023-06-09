@@ -47,7 +47,9 @@
                         android:id="@+id/chargingBtn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/rounded_button"
+                        android:textColor="@color/white"
                         android:text="SET" />
 
                 </LinearLayout>
@@ -60,14 +62,15 @@
                 android:layout_marginTop="10dp"
                 android:background="@color/black">
 
-                <TextView
-                    android:layout_width="100dp"
-                    android:layout_height="match_parent"
+                <CheckBox
+                    android:layout_width="115dp"
+                    android:id="@+id/charging_checkbox"
+                    android:layout_height="25dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
-                    android:layout_width="90dp"
+                    android:layout_width="70dp"
                     android:layout_height="match_parent"
                     android:textColor="@color/white"
                     android:layout_marginEnd="8dp"
