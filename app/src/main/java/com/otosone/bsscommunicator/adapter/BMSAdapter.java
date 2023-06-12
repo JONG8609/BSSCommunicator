@@ -73,7 +73,8 @@ public class BMSAdapter extends BaseAdapter {
         TextView bms_spinner_tv = convertView.findViewById(R.id.bms_spinner_tv);
 
         bms1_tv.setText(bmsItem.getId());
-        bms2_et.setText(Integer.toString(bmsItem.getValue()));
+        int newValue = bmsItem.getValue() / 10;
+        bms2_et.setText(String.valueOf(newValue));
         bms2_et.setFilters(new InputFilter[]{new InputFilterMinMax(0, 100)});
 
         checkBox.setOnCheckedChangeListener(null); // Remove any existing listeners
@@ -124,7 +125,8 @@ public class BMSAdapter extends BaseAdapter {
         dialogSpinner.setSelection(getItem(position).getCmd());
 
         // EditText setup
-        valueEditText.setText(String.valueOf(getItem(position).getValue()) + "%");
+        int roundedValue = Math.round((float)getItem(position).getValue() / 10);
+        valueEditText.setText(String.valueOf(roundedValue) + "%");
         valueEditText.setSelection(valueEditText.getText().length() - 1); // Set cursor position before "%"
         valueEditText.setEnabled(dialogSpinner.getSelectedItemPosition() == 0);
 
@@ -173,7 +175,7 @@ public class BMSAdapter extends BaseAdapter {
                         String valueText = valueEditText.getText().toString().replace("%", "");
                         newValue = Integer.parseInt(valueText);
                         if (newValue >= 0 && newValue <= 100) {
-                            bmsItem.setValue(newValue);
+                            bmsItem.setValue(newValue * 10);
                         } else {
                             Toast.makeText(context, "Value should be between 0 and 100", Toast.LENGTH_SHORT).show();
                         }

@@ -36,6 +36,7 @@ import com.otosone.bsscommunicator.databinding.ActivityMainBinding;
 import com.otosone.bsscommunicator.listItem.NavigationDrawerItem;
 import com.otosone.bsscommunicator.navFragments.BMSFragment;
 import com.otosone.bsscommunicator.navFragments.ChargerFragment;
+import com.otosone.bsscommunicator.navFragments.ChargingFragment;
 import com.otosone.bsscommunicator.navFragments.DoorFragment;
 import com.otosone.bsscommunicator.navFragments.FanFragment;
 import com.otosone.bsscommunicator.navFragments.HeaterFragment;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
             new NavigationDrawerItem.NavigationHeader("Control", false),
             new NavigationDrawerItem.NavigationItem("Station reset", R.drawable.bookmark),
             new NavigationDrawerItem.NavigationItem("Socket door", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Charger", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Charging", R.drawable.bookmark),
             new NavigationDrawerItem.NavigationItem("BMS", R.drawable.bookmark),
             new NavigationDrawerItem.NavigationDivider(), // New divider
             new NavigationDrawerItem.NavigationHeader("Setting", false),
@@ -224,8 +225,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                         case "Socket door":
                             selectedFragment = new DoorFragment();
                             break;
-                        case "Charger":
-                            selectedFragment = new ChargerFragment();
+                        case "Charging":
+                            selectedFragment = new ChargingFragment();
                             break;
                         case "BMS":
                             selectedFragment = new BMSFragment();
@@ -238,6 +239,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
                             break;
                         case "Heater":
                             selectedFragment = new HeaterFragment();
+                            break;
+                        case "Charger":
+                            selectedFragment = new ChargerFragment();
                             break;
                         default:
                             throw new IllegalArgumentException("Invalid item title " + navigationItem.getTitle());

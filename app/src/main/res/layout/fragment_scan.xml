@@ -45,14 +45,6 @@
                 android:layout_weight="1"
                 android:gravity="right">
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/stationBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/rounded_button"
-                    android:textColor="@color/white"
-                    android:text="SET" />
             </LinearLayout>
         </LinearLayout>
 

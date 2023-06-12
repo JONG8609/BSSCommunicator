@@ -189,6 +189,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
                         android:layout_marginRight="35dp"
+                        android:layout_marginBottom="3dp"
                         android:text="PaymentType"/>
 
                     <Spinner
@@ -199,7 +200,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_weight="1"
                         android:hint="Payment Type"
-                        android:drawableEnd="@android:drawable/arrow_down_float"
+                        android:background="@drawable/spinner_background"
                         android:textSize="25sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
