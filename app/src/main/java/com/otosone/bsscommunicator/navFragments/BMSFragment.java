@@ -69,11 +69,11 @@ public class BMSFragment extends Fragment {
             bluetoothConnectionService = binder.getService();
             isBound = true;
 
-            Log.d("BMSFragment", "Service connected");
+
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("BMSFragment", "MessageReceivedListener called");
+
 
                 getActivity().runOnUiThread(() -> {
                     try {
@@ -103,7 +103,7 @@ public class BMSFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("BMSFragment", "Service disconnected");
+
         }
     };
 
@@ -218,7 +218,7 @@ public class BMSFragment extends Fragment {
 
         Map<String, JSONObject> binaryStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
         if (binaryStatusMap != null) {
-            Log.d("statusinfo", binaryStatusMap.toString());
+
             for (Map.Entry<String, JSONObject> entry : binaryStatusMap.entrySet()) {
                 String socketId = entry.getKey();
                 JSONObject socketData = entry.getValue();
@@ -262,7 +262,7 @@ public class BMSFragment extends Fragment {
 
         Map<String, JSONObject> binaryStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
         if (binaryStatusMap != null) {
-            Log.d("statusinfo", binaryStatusMap.toString());
+
             for (Map.Entry<String, JSONObject> entry : binaryStatusMap.entrySet()) {
                 String socketId = entry.getKey();
                 JSONObject socketData = entry.getValue();

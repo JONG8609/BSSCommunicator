@@ -50,7 +50,7 @@ public class ChargerFragment extends Fragment {
             bluetoothConnectionService = binder.getService();
             isBound = true;
             //sendChargerRequest();
-            Log.d("ChargeFragment", "Service connected");
+
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
@@ -117,7 +117,7 @@ public class ChargerFragment extends Fragment {
                     }
                 });
 
-                Log.d("StationFragment", "Complete JSON: " + completeJsonString);
+
 
             });
 
@@ -128,7 +128,7 @@ public class ChargerFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("ChargeFragment", "Service disconnected");
+
         }
     };
 
@@ -286,7 +286,7 @@ public class ChargerFragment extends Fragment {
                     e.printStackTrace();
                 }
                 String jsonString = json.toString();
-                Log.d("UTF-8", jsonString);
+
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);

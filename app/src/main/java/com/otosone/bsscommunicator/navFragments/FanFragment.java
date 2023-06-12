@@ -60,7 +60,6 @@ public class FanFragment extends Fragment {
             bluetoothConnectionService = binder.getService();
             isBound = true;
             //sendFanRequest();
-            Log.d("FanFragment", "Service connected");
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
@@ -102,7 +101,6 @@ public class FanFragment extends Fragment {
                     }
                 });
 
-                Log.d("FanFragment", "Complete JSON: " + completeJsonString);
 
             });
 
@@ -112,7 +110,7 @@ public class FanFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("FanFragment", "Service disconnected");
+
         }
     };
 
@@ -171,7 +169,7 @@ public class FanFragment extends Fragment {
                     e.printStackTrace();
                 }
                 String fanJsonString = fanJson.toString();
-                Log.d("UTF-8", fanJsonString);
+
 
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {

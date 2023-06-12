@@ -58,7 +58,7 @@ public class ChargingFragment extends Fragment {
             bluetoothConnectionService = binder.getService();
             isBound = true;
 
-            Log.d("StationFragment", "Service connected");
+
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
@@ -95,7 +95,7 @@ public class ChargingFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("ChargingFragment", "Service disconnected");
+
         }
     };
 
@@ -197,7 +197,7 @@ public class ChargingFragment extends Fragment {
 
         Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
         if (binaryStatusMap != null) {
-            Log.d("statusinfo", binaryStatusMap.toString());
+
             for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
                 String socketId = entry.getKey();
                 String binaryStatus = entry.getValue();
@@ -238,7 +238,7 @@ public class ChargingFragment extends Fragment {
 
         Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
         if (binaryStatusMap != null) {
-            Log.d("statusinfo", binaryStatusMap.toString());
+
             for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
                 String socketId = entry.getKey();
                 String binaryStatus = entry.getValue();

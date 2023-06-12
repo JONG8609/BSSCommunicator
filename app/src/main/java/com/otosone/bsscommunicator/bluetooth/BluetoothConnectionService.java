@@ -74,7 +74,7 @@ public class BluetoothConnectionService extends Service {
 
     public void setMessageReceivedListener(MessageReceivedListener messageReceivedListener) {
         this.messageReceivedListener = messageReceivedListener;
-        Log.d("BluetoothConnService", "MessageReceivedListener set");
+
     }
 
     public class LocalBinder extends Binder {
@@ -168,7 +168,7 @@ public class BluetoothConnectionService extends Service {
         message += "\r\n";
 
         byte[] data = message.getBytes(StandardCharsets.UTF_8);
-        //Log.d("SendData", dataAsString);
+
 
         // Determine the chunk size
         int chunkSize = 10; // You can adjust this value depending on your needs
@@ -180,7 +180,7 @@ public class BluetoothConnectionService extends Service {
             connection.writeCharacteristic(UUID.fromString("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), chunk)
                     .subscribe(
                             bytes -> {
-                                //Log.d("Response", new String(bytes, StandardCharsets.UTF_8));
+
                             },
                             throwable -> {
                                 Log.e("SendDataError", "Error sending data", throwable);
@@ -197,7 +197,7 @@ public class BluetoothConnectionService extends Service {
                 .subscribe(
                         bytes -> {
                             String receivedMessage = new String(bytes, StandardCharsets.UTF_8);
-                            //Log.d("Received UTF-8 Message", receivedMessage);
+
                             processReceivedData(receivedMessage);
                         },
                         throwable -> {
@@ -268,7 +268,7 @@ public class BluetoothConnectionService extends Service {
                                 }
                             }
                             if (socketStatusMap.size() == 16) {
-                                Log.d("BluetoothConnService", "All SOCKET_STATUS messages processed. Creating log file.");
+
                                 DataHolder.getInstance().setAllDataReceived(true);
                                 createLogFile();
                             }
@@ -277,7 +277,7 @@ public class BluetoothConnectionService extends Service {
                         Log.e("BluetoothConnService", "Error parsing received JSON", e);
                     }
                 } else {
-                    Log.d("ProcessReceivedData", "messageReceivedListener is null");
+
                 }
 
                 receivedMessageBuilder.delete(0, closeBraceIndex + 1);
@@ -295,7 +295,7 @@ public class BluetoothConnectionService extends Service {
         new Thread(() -> {
             try {
                 String currentDate = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
-                Log.d("BluetoothConnService", "Current date: " + currentDate);
+
 
                 // Get the external storage directory
                 File externalDir = getExternalFilesDir(null);
@@ -304,20 +304,20 @@ public class BluetoothConnectionService extends Service {
                     return;
                 }
 
-                Log.d("BluetoothConnService", "External dir: " + externalDir.getAbsolutePath());
+
 
                 // Create the log file
                 String stationId = bssStatus.getString("stationId");
                 File logFile = new File(externalDir, stationId +"_" + currentDate + ".log");
-                Log.d("BluetoothConnService", "Log file path: " + logFile.getAbsolutePath());
+
 
                 // Checking if the file already exists
                 if (logFile.exists()) {
-                    Log.d("BluetoothConnService", "Log file for today already exists.");
+
                 } else {
                     boolean isCreated = logFile.createNewFile();
                     if (isCreated) {
-                        Log.d("BluetoothConnService", "Created new log file for today.");
+
                     } else {
                         Log.e("BluetoothConnService", "Failed to create log file.");
                         return;
@@ -333,7 +333,7 @@ public class BluetoothConnectionService extends Service {
                 osw.write(logContent);
                 osw.close();
                 fos.close();
-                Log.d("BluetoothConnService", "Successfully wrote to the file.");
+
 
                 // Clear the socketStatusMap after the log file has been created
                 socketStatusMap.clear();

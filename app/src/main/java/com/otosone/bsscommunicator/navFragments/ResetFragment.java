@@ -93,8 +93,7 @@ public class ResetFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("StationFragment", "Service disconnected");
-        }
+              }
     };
 
     @Override

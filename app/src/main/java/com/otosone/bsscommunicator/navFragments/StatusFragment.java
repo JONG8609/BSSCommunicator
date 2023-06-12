@@ -68,10 +68,8 @@ public class StatusFragment extends Fragment {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
             isBound = true;
-            Log.d("StationFragment", "Service connected");
-            // Set the MessageReceivedListener
+             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("StationFragment", "MessageReceivedListener called");
                 getActivity().runOnUiThread(() -> {
                     // Parse the received JSON string
                     try {
@@ -84,8 +82,7 @@ public class StatusFragment extends Fragment {
             });
 
             bluetoothConnectionService.setDeviceConnectedListener(connection -> {
-                Log.d("StatusFragment", "DeviceConnectedListener triggered");
-                initiateRequests();
+               initiateRequests();
             });
 
         }
@@ -94,8 +91,7 @@ public class StatusFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("StationFragment", "Service disconnected");
-        }
+             }
     };
 
 
@@ -135,8 +131,7 @@ public class StatusFragment extends Fragment {
     }
 
     public void initiateRequests() {
-        Log.d("StatusFragment", "initiateRequests...");
-        requestQueue = new LinkedList<>();
+         requestQueue = new LinkedList<>();
 
         // Add the requests to the queue
         addRequestToQueue("INFO");
@@ -246,21 +241,18 @@ public class StatusFragment extends Fragment {
         // Observe the allDataReceived LiveData
         DataHolder.getInstance().getAllDataReceived().observe(getViewLifecycleOwner(), allDataReceived -> {
             if (allDataReceived != null && allDataReceived) {
-                Log.d("allDataReceived", "All data received. Updating UI.");
 
                 // Get the latest bssStatus and socketStatusMap
                 JSONObject bssStatus = DataHolder.getInstance().getBssStatus().getValue();
                 JSONObject info = DataHolder.getInstance().getInfo().getValue();
                 Map<String, JSONObject> socketStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
                 if (info != null) {
-                    Log.d("info", info.toString());
                 }
 
                 if (bssStatus != null && info != null) {
                     try {
                         String apkVersion = info.getString("apkVersion");
-                        Log.d("bssinfo", bssStatus.toString());
-                        bssStatus(bssStatus, apkVersion);
+                         bssStatus(bssStatus, apkVersion);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -269,7 +261,6 @@ public class StatusFragment extends Fragment {
                 if (socketStatusMap != null) {
                     // Create a copy of the map entries
                     Set<Map.Entry<String, JSONObject>> entriesCopy = new HashSet<>(socketStatusMap.entrySet());
-                    Log.d("statusinfo", socketStatusMap.toString());
                     for (Map.Entry<String, JSONObject> entry : entriesCopy) {
                         socketStatus(entry.getValue());
                     }
@@ -286,7 +277,6 @@ public class StatusFragment extends Fragment {
 
         DataHolder.getInstance().getAllDataReceived().observe(getViewLifecycleOwner(), allDataReceived -> {
             if (allDataReceived != null && allDataReceived) {
-                Log.d("allDataReceived", "All data received. Updating UI.");
 
                 // Get the latest bssStatus and socketStatusMap
                 JSONObject bssStatus = DataHolder.getInstance().getBssStatus().getValue();
@@ -294,13 +284,11 @@ public class StatusFragment extends Fragment {
                 Map<String, JSONObject> socketStatusMap = DataHolder.getInstance().getSocketStatusMap().getValue();
 
                 if (info != null) {
-                    Log.d("info", info.toString());
                 }
 
                 if (bssStatus != null && info != null) {
                     try {
                         String apkVersion = info.getString("apkVersion");
-                        Log.d("bssinfo", bssStatus.toString());
                         bssStatus(bssStatus, apkVersion);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -310,7 +298,6 @@ public class StatusFragment extends Fragment {
                 if (socketStatusMap != null) {
                     // Create a copy of the map entries
                     Set<Map.Entry<String, JSONObject>> entriesCopy = new HashSet<>(socketStatusMap.entrySet());
-                    Log.d("statusinfo", socketStatusMap.toString());
                     for (Map.Entry<String, JSONObject> entry : entriesCopy) {
                         socketStatus(entry.getValue());
                     }

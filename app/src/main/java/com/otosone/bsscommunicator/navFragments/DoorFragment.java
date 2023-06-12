@@ -63,11 +63,11 @@ public class DoorFragment extends Fragment {
             bluetoothConnectionService = binder.getService();
             isBound = true;
 
-            Log.d("StationFragment", "Service connected");
+
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("DoorFragment", "MessageReceivedListener called");
+
                 getActivity().runOnUiThread(() -> {
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
@@ -90,7 +90,7 @@ public class DoorFragment extends Fragment {
                     }
                 });
 
-                Log.d("DoorFragment", "Complete JSON: " + completeJsonString);
+
 
             });
 
@@ -101,7 +101,7 @@ public class DoorFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("StationFragment", "Service disconnected");
+
         }
     };
 
@@ -156,7 +156,7 @@ public class DoorFragment extends Fragment {
                 }
 
                 String jsonString = json.toString();
-                Log.d("UTF-8", jsonString);
+
 
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
@@ -201,7 +201,7 @@ public class DoorFragment extends Fragment {
 
         Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
         if (binaryStatusMap != null) {
-            Log.d("statusinfo", binaryStatusMap.toString());
+
             for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
                 String socketId = entry.getKey();
                 String binaryStatus = entry.getValue();
@@ -242,7 +242,7 @@ public class DoorFragment extends Fragment {
 
         Map<String, String> binaryStatusMap = DataHolder.getInstance().getBinaryStatusMap().getValue();
         if (binaryStatusMap != null) {
-            Log.d("statusinfo", binaryStatusMap.toString());
+
             for (Map.Entry<String, String> entry : binaryStatusMap.entrySet()) {
                 String socketId = entry.getKey();
                 String binaryStatus = entry.getValue();

@@ -65,12 +65,10 @@ public class StationFragment extends Fragment {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
             isBound = true;
-            Log.d("StationFragment", "Service connected");
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("StationFragment", "MessageReceivedListener called");
-                getActivity().runOnUiThread(() -> {
+                       getActivity().runOnUiThread(() -> {
 
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
@@ -112,8 +110,7 @@ public class StationFragment extends Fragment {
                     }
                 });
 
-                Log.d("StationFragment", "Complete JSON: " + completeJsonString);
-            });
+                  });
 
 
         }
@@ -122,8 +119,7 @@ public class StationFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("StationFragment", "Service disconnected");
-        }
+                }
     };
 
     @Override
@@ -253,8 +249,7 @@ public class StationFragment extends Fragment {
                     e.printStackTrace();
                 }
                 String jsonString = json.toString();
-                Log.d("UTF-8", jsonString);
-                // Call the sendAsciiMessage method with the string as an argument
+                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
 

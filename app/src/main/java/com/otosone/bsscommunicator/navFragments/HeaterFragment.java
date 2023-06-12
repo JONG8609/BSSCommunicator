@@ -58,7 +58,6 @@ public class HeaterFragment extends Fragment {
             bluetoothConnectionService = binder.getService();
             isBound = true;
             //sendHeaterRequest();
-            Log.d("HeaterFragment", "Service connected");
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
@@ -100,7 +99,6 @@ public class HeaterFragment extends Fragment {
                     }
                 });
 
-                Log.d("HeaterFragment", "Complete JSON: " + completeJsonString);
 
             });
 
@@ -131,8 +129,7 @@ public class HeaterFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-            Log.d("HeaterFragment", "Service disconnected");
-        }
+               }
     };
 
     @Override
@@ -183,7 +180,6 @@ public class HeaterFragment extends Fragment {
                     e.printStackTrace();
                 }
                 String heaterJsonString = heaterJson.toString();
-                Log.d("UTF-8", heaterJsonString);
 
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
