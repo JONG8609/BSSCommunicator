@@ -13,12 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.otosone.bsscommunicator.bluetooth.BluetoothConnectionService;
 import com.otosone.bsscommunicator.R;
@@ -40,6 +42,7 @@ public class ResetFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
     private boolean isBound = false;
     private Button resetBtn;
+    private boolean responseReceived = false;
 
     public static ResetFragment newInstance(String param1, String param2) {
         ResetFragment fragment = new ResetFragment();
@@ -62,9 +65,18 @@ public class ResetFragment extends Fragment {
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
-                        // Check if it's a request
-                        if (receivedJson.has("response")) {
-                            resetResponse(completeJsonString);
+
+                        if (receivedJson.has("response") && receivedJson.getString("response").equals("CTRL_RESET")) {
+                            String result = receivedJson.getString("result");
+                            int errorCode = receivedJson.getInt("error_code");
+
+                            if (result.equals("ok") && errorCode == 0) {
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
+                            } else {
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                     } catch (JSONException e) {
@@ -74,20 +86,6 @@ public class ResetFragment extends Fragment {
 
             });
 
-
-        }
-
-        private void resetResponse(String jsonData) {
-            try {
-                JSONObject jsonObject = new JSONObject(jsonData);
-
-                String responseType = jsonObject.getString("response");
-                String result = jsonObject.getString("result");
-                int errorCode = jsonObject.getInt("error_code");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
 
 
@@ -123,7 +121,7 @@ public class ResetFragment extends Fragment {
     private void showResetConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle("Reset Confirmation");
-        builder.setMessage("Would you lkie to run the command?");
+        builder.setMessage("Would you like to run the command?");
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -143,6 +141,18 @@ public class ResetFragment extends Fragment {
         }
         if (bluetoothConnectionService != null) {
             bluetoothConnectionService.sendMessage(resetRequest.toString());
+
+            responseReceived = false; // reset the flag
+
+            // Start a Handler to check for response
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (!responseReceived) {
+                        Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }, 1000);
         }
     }
 

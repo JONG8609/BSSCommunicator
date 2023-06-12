@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -41,7 +42,7 @@ public class ChargerFragment extends Fragment {
     private StringBuilder jsonStringBuilder = new StringBuilder();
     private Button chargerBtn;
     private EditText preChargerRefVoltageEt, preChargerCurrentEt, preChargerTempEt, preChargerTimeoutEt, chargerVoltageEt, chargerCurrentEt, chargerLimitTempEt, ChargerCutoffVoltageEt, ChargerCutoffCurrentEt, chargingTimeoutEt, cellDeltaVEt;
-
+    private boolean responseReceived = false;
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
@@ -56,22 +57,24 @@ public class ChargerFragment extends Fragment {
 
                 getActivity().runOnUiThread(() -> {
 
-                    double preChgRefVol = Double.parseDouble(preChargerRefVoltageEt.getText().toString());
-                    double preChgCur = Double.parseDouble(preChargerCurrentEt.getText().toString());
-                    int preChgTemp = Integer.parseInt(preChargerTempEt.getText().toString());
-                    int preChgTimeout = Integer.parseInt(preChargerTimeoutEt.getText().toString());
-                    double chgVol = Double.parseDouble(chargerVoltageEt.getText().toString());
-                    double chgCur = Double.parseDouble(chargerCurrentEt.getText().toString());
-                    int chgLimitTemp = Integer.parseInt(chargerLimitTempEt.getText().toString());
-                    double chgCutoffVol = Double.parseDouble(ChargerCutoffVoltageEt.getText().toString());
-                    double chgCutoffCur = Double.parseDouble(ChargerCutoffCurrentEt.getText().toString());
-                    int chgTimeout = Integer.parseInt(chargingTimeoutEt.getText().toString());
-                    int cellDeltaV = Integer.parseInt(cellDeltaVEt.getText().toString());
+
                     // Parse the received JSON string
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
                         if (receivedJson.has("request") && receivedJson.getString("request").equals("CHG_CFG")) {
+
+                            double preChgRefVol = Double.parseDouble(preChargerRefVoltageEt.getText().toString());
+                            double preChgCur = Double.parseDouble(preChargerCurrentEt.getText().toString());
+                            int preChgTemp = Integer.parseInt(preChargerTempEt.getText().toString());
+                            int preChgTimeout = Integer.parseInt(preChargerTimeoutEt.getText().toString());
+                            double chgVol = Double.parseDouble(chargerVoltageEt.getText().toString());
+                            double chgCur = Double.parseDouble(chargerCurrentEt.getText().toString());
+                            int chgLimitTemp = Integer.parseInt(chargerLimitTempEt.getText().toString());
+                            double chgCutoffVol = Double.parseDouble(ChargerCutoffVoltageEt.getText().toString());
+                            double chgCutoffCur = Double.parseDouble(ChargerCutoffCurrentEt.getText().toString());
+                            int chgTimeout = Integer.parseInt(chargingTimeoutEt.getText().toString());
+                            int cellDeltaV = Integer.parseInt(cellDeltaVEt.getText().toString());
 
                             JSONObject responseJson = new JSONObject();
                             responseJson.put("response", "CHG_CFG");
@@ -101,14 +104,11 @@ public class ChargerFragment extends Fragment {
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "CHG_CFG");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
-                                // Handle success case here
+                                responseReceived = true;
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                             } else {
-                                // Handle error case here
-                                Log.e("StationFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -123,26 +123,7 @@ public class ChargerFragment extends Fragment {
 
         }
 
-        private void sendChargerRequest() {
-            // Create a JSON object
-            JSONObject json = new JSONObject();
 
-            try {
-                json.put("request", "CHG_CFG");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            String jsonString = json.toString();
-
-            // Call the sendAsciiMessage method with the string as an argument
-            if (isBound && bluetoothConnectionService != null) {
-                bluetoothConnectionService.sendMessage(jsonString);
-
-            } else {
-                Log.e("StatusFragment","Cannot send message, service is not bound or null");
-            }
-        }
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
@@ -309,7 +290,18 @@ public class ChargerFragment extends Fragment {
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
-                    Log.d("json11", jsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
                 } else {
                     Log.e("ChargerFragment", "BluetoothConnectionService is not bound");
                 }

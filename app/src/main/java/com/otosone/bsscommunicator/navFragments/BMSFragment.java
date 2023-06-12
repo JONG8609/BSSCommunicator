@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,6 +57,7 @@ public class BMSFragment extends Fragment {
     private List<BMSItem> bmsItems;
     private Button bmsBtn;
     private CheckBox bms_checkbox;
+    private boolean responseReceived = false;
     public static BMSFragment newInstance() {
         return new BMSFragment();
     }
@@ -78,18 +80,15 @@ public class BMSFragment extends Fragment {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
 
                         if (receivedJson.has("response") && receivedJson.getString("response").equals("CTRL_BMS")) {
-                            Log.d("231441", "221");
                             String result = receivedJson.getString("result");
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                Log.d("231441", "222");
-                                // Show a notification here when the success case is met
-                                showNotification("Success!");
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                             } else {
-                                Log.e("BMSFragment", "Received error: result = " + result + ", error_code = " + errorCode);
-                                // Show a notification here when the error case is met
-                                showNotification("Error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
                     } catch (JSONException e) {
@@ -179,6 +178,18 @@ public class BMSFragment extends Fragment {
                 if (isBound && bluetoothConnectionService != null) {
                     String jsonString = json.toString();
                     bluetoothConnectionService.sendMessage(jsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
                 } else {
                     Toast.makeText(getActivity(), "Not connected to a device", Toast.LENGTH_SHORT).show();
                 }

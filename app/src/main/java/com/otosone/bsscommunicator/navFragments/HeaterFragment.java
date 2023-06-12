@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,6 +38,7 @@ public class HeaterFragment extends Fragment {
     private StringBuilder jsonStringBuilder = new StringBuilder();
     private Button heaterBtn;
     private EditText heaterStartTempEt, heaterStopTempEt;
+    private boolean responseReceived = false;
 
     public HeaterFragment() {
         // Required empty public constructor
@@ -85,14 +87,11 @@ public class HeaterFragment extends Fragment {
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "HEATER_CFG");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
-                                // Handle success case here
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                             } else {
-                                // Handle error case here
-                                Log.e("HeaterFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -189,7 +188,18 @@ public class HeaterFragment extends Fragment {
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(heaterJsonString);
-                    Log.d("json11", heaterJsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
                 } else {
                     Log.e("HeaterFragment", "BluetoothConnectionService is not bound");
                 }

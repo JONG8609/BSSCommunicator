@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,6 +53,7 @@ public class DoorFragment extends Fragment {
     private List<DoorItem> doorItems;
     private Button doorBtn;
     private CheckBox door_checkbox;
+    private boolean responseReceived = false;
 
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
@@ -75,14 +77,11 @@ public class DoorFragment extends Fragment {
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "CTRL_LOCK");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
-                                // Handle success case here
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                             } else {
-                                // Handle error case here
-                                Log.e("DoorFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -161,10 +160,22 @@ public class DoorFragment extends Fragment {
 
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
                 } else {
                     Log.e("DoorFragment", "BluetoothConnectionService is not bound");
                 }
-                Toast.makeText(getActivity(),"sampl", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getActivity(),"sampl", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,6 +39,7 @@ public class FanFragment extends Fragment {
     private StringBuilder jsonStringBuilder = new StringBuilder();
     private Button fanBtn;
     private EditText fanStartTempEt, fanStopTempEt;
+    private boolean responseReceived = false;
 
     public FanFragment() {
         // Required empty public constructor
@@ -87,14 +89,11 @@ public class FanFragment extends Fragment {
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "FAN_CFG");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
-                                // Handle success case here
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                             } else {
-                                // Handle error case here
-                                Log.e("fanFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -107,27 +106,6 @@ public class FanFragment extends Fragment {
 
             });
 
-        }
-
-        private void sendFanRequest() {
-            // Create a JSON object
-            JSONObject json = new JSONObject();
-
-            try {
-                json.put("request", "FAN_CFG");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            String jsonString = json.toString();
-
-            // Call the sendAsciiMessage method with the string as an argument
-            if (isBound && bluetoothConnectionService != null) {
-                bluetoothConnectionService.sendMessage(jsonString);
-
-            } else {
-                Log.e("StatusFragment", "Cannot send message, service is not bound or null");
-            }
         }
 
         @Override
@@ -198,7 +176,19 @@ public class FanFragment extends Fragment {
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(fanJsonString);
-                    Log.d("json11", fanJsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
+
                 } else {
                     Log.e("FanFragment", "BluetoothConnectionService is not bound");
                 }

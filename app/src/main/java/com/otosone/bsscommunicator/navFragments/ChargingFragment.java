@@ -8,6 +8,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,6 +49,7 @@ public class ChargingFragment extends Fragment {
     private List<ChargingItem> chargingItems;
     private Button chargingBtn;
     private CheckBox charging_checkbox;
+    private boolean responseReceived = false;
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -71,14 +73,11 @@ public class ChargingFragment extends Fragment {
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "CTRL_CHG");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
-                                // Handle success case here
+                                responseReceived = true;
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                             } else {
-                                // Handle error case here
-                                Log.e("StationFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -158,6 +157,18 @@ public class ChargingFragment extends Fragment {
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
                 } else {
                     Log.e("ChargingFragment", "BluetoothConnectionService is not bound");
                 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,6 +47,7 @@ public class StationFragment extends Fragment {
     private Button stationBtn;
     private Spinner paymentTypeSpinner;
     private int paymentType = 3; // Default is NFC
+    private boolean responseReceived = false;
     public StationFragment() {
         // Required empty public constructor
     }
@@ -97,14 +99,12 @@ public class StationFragment extends Fragment {
                             int errorCode = receivedJson.getInt("error_code");
 
                             if (result.equals("ok") && errorCode == 0) {
-                                JSONObject responseJson = new JSONObject();
-                                responseJson.put("response", "STA_CFG");
-                                responseJson.put("result", "ok");
-                                responseJson.put("error_code", 0);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"success", Toast.LENGTH_SHORT).show();
                                 // Handle success case here
                             } else {
-                                // Handle error case here
-                                Log.e("StationFragment", "Received error: result = " + result + ", error_code = " + errorCode);
+                                responseReceived = true; // set the flag
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
                     } catch (JSONException e) {
@@ -257,6 +257,18 @@ public class StationFragment extends Fragment {
                 // Call the sendAsciiMessage method with the string as an argument
                 if (isBound && bluetoothConnectionService != null) {
                     bluetoothConnectionService.sendMessage(jsonString);
+
+                    responseReceived = false; // reset the flag
+
+                    // Start a Handler to check for response
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!responseReceived) {
+                                Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }, 1000);
                 } else {
                     Log.e("StationFragment", "BluetoothConnectionService is not bound");
                 }
