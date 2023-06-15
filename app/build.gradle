@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.otosone.bsscommunicator'
+    namespace 'com.otosone.bssmgr'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.otosone.bsscommunicator"
+        applicationId "com.otosone.bssmgr"
         minSdk 21
         targetSdk 33
         versionCode 1
