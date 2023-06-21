@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
     private NavigationDrawerAdapter adapter;
 
     NavigationDrawerItem[] drawerItems = new NavigationDrawerItem[]{
+            //new NavigationDrawerItem.NavigationHeader(R.drawable.your_header_image, true),
             new NavigationDrawerItem.NavigationHeader("OTOS BSS APP", true),
             new NavigationDrawerItem.NavigationDivider(), // New divider
             new NavigationDrawerItem.NavigationItem("Bluetooth Scan", R.drawable.bookmark),

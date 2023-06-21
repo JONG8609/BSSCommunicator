@@ -31,7 +31,7 @@ import com.polidea.rxandroidble2.scan.ScanSettings;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScanActivity extends AppCompatActivity {
+public class ScanActivity extends AppCompatActivity implements DeviceArrayAdapter.DeviceConnectListener{
 
     private static final int REQUEST_FINE_LOCATION_PERMISSION = 100;
     private static final int REQUEST_ENABLE_BT = 101;
@@ -67,7 +67,7 @@ public class ScanActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_scan);
 
         foundDevices = new ArrayList<>();
-        arrayAdapter = new DeviceArrayAdapter(this,foundDevices);
+        arrayAdapter = new DeviceArrayAdapter(this, foundDevices, this);
         binding.listView.setAdapter(arrayAdapter);
         binding.listView.setOnItemClickListener((parent, view, position, id) -> {
             binding.listView.setItemChecked(position, true);
@@ -198,5 +198,25 @@ public class ScanActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    @Override
+    public void onDeviceConnectClicked(RxBleDevice device) {
+        bluetoothConnectionService.setConnectionStateListener(new BluetoothConnectionService.ConnectionStateListener() {
+            @Override
+            public void onDeviceConnected() {
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(ScanActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                });
+            }
+
+            @Override
+            public void onDeviceDisconnected() {
+                // Handle disconnection if needed
+            }
+        });
+        bluetoothConnectionService.connectToDevice(device);
     }
 }

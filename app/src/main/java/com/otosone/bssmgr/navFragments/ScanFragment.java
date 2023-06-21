@@ -7,24 +7,22 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ParcelUuid;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.databinding.DataBindingUtil;
 
+import com.otosone.bssmgr.R;
 import com.otosone.bssmgr.adapter.DeviceArrayAdapter;
 import com.otosone.bssmgr.bluetooth.BluetoothConnectionService;
-import com.otosone.bssmgr.bluetooth.ConnectionFailedListener;
-import com.otosone.bssmgr.R;
 import com.otosone.bssmgr.databinding.FragmentScanBinding;
 import com.polidea.rxandroidble2.RxBleDevice;
 import com.polidea.rxandroidble2.scan.ScanFilter;
@@ -35,22 +33,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScanFragment extends Fragment {
-
+    private static final int REQUEST_FINE_LOCATION_PERMISSION = 100;
+    private static final int REQUEST_ENABLE_BT = 101;
     private FragmentScanBinding binding;
+    private DeviceArrayAdapter.DeviceConnectListener deviceConnectListener;
     private BluetoothConnectionService bluetoothConnectionService;
     private List<RxBleDevice> foundDevices;
     private DeviceArrayAdapter arrayAdapter;
     private BluetoothAdapter bluetoothAdapter;
-    private ConnectionFailedListener connectionFailedListener;
-    private static final int REQUEST_ENABLE_BT = 101;
-    private static final int REQUEST_FINE_LOCATION_PERMISSION = 100;
 
     public ScanFragment() {
         // Required empty public constructor
-    }
-
-    public void setConnectionFailedListener(ConnectionFailedListener connectionFailedListener) {
-        this.connectionFailedListener = connectionFailedListener;
     }
 
     public void setBluetoothConnectionService(BluetoothConnectionService bluetoothConnectionService) {
@@ -61,49 +54,21 @@ public class ScanFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_scan, container, false);
-        View root = binding.getRoot();
-
-        return root;
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Toast.makeText(getActivity(), "disconnected", Toast.LENGTH_SHORT).show();
+
         foundDevices = new ArrayList<>();
-        arrayAdapter = new DeviceArrayAdapter(requireContext(), foundDevices); // <-- Changed here
+
+        deviceConnectListener = device -> {
+            bluetoothConnectionService.connectToDevice(device);
+        };
+
+        arrayAdapter = new DeviceArrayAdapter(requireContext(), foundDevices, deviceConnectListener);
         binding.listView.setAdapter(arrayAdapter);
-        binding.listView.setOnItemClickListener((parent, itemView, position, id) -> {
-            RxBleDevice selectedDevice = foundDevices.get(position);
-            bluetoothConnectionService.setConnectionStateListener(new BluetoothConnectionService.ConnectionStateListener() {
-                @Override
-                public void onDeviceConnected() {
-                    requireActivity().runOnUiThread(() -> {
-                        //Toast.makeText(getActivity(), "connection done", Toast.LENGTH_LONG).show();
-
-                        StatusFragment statusFragment = new StatusFragment(); // Create instance of StatusFragment
-                        getFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragment_container, statusFragment) // Replace current Fragment with StatusFragment
-                                .commit();
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                statusFragment.executeRefresh();
-                            }
-                        }, 500); // Adjust this delay as per your needs
-                    });
-                }
-
-                @Override
-                public void onDeviceDisconnected() {
-                    // Handle disconnection if needed
-                    startScan(); // Start scanning when the connection is lost
-                }
-            });
-            bluetoothConnectionService.connectToDevice(selectedDevice);
-        });
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -114,16 +79,14 @@ public class ScanFragment extends Fragment {
         } else {
             if (bluetoothAdapter == null) {
                 // Device doesn't support Bluetooth
-                Toast.makeText(requireContext(), "Your device doesnot support Bluetooth", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Your device does not support Bluetooth", Toast.LENGTH_SHORT).show();
             } else if (!bluetoothAdapter.isEnabled()) {
-// Bluetooth is not enabled
+                // Bluetooth is not enabled
                 showEnableBluetoothDialog();
             } else {
-//bindService();
-                startScan(); // Start scanning when Bluetooth is already enabled
+                startScan();
             }
         }
-        startScan();
     }
 
     private void showEnableBluetoothDialog() {
@@ -133,16 +96,9 @@ public class ScanFragment extends Fragment {
                 .setPositiveButton("Yes", (dialog, which) -> {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
-                    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                    startActivityForResult (enableBtIntent, REQUEST_ENABLE_BT);
                 })
                 .setNegativeButton("No", (dialog, which) -> {
                     Toast.makeText(requireContext(), "Bluetooth is required for this app to work", Toast.LENGTH_SHORT).show();
@@ -150,11 +106,6 @@ public class ScanFragment extends Fragment {
                 })
                 .create()
                 .show();
-    }
-
-
-    public void setServiceConnection(BluetoothConnectionService bluetoothConnectionService) {
-        this.bluetoothConnectionService = bluetoothConnectionService;
     }
 
     private void startScan() {
@@ -168,11 +119,7 @@ public class ScanFragment extends Fragment {
                 .build();
 
         bluetoothConnectionService.scanBleDevices(scanSettings, scanFilter, this::onScanResult);
-
-        // Add this line to set the connection failed listener
-        bluetoothConnectionService.setConnectionFailedListener(connectionFailedListener);
     }
-
 
     private void onScanResult(ScanResult scanResult) {
         RxBleDevice foundDevice = scanResult.getBleDevice();
@@ -182,16 +129,14 @@ public class ScanFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100) {
+        if (requestCode == REQUEST_FINE_LOCATION_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startScan();
             } else {
-                // Handle permission denial
                 Toast.makeText(requireContext(), "Location permission is required for this app to work", Toast.LENGTH_SHORT).show();
             }
         }
@@ -205,7 +150,6 @@ public class ScanFragment extends Fragment {
                 startScan();
             } else {
                 Toast.makeText(requireContext(), "Bluetooth is required for this app to work", Toast.LENGTH_SHORT).show();
-                //finish();
             }
         }
     }
@@ -216,3 +160,4 @@ public class ScanFragment extends Fragment {
         binding = null;
     }
 }
+
