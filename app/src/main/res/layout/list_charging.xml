@@ -15,6 +15,7 @@
     <TextView
         android:id="@+id/charging1_tv"
         android:layout_width="90dp"
+        android:textColor="@color/black"
         android:layout_height="match_parent"
         android:layout_marginEnd="8dp"
         android:gravity="center"
@@ -24,6 +25,7 @@
     <TextView
         android:id="@+id/charging2_tv"
         android:layout_width="match_parent"
+        android:textColor="@color/black"
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="Text 2"

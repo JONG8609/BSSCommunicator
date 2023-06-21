@@ -13,10 +13,8 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
 
-
 import com.otosone.bssmgr.R;
 import com.otosone.bssmgr.listItem.NavigationDrawerItem;
-
 
 public class NavigationDrawerAdapter extends ArrayAdapter<NavigationDrawerItem> {
     private final Context context;
@@ -41,13 +39,21 @@ public class NavigationDrawerAdapter extends ArrayAdapter<NavigationDrawerItem> 
         NavigationDrawerItem currentItem = values[position];
 
         if (currentItem instanceof NavigationDrawerItem.NavigationHeader) {
-            if (((NavigationDrawerItem.NavigationHeader) currentItem).isLarge()) {
+            NavigationDrawerItem.NavigationHeader header = (NavigationDrawerItem.NavigationHeader) currentItem;
+            if (header.isLarge()) {
                 row = inflater.inflate(R.layout.header_row_large, parent, false);
             } else {
                 row = inflater.inflate(R.layout.header_row_small, parent, false);
             }
-            TextView textView = row.findViewById(R.id.header);
-            textView.setText(((NavigationDrawerItem.NavigationHeader) currentItem).getTitle());
+
+            if (header.isImageHeader()) {
+                ImageView imageView = row.findViewById(R.id.image); // replace with your image view id
+                imageView.setImageResource(header.getImageId());
+            } else {
+                TextView textView = row.findViewById(R.id.header);
+                textView.setText(header.getTitle());
+            }
+
             row.setBackgroundColor(Color.TRANSPARENT);
         } else if (currentItem instanceof NavigationDrawerItem.NavigationItem) {
             row = inflater.inflate(R.layout.item_row, parent, false);

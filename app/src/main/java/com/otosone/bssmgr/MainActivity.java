@@ -65,22 +65,22 @@ public class MainActivity extends AppCompatActivity implements ConnectionFailedL
     private NavigationDrawerAdapter adapter;
 
     NavigationDrawerItem[] drawerItems = new NavigationDrawerItem[]{
-            new NavigationDrawerItem.NavigationHeader("OTOS BSS APP", true),
+            new NavigationDrawerItem.NavigationHeader(R.drawable.otosoneimage, true),
             new NavigationDrawerItem.NavigationDivider(), // New divider
-            new NavigationDrawerItem.NavigationItem("Bluetooth Scan", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Socket Status", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Bluetooth Scan", R.drawable.scan),
+            new NavigationDrawerItem.NavigationItem("Socket Status", R.drawable.status),
             new NavigationDrawerItem.NavigationDivider(), // New divider
             new NavigationDrawerItem.NavigationHeader("Control", false),
-            new NavigationDrawerItem.NavigationItem("Station reset", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Socket door", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Charging", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("BMS", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Station reset", R.drawable.reset),
+            new NavigationDrawerItem.NavigationItem("Socket door", R.drawable.door),
+            new NavigationDrawerItem.NavigationItem("Charging", R.drawable.charging),
+            new NavigationDrawerItem.NavigationItem("BMS", R.drawable.bms),
             new NavigationDrawerItem.NavigationDivider(), // New divider
             new NavigationDrawerItem.NavigationHeader("Setting", false),
-            new NavigationDrawerItem.NavigationItem("Station", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Fan", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Heater", R.drawable.bookmark),
-            new NavigationDrawerItem.NavigationItem("Charger", R.drawable.bookmark),
+            new NavigationDrawerItem.NavigationItem("Station", R.drawable.station),
+            new NavigationDrawerItem.NavigationItem("Fan", R.drawable.fan),
+            new NavigationDrawerItem.NavigationItem("Heater", R.drawable.heater),
+            new NavigationDrawerItem.NavigationItem("Charger", R.drawable.charger),
     };
 
     @Override

@@ -12,6 +12,7 @@ public abstract class NavigationDrawerItem {
     }
 
     public static class NavigationHeader extends NavigationDrawerItem {
+        private int imageId = -1;  // Default to invalid ID
         private String title;
         private boolean isLarge;
 
@@ -21,12 +22,26 @@ public abstract class NavigationDrawerItem {
             this.isLarge = isLarge;
         }
 
+        public NavigationHeader(int imageId, boolean isLarge) {
+            super(true);  // true indicates it's a header
+            this.imageId = imageId;
+            this.isLarge = isLarge;
+        }
+
+        public int getImageId() {
+            return imageId;
+        }
+
         public String getTitle() {
             return title;
         }
 
         public boolean isLarge() {
             return isLarge;
+        }
+
+        public boolean isImageHeader() {
+            return imageId != -1;  // If imageId is not default, it's an image header
         }
     }
 

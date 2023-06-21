@@ -43,10 +43,11 @@ public class StationFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
     private boolean isBound = false;
 
-    private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt;
+    private EditText reportPeriodEt, batteryInTimeoutEt, batteryOutTimeoutEt, paymentTimeoutEt, urlMqttEt, urlRestEt;
     private Button stationBtn;
-    private Spinner paymentTypeSpinner;
+    private Spinner paymentTypeSpinner, operateModeSpinner;
     private int paymentType = 3; // Default is NFC
+    private int operationMode = 1; //Default is mode 1
     private boolean responseReceived = false;
     public StationFragment() {
         // Required empty public constructor
@@ -172,20 +173,31 @@ public class StationFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         paymentTypeSpinner.setAdapter(adapter);
 
+        ArrayAdapter<CharSequence> operateModeAdapter = ArrayAdapter.createFromResource(requireContext(),
+                R.array.operation_mode_array, android.R.layout.simple_spinner_item);
+        operateModeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        operateModeSpinner.setAdapter(operateModeAdapter);
+
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("stationValue", Context.MODE_PRIVATE);
         int reportPeriod = sharedPreferences.getInt("reportPeriod", 60);
         int batteryInTimeout = sharedPreferences.getInt("batteryInTimeout", 60);
         int batteryOutTimeout = sharedPreferences.getInt("batteryOutTimeout", 60);
         int paymentTimeout = sharedPreferences.getInt("paymentTimeout", 60);
         int spinnerPosition = sharedPreferences.getInt("spinnerPosition", 2);
+        int operateModePosition = sharedPreferences.getInt("operateModePosition", 0);
+        String urlMqtt = sharedPreferences.getString("urlMqtt", "ssl://a26s7vsf9z6tm-ats.iot.ap-northeast-2.amazonaws.com:8883");
+        String urlRest = sharedPreferences.getString("urlRest", "https://lb1bkrvbm6.execute-api.ap-northeast-2.amazonaws.com/otos/station");
+
 
         reportPeriodEt.setText(String.valueOf(reportPeriod) + " Min");
         batteryInTimeoutEt.setText(String.valueOf(batteryInTimeout) + " Sec");
         batteryOutTimeoutEt.setText(String.valueOf(batteryOutTimeout) + " Sec");
         paymentTimeoutEt.setText(String.valueOf(paymentTimeout) + " Sec");
+        urlMqttEt.setText((urlMqtt));
+        urlRestEt.setText((urlRest));
 
         paymentTypeSpinner.setSelection(spinnerPosition);
-
+        operateModeSpinner.setSelection(operateModePosition);
         paymentTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -213,7 +225,20 @@ public class StationFragment extends Fragment {
             }
         });
 
+        operateModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                operationMode = position + 1; // modes are 1-indexed
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("operateModePosition", position);
+                editor.apply();
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                operationMode = 1; // Mode 1 by default
+            }
+        });
 
         stationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -242,6 +267,9 @@ public class StationFragment extends Fragment {
                     dataJson.put("batOutTimeout", batteryOutTimeout);
                     dataJson.put("payTimeout", paymentTimeout);
                     dataJson.put("payType", paymentType);
+                    dataJson.put("operateMode", operationMode);
+                    dataJson.put("urlMqtt", "ssl://a26s7vsf9z6tm-ats.iot.ap-northeast-2.amazonaws.com:8883");
+                    dataJson.put("urlRest", "https://lb1bkrvbm6.execute-api.ap-northeast-2.amazonaws.com/otos/station");
 
                     json.put("request", "STA_CFG");
                     json.put("data", dataJson);
@@ -282,6 +310,9 @@ public class StationFragment extends Fragment {
         batteryOutTimeoutEt = binding.batteryOutTimeoutEt;
         paymentTimeoutEt = binding.paymentTimeoutEt;
         paymentTypeSpinner = binding.paymentTypeSpinner;
+        operateModeSpinner = binding.operateModeSpinner;
+        urlRestEt = binding.urlRestEt;
+        urlMqttEt = binding.urlMqttEt;
     }
 
     @Override

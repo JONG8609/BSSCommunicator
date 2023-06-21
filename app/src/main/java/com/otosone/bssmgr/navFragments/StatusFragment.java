@@ -416,13 +416,13 @@ public class StatusFragment extends Fragment {
 
             String status = dataObject.getString("status");
             String binaryStatus = HexToBinUtil.hexToBin(status);
-            char lockBit = binaryStatus.length() >= 5 ? binaryStatus.charAt(4) : '0'; // remember indices start from 0
+            char lockBit = binaryStatus.length() >= 32 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
 
 
             // Set background color
-            if (binaryStatus.charAt(0) == '0' || binaryStatus.charAt(1) == '0') {
+            if (binaryStatus.charAt(30) == '0' || binaryStatus.charAt(31) == '0') {
                 layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#202124"), 60));
             } else {
                 switch (charging) {
