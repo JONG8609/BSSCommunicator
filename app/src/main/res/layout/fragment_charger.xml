@@ -301,7 +301,7 @@
                             android:layout_height="match_parent"
                             android:layout_weight="1"
                             android:layout_marginRight="10dp"
-                            android:hint="   Limit Temperature   ">
+                            android:hint=" Limit Temperature ">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/chargerLimitTempEt"

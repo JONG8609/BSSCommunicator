@@ -42,6 +42,7 @@ import com.otosone.bssmgr.navFragments.FanFragment;
 import com.otosone.bssmgr.navFragments.HeaterFragment;
 import com.otosone.bssmgr.navFragments.ResetFragment;
 import com.otosone.bssmgr.navFragments.ScanFragment;
+import com.otosone.bssmgr.navFragments.SocketSpecFragment;
 import com.otosone.bssmgr.navFragments.StationFragment;
 import com.otosone.bssmgr.navFragments.StatusFragment;
 import com.otosone.bssmgr.utils.DataHolder;

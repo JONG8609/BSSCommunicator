@@ -53,12 +53,6 @@ public class StationFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static StationFragment newInstance(String param1, String param2) {
-        StationFragment fragment = new StationFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
