@@ -416,7 +416,7 @@ public class StatusFragment extends Fragment {
 
             String status = dataObject.getString("status");
             String binaryStatus = HexToBinUtil.hexToBin(status);
-            char lockBit = binaryStatus.length() >= 5 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
+            char lockBit = binaryStatus.length() >= 32 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
 
