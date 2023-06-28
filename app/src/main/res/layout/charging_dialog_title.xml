@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="ID"
+            android:textColor="@color/black"
             android:gravity="center"
             android:textSize="20dp"/>
 
@@ -26,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="ID"
+            android:textColor="@color/black"
             android:id="@+id/title_id"
             android:gravity="center"
             android:textSize="35dp"/>
@@ -60,12 +62,17 @@
             android:id="@+id/ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+            android:layout_marginBottom="10dp"
+            android:textColor="@color/white"
             android:text="OK" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+            android:textColor="@color/white"
             android:text="Cancel" />
 
     </LinearLayout>

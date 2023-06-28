@@ -11,6 +11,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -113,12 +115,54 @@ public class StatusFragment extends Fragment {
         setDefaultStatus();
 
         statusRefreshIv.setOnClickListener(new View.OnClickListener() {
+            private boolean isClickable = true;
+            private int remainingSeconds = 0;
+            private Handler handler = new Handler(Looper.getMainLooper());
+            private Runnable enableButtonRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    isClickable = true;
+                    remainingSeconds = 0;
+                }
+            };
+            private Runnable countdownRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (remainingSeconds > 0) {
+                        remainingSeconds--;
+                        if (remainingSeconds <= 10) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), "You can click again in "+ remainingSeconds +" seconds", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                        handler.postDelayed(this, 1000); // 1000 milliseconds = 1 second
+                    }
+                }
+            };
+
             @Override
             public void onClick(View v) {
-                rotateImageButton(statusRefreshIv);
-                initiateRequests();
+                if(isClickable){
+                    isClickable = false;
+                    remainingSeconds = 60; // 1 minute = 60 seconds
+                    rotateImageButton(statusRefreshIv);
+                    initiateRequests();
+                    handler.postDelayed(enableButtonRunnable, 60000); // 60000 milliseconds = 1 minute
+                    handler.postDelayed(countdownRunnable, 1000); // 1000 milliseconds = 1 second
+                } else if (remainingSeconds <= 60) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getActivity(), "You can click again in "+ remainingSeconds +" seconds.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
+
         return root;
     }
 
@@ -403,10 +447,12 @@ public class StatusFragment extends Fragment {
 
 
     private void socketStatus(JSONObject socketStatus) {
+        String binaryStatus = "";
+        String indexString = "";
         try {
             JSONObject dataObject = socketStatus;
             int index = dataObject.getInt("index");
-
+            indexString = Integer.toString(index);
             LinearLayout[] layouts = {layout1, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9, layout10, layout11, layout12, layout13, layout14, layout15, layout16};
             TextView[] chargerTextViews = {charger1Tv, charger2Tv, charger3Tv, charger4Tv, charger5Tv, charger6Tv, charger7Tv, charger8Tv, charger9Tv, charger10Tv, charger11Tv, charger12Tv, charger13Tv, charger14Tv, charger15Tv, charger16Tv};
             TextView[] lockTextViews = {isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv};
@@ -415,8 +461,10 @@ public class StatusFragment extends Fragment {
             int soc = Math.round((float)dataObject.getJSONObject("bms").getInt("soc") / 10);
 
             String status = dataObject.getString("status");
-            String binaryStatus = HexToBinUtil.hexToBin(status);
-            char lockBit = binaryStatus.length() >= 32 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
+            binaryStatus = HexToBinUtil.hexToBin(status);
+
+
+            char lockBit = binaryStatus.length() >= 31 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
 
@@ -462,6 +510,9 @@ public class StatusFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.d("StatusFragment", "binaryStatus value: " + binaryStatus);
+        Log.d("StatusFragment", "binaryStatus length: " + binaryStatus.length());
+        Log.d("StatusFragment", "index number: " + indexString);
     }
 
     Drawable getRoundedCornerDrawable(int color, float radius) {
