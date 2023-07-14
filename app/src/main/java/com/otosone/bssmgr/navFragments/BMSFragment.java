@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -179,14 +180,16 @@ public class BMSFragment extends Fragment {
                     responseReceived = false; // reset the flag
 
                     // Start a Handler to check for response
-                    new Handler().postDelayed(new Runnable() {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (!responseReceived) {
+                                Log.d("errrrr", "isaccessed");
                                 Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    }, 1000);
+                    }, 3000);
                 } else {
                     Toast.makeText(getActivity(), "Not connected to a device", Toast.LENGTH_SHORT).show();
                 }

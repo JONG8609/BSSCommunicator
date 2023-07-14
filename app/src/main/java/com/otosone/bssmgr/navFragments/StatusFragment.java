@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,6 +33,7 @@ import com.otosone.bssmgr.databinding.FragmentStatusBinding;
 import com.otosone.bssmgr.utils.DataHolder;
 import com.otosone.bssmgr.utils.HexToBinUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +42,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class StatusFragment extends Fragment {
     private BluetoothConnectionService bluetoothConnectionService;
@@ -52,9 +56,14 @@ public class StatusFragment extends Fragment {
     private ImageButton statusRefreshIv;
     public Queue<JSONObject> requestQueue;
     private int retryCount = 0;
-    private static final int MAX_RETRY = 2;
+    private static final int MAX_RETRY = 3;
     private Handler retryHandler = new Handler();
     private Runnable retryRunnable;
+
+    private static final int STATION_ID_LENGTH = 16;
+    private static final int CELL_V_LENGTH = 10;
+    private static final int CELL_T_LENGTH = 6;
+    private static final int CYCLE_LENGTH = 2;
     public static StatusFragment newInstance(String param1, String param2) {
         StatusFragment fragment = new StatusFragment();
         Bundle args = new Bundle();
@@ -63,26 +72,37 @@ public class StatusFragment extends Fragment {
     }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
+
+        ExecutorService executor = Executors.newCachedThreadPool();
+
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             BluetoothConnectionService.LocalBinder binder = (BluetoothConnectionService.LocalBinder) iBinder;
             bluetoothConnectionService = binder.getService();
             isBound = true;
-             // Set the MessageReceivedListener
+
+            // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                getActivity().runOnUiThread(() -> {
+                Log.d("statusString", completeJsonString);
+                executor.submit(() -> {
                     // Parse the received JSON string
                     try {
                         JSONObject receivedJson = new JSONObject(completeJsonString);
                         processResponse(receivedJson);
                     } catch (JSONException e) {
-                        Log.e("StationFragment", "Error parsing received JSON", e);
+                        e.printStackTrace();
                     }
                 });
             });
 
+            // Set the JsonExceptionListener
+            bluetoothConnectionService.setOnJSONExceptionListener(() -> {
+                // Call retryCurrentRequest when a JSONException is thrown
+                retryCurrentRequest();
+            });
+
             bluetoothConnectionService.setDeviceConnectedListener(connection -> {
-               initiateRequests();
+                initiateRequests();
             });
 
         }
@@ -91,14 +111,10 @@ public class StatusFragment extends Fragment {
         public void onServiceDisconnected(ComponentName componentName) {
             bluetoothConnectionService = null;
             isBound = false;
-             }
+        }
     };
 
 
-    public void executeRefresh() {
-        //rotateImageButton(statusRefreshIv);
-        initiateRequests();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,7 +150,7 @@ public class StatusFragment extends Fragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(getActivity(), "You can click again in "+ remainingSeconds +" seconds", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "You can click again in " + remainingSeconds + " seconds", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -145,18 +161,18 @@ public class StatusFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                if(isClickable){
+                if (isClickable) {
                     isClickable = false;
                     remainingSeconds = 60; // 1 minute = 60 seconds
                     rotateImageButton(statusRefreshIv);
                     initiateRequests();
-                    handler.postDelayed(enableButtonRunnable, 60000); // 60000 milliseconds = 1 minute
+                    handler.postDelayed(enableButtonRunnable, 0); // 60000 milliseconds = 1 minute
                     handler.postDelayed(countdownRunnable, 1000); // 1000 milliseconds = 1 second
                 } else if (remainingSeconds <= 60) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getActivity(), "You can click again in "+ remainingSeconds +" seconds.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "You can click again in " + remainingSeconds + " seconds.", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -173,7 +189,7 @@ public class StatusFragment extends Fragment {
     }
 
     public void initiateRequests() {
-         requestQueue = new LinkedList<>();
+        requestQueue = new LinkedList<>();
 
         // Add the requests to the queue
         addRequestToQueue("INFO");
@@ -227,7 +243,7 @@ public class StatusFragment extends Fragment {
             public void run() {
                 retryCount++;
                 if (retryCount > MAX_RETRY) {
-                    Log.e("StationFragment", "Maximum retries reached for request: " + requestQueue.peek().toString());
+                    Log.d("errr", "Maximum retries reached for request: " + requestQueue.peek().toString());
                     requestQueue.poll(); // Remove the failed request from the queue
                     //sendNextRequest(); // Send the next request
                 } else {
@@ -245,37 +261,181 @@ public class StatusFragment extends Fragment {
     }
 
     private void retryCurrentRequest() {
-        if (!requestQueue.isEmpty() && isBound && bluetoothConnectionService != null) {
+        Log.d("errr", "retry is called");
+
+        if (requestQueue.isEmpty()) {
+            Log.d("errr", "Request queue is empty");
+        } else if (!isBound) {
+            Log.d("errr", "BluetoothConnectionService is not bound");
+        } else if (bluetoothConnectionService == null) {
+            Log.d("errr", "BluetoothConnectionService is null");
+        } else {
             if (retryCount < MAX_RETRY) {
-                new Handler().postDelayed(() -> {
+                Log.d("errr", "retry is works");
+
+                // Use the Looper of the main thread
+                Handler handler = new Handler(Looper.getMainLooper());
+
+                Log.d("errr", "About to post delayed task");
+
+                handler.postDelayed(() -> {
+                    Log.d("errr", "Executing delayed task");
+
                     JSONObject currentRequest = requestQueue.peek();
                     bluetoothConnectionService.sendMessage(currentRequest.toString());
+
+                    Log.d("errr", "retry is sented");
+
                     retryCount++;
-                },1000);
+                }, 1000);
             } else {
                 Log.e("StationFragment", "Maximum retries reached for request: " + requestQueue.peek().toString());
             }
-        } else {
-            Log.e("StationFragment", "BluetoothConnectionService is not bound or the queue is empty");
         }
     }
-
+    //Validation process
     private void processResponse(JSONObject response) {
         try {
-            if (response.has("response")) {
+            // common validation for all types of responses
+            if (response.has("response") && response.has("result") && response.has("error_code") && response.has("data")) {
                 String result = response.getString("result");
-                if ("ok".equals(result)) {
-                    cancelRetryTimer();
-                    requestQueue.poll(); // Remove the handled request from the queue
-                    sendNextRequest(); // Send the next request
-                } else {
+                String responseType = response.getString("response");
+                JSONObject data = response.getJSONObject("data");
+
+                // INFO validation
+                if (responseType.equals("INFO")) {
+                    if (data.has("stationId") && data.has("apkVersion")) {
+                        String stationId = data.getString("stationId");
+                        String apkVersion = data.getString("apkVersion");
+
+                        // Regular expression to validate apkVersion
+                        String regex = "\\d+\\.\\d{2}"; // any number of digits, followed by a dot, followed by exactly two digits
+
+                        // Additional checks for stationId and apkVersion
+                        if(stationId != null && stationId.length() == STATION_ID_LENGTH
+                                && apkVersion != null && !apkVersion.isEmpty() && apkVersion.matches(regex)) {
+
+                            // process INFO response
+                            if (result.equals("ok")) {
+                                cancelRetryTimer();
+                                requestQueue.poll();
+                                sendNextRequest();
+                            }
+                        }
+                    }
+                }
+                // BSS_STATUS validation
+                else if (responseType.equals("BSS_STATUS")
+                        && data.has("stationId")
+                        && data.has("fan")
+                        && data.has("heater")
+                        && data.has("temperature")
+                        && data.has("humidity")
+                        && data.has("door")
+                        && data.has("comm")
+                        && data.has("emergency")) {
+
+                    // Type checks
+                    if(data.getString("stationId").length() == STATION_ID_LENGTH
+                            && data.get("fan") instanceof Integer
+                            && data.get("heater") instanceof Integer
+                            && data.get("temperature") instanceof JSONObject
+                            && data.get("humidity") instanceof Integer
+                            && data.get("door") instanceof Integer
+                            && data.get("comm") instanceof JSONObject
+                            && data.get("emergency") instanceof Integer) {
+
+                        JSONObject temperature = data.getJSONObject("temperature");
+                        JSONObject comm = data.getJSONObject("comm");
+
+                        // Further nested checks for temperature and comm
+                        if(temperature.has("top") && temperature.has("mid") && temperature.has("bottom")
+                                && comm.has("mqtt") && comm.has("rest") && comm.has("local")
+                                && temperature.get("top") instanceof Integer
+                                && temperature.get("mid") instanceof Integer
+                                && temperature.get("bottom") instanceof Integer
+                                && comm.get("mqtt") instanceof Integer
+                                && comm.get("rest") instanceof Integer
+                                && comm.get("local") instanceof Integer) {
+
+                            // process BSS_STATUS response
+                            if (result.equals("ok")) {
+                                cancelRetryTimer();
+                                requestQueue.poll();
+                                sendNextRequest();
+                            }
+                        }
+                    }
+                }
+                // SOCKET_STATUS validation
+                else if (responseType.equals("SOCKET_STATUS")
+                        && data.has("index")
+                        && data.has("status")
+                        && data.has("cboard")
+                        && data.has("charger")
+                        && data.has("bms")) {
+
+                    // Type checks
+                    if(data.get("index") instanceof Integer
+                            && data.get("status") instanceof String
+                            && data.get("cboard") instanceof JSONObject
+                            && data.get("charger") instanceof JSONObject
+                            && data.get("bms") instanceof JSONObject) {
+
+                        JSONObject charger = data.getJSONObject("charger");
+                        JSONObject bms = data.getJSONObject("bms");
+
+                        // Further nested checks for charger, and bms
+                        if(charger.has("temp") && charger.has("voltage") && charger.has("current") && charger.has("charging")
+                                && bms.has("serial") && bms.has("country") && bms.has("factory") && bms.has("soc")
+                                && bms.has("pack_v") && bms.has("pack_a") && bms.has("cell_v") && bms.has("cell_t")
+                                && bms.has("cycle") && bms.has("alarm")
+                                && charger.get("temp") instanceof Integer
+                                && charger.get("voltage") instanceof Integer
+                                && charger.get("current") instanceof Integer
+                                && charger.get("charging") instanceof Integer
+                                && bms.get("serial") instanceof String
+                                && bms.get("country") instanceof Integer
+                                && bms.get("factory") instanceof Integer
+                                && bms.get("soc") instanceof Integer
+                                && bms.get("pack_v") instanceof Integer
+                                && bms.get("pack_a") instanceof Integer
+                                && bms.get("cell_v") instanceof JSONArray
+                                && bms.get("cell_t") instanceof JSONArray
+                                && bms.get("cycle") instanceof JSONArray
+                                && bms.get("alarm") instanceof String) {
+
+                            // Check cell_v, cell_t and cycle array length.
+                            JSONArray cell_v = bms.getJSONArray("cell_v");
+                            JSONArray cell_t = bms.getJSONArray("cell_t");
+                            JSONArray cycle = bms.getJSONArray("cycle");
+
+                            if(cell_v.length() == CELL_V_LENGTH && cell_t.length() == CELL_T_LENGTH && cycle.length() == CYCLE_LENGTH) {
+                                // process SOCKET_STATUS response
+                                if (result.equals("ok")) {
+                                    cancelRetryTimer();
+                                    requestQueue.poll();
+                                    sendNextRequest();
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    // If JSON format does not match any expected response format, retry or throw an error.
                     retryCurrentRequest();
                 }
+            } else {
+                Log.d("errr", "errr");
+                retryCurrentRequest();
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -294,7 +454,7 @@ public class StatusFragment extends Fragment {
                 if (bssStatus != null && info != null) {
                     try {
                         String apkVersion = info.getString("apkVersion");
-                         bssStatus(bssStatus, apkVersion);
+                        bssStatus(bssStatus, apkVersion);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -352,20 +512,16 @@ public class StatusFragment extends Fragment {
     }
 
 
-
-
     private void Databind() {
-        layout1 = binding.layout1; layout2 = binding.layout2; layout3 = binding.layout3; layout4 = binding.layout4; layout5 = binding.layout5; layout6 = binding.layout6; layout7 = binding.layout7; layout8 = binding.layout8; layout9 = binding.layout9;
-        layout10 = binding.layout10; layout11 = binding.layout11; layout12 = binding.layout12; layout13 = binding.layout13; layout14 = binding.layout14; layout15 = binding.layout15; layout16 = binding.layout16;
-        charger1Tv = binding.charger1Tv; charger2Tv = binding.charger2Tv; charger3Tv = binding.charger3Tv; charger4Tv = binding.charger4Tv; charger5Tv = binding.charger5Tv;
-        charger6Tv = binding.charger6Tv; charger7Tv = binding.charger7Tv; charger8Tv = binding.charger8Tv; charger9Tv = binding.charger9Tv; charger10Tv = binding.charger10Tv;
-        charger11Tv = binding.charger11Tv; charger12Tv = binding.charger12Tv; charger13Tv = binding.charger13Tv; charger14Tv = binding.charger14Tv; charger15Tv = binding.charger15Tv; charger16Tv = binding.charger16Tv;
-        isLock1Tv = binding.isLock1Tv; isLock2Tv = binding.isLock2Tv; isLock3Tv = binding.isLock3Tv; isLock4Tv = binding.isLock4Tv; isLock5Tv = binding.isLock5Tv; isLock6Tv = binding.isLock6Tv;
-        isLock7Tv = binding.isLock7Tv; isLock8Tv = binding.isLock8Tv; isLock9Tv = binding.isLock9Tv; isLock10Tv = binding.isLock10Tv; isLock11Tv = binding.isLock11Tv; isLock12Tv = binding.isLock12Tv;
-        isLock13Tv = binding.isLock13Tv; isLock14Tv = binding.isLock14Tv; isLock15Tv = binding.isLock15Tv; isLock16Tv = binding.isLock16Tv;
-        socketBssIdTv = binding.socketBssIdTv; statusTempTv = binding.statusTempTv; statusFanTv = binding.statusFanTv; statusHeaterTv = binding.statusHeaterTv; statusDoorTv = binding.statusDoorTv;
-        statusHumidityTv = binding.statusHumidityTv; statusMqttTv = binding.statusMqttTv; statusRestTv = binding.statusRestTv; statusLocalTv = binding.statusLocalTv;
-        statusRefreshIv = binding.statusRefreshIv;
+        layout1 = binding.layout1;layout2 = binding.layout2;layout3 = binding.layout3;layout4 = binding.layout4;layout5 = binding.layout5;layout6 = binding.layout6;layout7 = binding.layout7;layout8 = binding.layout8;
+        layout9 = binding.layout9;layout10 = binding.layout10;layout11 = binding.layout11;layout12 = binding.layout12;layout13 = binding.layout13;layout14 = binding.layout14;layout15 = binding.layout15;
+        layout16 = binding.layout16;charger1Tv = binding.charger1Tv;charger2Tv = binding.charger2Tv;charger3Tv = binding.charger3Tv;charger4Tv = binding.charger4Tv;charger5Tv = binding.charger5Tv;charger6Tv = binding.charger6Tv;
+        charger7Tv = binding.charger7Tv;charger8Tv = binding.charger8Tv;charger9Tv = binding.charger9Tv;charger10Tv = binding.charger10Tv;charger11Tv = binding.charger11Tv;charger12Tv = binding.charger12Tv;
+        charger13Tv = binding.charger13Tv;charger14Tv = binding.charger14Tv;charger15Tv = binding.charger15Tv;charger16Tv = binding.charger16Tv;isLock1Tv = binding.isLock1Tv;isLock2Tv = binding.isLock2Tv;
+        isLock3Tv = binding.isLock3Tv;isLock4Tv = binding.isLock4Tv;isLock5Tv = binding.isLock5Tv;isLock6Tv = binding.isLock6Tv;isLock7Tv = binding.isLock7Tv;isLock8Tv = binding.isLock8Tv;isLock9Tv = binding.isLock9Tv;
+        isLock10Tv = binding.isLock10Tv;isLock11Tv = binding.isLock11Tv;isLock12Tv = binding.isLock12Tv;isLock13Tv = binding.isLock13Tv;isLock14Tv = binding.isLock14Tv;isLock15Tv = binding.isLock15Tv;
+        isLock16Tv = binding.isLock16Tv;socketBssIdTv = binding.socketBssIdTv;statusTempTv = binding.statusTempTv;statusFanTv = binding.statusFanTv;statusHeaterTv = binding.statusHeaterTv;statusDoorTv = binding.statusDoorTv;
+        statusHumidityTv = binding.statusHumidityTv;statusMqttTv = binding.statusMqttTv;statusRestTv = binding.statusRestTv;statusLocalTv = binding.statusLocalTv;statusRefreshIv = binding.statusRefreshIv;
     }
 
     private void setDefaultStatus() {
@@ -444,13 +600,12 @@ public class StatusFragment extends Fragment {
     }
 
 
-
-
     private void socketStatus(JSONObject socketStatus) {
         String binaryStatus = "";
         String indexString = "";
+        JSONObject dataObject = socketStatus;
         try {
-            JSONObject dataObject = socketStatus;
+
             int index = dataObject.getInt("index");
             indexString = Integer.toString(index);
             LinearLayout[] layouts = {layout1, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9, layout10, layout11, layout12, layout13, layout14, layout15, layout16};
@@ -458,7 +613,7 @@ public class StatusFragment extends Fragment {
             TextView[] lockTextViews = {isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv};
             JSONObject chargerObject = dataObject.getJSONObject("charger");
             int charging = chargerObject.getInt("charging");
-            int soc = Math.round((float)dataObject.getJSONObject("bms").getInt("soc") / 10);
+            int soc = Math.round((float) dataObject.getJSONObject("bms").getInt("soc") / 10);
 
             String status = dataObject.getString("status");
             binaryStatus = HexToBinUtil.hexToBin(status);
@@ -466,7 +621,6 @@ public class StatusFragment extends Fragment {
 
             char lockBit = binaryStatus.length() >= 31 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
-
 
 
             // Set background color
@@ -491,7 +645,7 @@ public class StatusFragment extends Fragment {
                         break;
                     case 6:
                         char yellowBackground = binaryStatus.charAt(3);
-                        if(yellowBackground == '1'){
+                        if (yellowBackground == '1') {
                             layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));
                         } else {
                             layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));
@@ -510,9 +664,7 @@ public class StatusFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.d("StatusFragment", "binaryStatus value: " + binaryStatus);
-        Log.d("StatusFragment", "binaryStatus length: " + binaryStatus.length());
-        Log.d("StatusFragment", "index number: " + indexString);
+
     }
 
     Drawable getRoundedCornerDrawable(int color, float radius) {
@@ -521,6 +673,7 @@ public class StatusFragment extends Fragment {
         gradientDrawable.setCornerRadius(radius);
         return gradientDrawable;
     }
+
     @Override
     public void onPause() {
         super.onPause();

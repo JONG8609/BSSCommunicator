@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -159,14 +160,15 @@ public class ChargingFragment extends Fragment {
                     responseReceived = false; // reset the flag
 
                     // Start a Handler to check for response
-                    new Handler().postDelayed(new Runnable() {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (!responseReceived) {
                                 Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    }, 1000);
+                    }, 3000);
                 } else {
                     Log.e("ChargingFragment", "BluetoothConnectionService is not bound");
                 }

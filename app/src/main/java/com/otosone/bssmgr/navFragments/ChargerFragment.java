@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -293,14 +294,15 @@ public class ChargerFragment extends Fragment {
                     responseReceived = false; // reset the flag
 
                     // Start a Handler to check for response
-                    new Handler().postDelayed(new Runnable() {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             if (!responseReceived) {
                                 Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }
-                    }, 1000);
+                    }, 3000);
                 } else {
                     Log.e("ChargerFragment", "BluetoothConnectionService is not bound");
                 }

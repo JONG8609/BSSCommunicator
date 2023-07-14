@@ -63,13 +63,22 @@ public class BluetoothConnectionService extends Service {
     private DeviceConnectedListener deviceConnectedListener;
     private StringBuilder receivedMessageBuilder = new StringBuilder();
     private RxBleConnection deviceConnectedCallback = null;
+    private OnJSONExceptionListener jsonExceptionListener;
     public interface MessageReceivedListener {
         void onMessageReceived(String message);
+    }
+
+    public void setOnJSONExceptionListener(OnJSONExceptionListener listener) {
+        this.jsonExceptionListener = listener;
     }
 
     public void setMessageReceivedListener(MessageReceivedListener messageReceivedListener) {
         this.messageReceivedListener = messageReceivedListener;
 
+    }
+
+    public interface OnJSONExceptionListener {
+        void onJSONException();
     }
 
     public class LocalBinder extends Binder {
@@ -222,7 +231,6 @@ public class BluetoothConnectionService extends Service {
                             JSONObject data = receivedJson.getJSONObject("data");
                             if(data.has("stationId") && data.has("apkVersion")) {
                                 DataHolder.getInstance().setInfo(data);
-
                             }
                         }
 
@@ -263,16 +271,18 @@ public class BluetoothConnectionService extends Service {
                                 }
                             }
                             if (socketStatusMap.size() == 16) {
-
                                 DataHolder.getInstance().setAllDataReceived(true);
                                 createLogFile();
+                                Log.d("fileCreated or writed", "created or writed");
                             }
                         }
                     } catch (JSONException e) {
                         Log.e("BluetoothConnService", "Error parsing received JSON", e);
+                        // Call the listener's method when a JSONException occurs
+                        if (jsonExceptionListener != null) {
+                            jsonExceptionListener.onJSONException();
+                        }
                     }
-                } else {
-
                 }
 
                 receivedMessageBuilder.delete(0, closeBraceIndex + 1);
@@ -308,7 +318,7 @@ public class BluetoothConnectionService extends Service {
 
                 // Checking if the file already exists
                 if (logFile.exists()) {
-
+                        Log.d("file","existed");
                 } else {
                     boolean isCreated = logFile.createNewFile();
                     if (isCreated) {
