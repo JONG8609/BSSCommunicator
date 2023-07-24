@@ -28,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
         dataBinding();
         initialize();
         username_et.setText("admin");
-        password_et.setText("otosone");
+        password_et.setText("otosone443");
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,7 +59,9 @@ public class LoginActivity extends AppCompatActivity {
         login_btn = binding.loginBtn;
     }
     private int authenticateUser(String username, String password) {
-        if (username.equals("admin") && password.equals("otosone")) {
+        if ((username.equals("admin") && password.equals("otosone443")) ||
+                (username.equals("otos") && password.equals("forever213")) ||
+                (username.equals("testotos") && password.equals("1"))) {
             return 1;
         } else {
             return 0;

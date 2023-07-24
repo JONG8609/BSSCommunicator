@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
@@ -81,7 +82,7 @@ public class ChargingFragment extends Fragment {
                         }
 
                     } catch (JSONException e) {
-                        Log.e("ChargingFragment", "Error parsing received JSON", e);
+
                     }
                 });
 
@@ -170,7 +171,7 @@ public class ChargingFragment extends Fragment {
                         }
                     }, 3000);
                 } else {
-                    Log.e("ChargingFragment", "BluetoothConnectionService is not bound");
+
                 }
             }
         });

@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -120,12 +122,22 @@ public class BluetoothConnectionService extends Service {
                             if (connectionStateListener != null) {
                                 connectionStateListener.onDeviceConnected();
                             }
+
+                            // Requesting for high connection priority
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                                connection.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH, 1, TimeUnit.SECONDS)
+                                        .subscribe(
+                                                () -> Log.d("ConnectionPriority", "High performance priority set!"),
+                                                throwable -> Log.e("ConnectionPriorityError", "Error setting connection priority", throwable)
+                                        );
+                            }
                         },
                         throwable -> {
                             Log.e("ConnectionError", "Error connecting to device", throwable);
                         }
                 );
     }
+
 
     public void disconnect() {
         if (connectionDisposable != null && !connectionDisposable.isDisposed()) {
@@ -273,7 +285,7 @@ public class BluetoothConnectionService extends Service {
                             if (socketStatusMap.size() == 16) {
                                 DataHolder.getInstance().setAllDataReceived(true);
                                 createLogFile();
-                                Log.d("fileCreated or writed", "created or writed");
+
                             }
                         }
                     } catch (JSONException e) {
@@ -318,7 +330,7 @@ public class BluetoothConnectionService extends Service {
 
                 // Checking if the file already exists
                 if (logFile.exists()) {
-                        Log.d("file","existed");
+
                 } else {
                     boolean isCreated = logFile.createNewFile();
                     if (isCreated) {

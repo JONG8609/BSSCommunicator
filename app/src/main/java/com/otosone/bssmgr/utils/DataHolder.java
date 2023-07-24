@@ -58,12 +58,19 @@ public class DataHolder {
         return socketStatusMap;
     }
 
+    public Map<String, JSONObject> getSocketStatusMapDirectly() {
+        return socketStatusMap.getValue();
+    }
     public void setBinaryStatusMap(Map<String, String> binaryStatusMap) {
         this.binaryStatusMap.postValue(binaryStatusMap);
     }
 
     public LiveData<Map<String, String>> getBinaryStatusMap() {
         return binaryStatusMap;
+    }
+
+    public Map<String, String> getBinaryStatusMapDirectly() {
+        return binaryStatusMap.getValue();
     }
 
     public LiveData<Boolean> getAllDataReceived() {

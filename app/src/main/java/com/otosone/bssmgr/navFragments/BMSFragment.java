@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
@@ -130,6 +131,7 @@ public class BMSFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bms, container, false);
         bmsBtn = binding.bmsBtn;
         bms_checkbox = binding.bmsCheckbox;
@@ -176,7 +178,6 @@ public class BMSFragment extends Fragment {
                 if (isBound && bluetoothConnectionService != null) {
                     String jsonString = json.toString();
                     bluetoothConnectionService.sendMessage(jsonString);
-
                     responseReceived = false; // reset the flag
 
                     // Start a Handler to check for response
@@ -185,7 +186,6 @@ public class BMSFragment extends Fragment {
                         @Override
                         public void run() {
                             if (!responseReceived) {
-                                Log.d("errrrr", "isaccessed");
                                 Toast.makeText(getActivity(),"fail", Toast.LENGTH_SHORT).show();
                             }
                         }

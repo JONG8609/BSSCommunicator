@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:weightSum="7"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/index_text"
+        android:layout_width="0dp"
+        android:textColor="@android:color/black"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="ID"
+        android:textSize="16sp" />
+
+
+    <TextView
+        android:id="@+id/soc_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="SoC\n(%)"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/pack_v_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Pack\n(V)"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/pack_a_text"
+        android:layout_width="0dp"
+        android:textColor="@android:color/black"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Pack\n(A)"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/cycle_text"
+        android:layout_width="0dp"
+        android:textColor="@android:color/black"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Cycle\n(N,D)"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/alarm_text"
+        android:layout_width="0dp"
+        android:textColor="@android:color/black"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="Alarm"
+        android:textSize="14sp" />
+
+</LinearLayout>

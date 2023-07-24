@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -83,7 +84,7 @@ public class StatusFragment extends Fragment {
 
             // Set the MessageReceivedListener
             bluetoothConnectionService.setMessageReceivedListener(completeJsonString -> {
-                Log.d("statusString", completeJsonString);
+
                 executor.submit(() -> {
                     // Parse the received JSON string
                     try {
@@ -243,7 +244,7 @@ public class StatusFragment extends Fragment {
             public void run() {
                 retryCount++;
                 if (retryCount > MAX_RETRY) {
-                    Log.d("errr", "Maximum retries reached for request: " + requestQueue.peek().toString());
+
                     requestQueue.poll(); // Remove the failed request from the queue
                     //sendNextRequest(); // Send the next request
                 } else {
@@ -261,30 +262,30 @@ public class StatusFragment extends Fragment {
     }
 
     private void retryCurrentRequest() {
-        Log.d("errr", "retry is called");
+
 
         if (requestQueue.isEmpty()) {
-            Log.d("errr", "Request queue is empty");
+
         } else if (!isBound) {
-            Log.d("errr", "BluetoothConnectionService is not bound");
+
         } else if (bluetoothConnectionService == null) {
-            Log.d("errr", "BluetoothConnectionService is null");
+
         } else {
             if (retryCount < MAX_RETRY) {
-                Log.d("errr", "retry is works");
+
 
                 // Use the Looper of the main thread
                 Handler handler = new Handler(Looper.getMainLooper());
 
-                Log.d("errr", "About to post delayed task");
+
 
                 handler.postDelayed(() -> {
-                    Log.d("errr", "Executing delayed task");
+
 
                     JSONObject currentRequest = requestQueue.peek();
                     bluetoothConnectionService.sendMessage(currentRequest.toString());
 
-                    Log.d("errr", "retry is sented");
+
 
                     retryCount++;
                 }, 1000);
@@ -603,6 +604,7 @@ public class StatusFragment extends Fragment {
     private void socketStatus(JSONObject socketStatus) {
         String binaryStatus = "";
         String indexString = "";
+        int soc = 0; // default value
         JSONObject dataObject = socketStatus;
         try {
 
@@ -613,49 +615,70 @@ public class StatusFragment extends Fragment {
             TextView[] lockTextViews = {isLock1Tv, isLock2Tv, isLock3Tv, isLock4Tv, isLock5Tv, isLock6Tv, isLock7Tv, isLock8Tv, isLock9Tv, isLock10Tv, isLock11Tv, isLock12Tv, isLock13Tv, isLock14Tv, isLock15Tv, isLock16Tv};
             JSONObject chargerObject = dataObject.getJSONObject("charger");
             int charging = chargerObject.getInt("charging");
-            int soc = Math.round((float) dataObject.getJSONObject("bms").getInt("soc") / 10);
+
+            if (dataObject.getJSONObject("bms").has("soc")) {
+                soc = Math.round((float) dataObject.getJSONObject("bms").getInt("soc") / 10);
+            }
 
             String status = dataObject.getString("status");
             binaryStatus = HexToBinUtil.hexToBin(status);
 
 
-            char lockBit = binaryStatus.length() >= 31 ? binaryStatus.charAt(27) : '0'; // remember indices start from 0
+            char lockBit = binaryStatus.length() >= 31 ? binaryStatus.charAt(27) : '0';
             String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
 
 
             // Set background color
             if (binaryStatus.charAt(30) == '0' || binaryStatus.charAt(31) == '0') {
-                layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#202124"), 60));
-            } else {
+
+                layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#202124"), 60));// Dark Grey / Black
+            } else if(isAllOne(binaryStatus, 31, 27) && !isAllZeroes(binaryStatus, 0, 11)) {
+                layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));// Yellow
+            }else
                 switch (charging) {
                     case 0:
-                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));
+                        if(binaryStatus.charAt(29) == '0' && binaryStatus.charAt(28) == '0' && isAllZeroes(binaryStatus, 0, 11)) {
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
+                        }else if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '0' && !isAllZeroes(binaryStatus, 0, 11)){
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));// Yellow
+                    }else {
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
+                        }
                         break;
                     case 1:
+
+                        if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '1' && isAllZeroes(binaryStatus, 0, 11)){
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
+                        }
+
                     case 2:
+                        if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '1' && isAllZeroes(binaryStatus, 0, 11)){
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
+                        }
                     case 3:
-                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));
+                        if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '1' && isAllZeroes(binaryStatus, 0, 11)){
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
+                        }
                         break;
                     case 4:
                         if (soc > 95) {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#27B6FF"), 60));
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#27B6FF"), 60));// Bright Blue
                         } else {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
                         }
                         break;
                     case 6:
-                        char yellowBackground = binaryStatus.charAt(3);
-                        if (yellowBackground == '1') {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));
-                        } else {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));
-                        }
+                        if(isAllOne(binaryStatus, 31, 27))
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));// Yellow
+
                         break;
                     default:
-                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));
+                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
                         break;
                 }
-            }
+
+
+
 
             // Set charger info and lock status
             chargerTextViews[index].setText(String.valueOf(soc));
@@ -666,6 +689,25 @@ public class StatusFragment extends Fragment {
         }
 
     }
+
+    private boolean isAllZeroes(String binaryStatus, int start, int end) {
+        for (int i = start; i <= end; i++) {
+            if (binaryStatus.charAt(i) != '0') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isAllOne(String binaryStatus, int start, int end) {
+        for (int i = start; i <= end; i++) {
+            if (binaryStatus.charAt(i) != '1') {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     Drawable getRoundedCornerDrawable(int color, float radius) {
         GradientDrawable gradientDrawable = new GradientDrawable();

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:weightSum="11"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/index_text"
+        android:layout_width="0dp"
+        android:textColor="@android:color/black"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="ID"
+        android:textSize="16sp" />
+
+
+    <TextView
+        android:id="@+id/cell_1_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_2_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_3_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_4_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_5_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_6_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_7_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_8_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_9_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+    <TextView
+        android:id="@+id/cell_10_text"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="1.201" />
+
+
+
+</LinearLayout>

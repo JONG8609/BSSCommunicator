@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
@@ -92,7 +93,6 @@ public class DoorFragment extends Fragment {
 
 
             });
-
 
         }
 
@@ -206,9 +206,9 @@ public class DoorFragment extends Fragment {
                 String socketId = entry.getKey();
                 String binaryStatus = entry.getValue();
                 // Update ChargingItem status based on the 7th char in binaryStatus
-                if (binaryStatus.length() > 6) {
-                    char chargingStatusChar = binaryStatus.charAt(5);
-                    String doorStatus = (chargingStatusChar == '0') ? "UNLOCK" : "LOCK";
+                if (binaryStatus.length() >= 31) {
+                    char chargingStatusChar = binaryStatus.charAt(27);
+                    String doorStatus = chargingStatusChar == '0' ? "UNLOCK" : "LOCK";
                     for (DoorItem item : doorItems) {
                         if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {
                             item.setDoorStatus(doorStatus);
@@ -247,8 +247,8 @@ public class DoorFragment extends Fragment {
                 String socketId = entry.getKey();
                 String binaryStatus = entry.getValue();
                 // Update ChargingItem status based on the 7th char in binaryStatus
-                if (binaryStatus.length() > 6) {
-                    char chargingStatusChar = binaryStatus.charAt(5);
+                if (binaryStatus.length() > 31) {
+                    char chargingStatusChar = binaryStatus.charAt(27);
                     String doorStatus = (chargingStatusChar == '0') ? "UNLOCK" : "LOCK";
                     for (DoorItem item : doorItems) {
                         if (item.getId().equals(String.format("%02d", Integer.parseInt(socketId)))) {

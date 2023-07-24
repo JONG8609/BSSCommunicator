@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -45,12 +46,6 @@ public class HeaterFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static HeaterFragment newInstance() {
-        HeaterFragment fragment = new HeaterFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -105,26 +100,26 @@ public class HeaterFragment extends Fragment {
 
         }
 
-        private void sendHeaterRequest() {
-            // Create a JSON object
-            JSONObject json = new JSONObject();
-
-            try {
-                json.put("request", "HEATER_CFG");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            String jsonString = json.toString();
-
-            // Call the sendAsciiMessage method with the string as an argument
-            if (isBound && bluetoothConnectionService != null) {
-                bluetoothConnectionService.sendMessage(jsonString);
-
-            } else {
-                Log.e("StatusFragment", "Cannot send message, service is not bound or null");
-            }
-        }
+      //  private void sendHeaterRequest() {
+      //      // Create a JSON object
+      //      JSONObject json = new JSONObject();
+//
+      //      try {
+      //          json.put("request", "HEATER_CFG");
+//
+      //      } catch (JSONException e) {
+      //          e.printStackTrace();
+      //      }
+      //      String jsonString = json.toString();
+//
+      //      // Call the sendAsciiMessage method with the string as an argument
+      //      if (isBound && bluetoothConnectionService != null) {
+      //          bluetoothConnectionService.sendMessage(jsonString);
+//
+      //      } else {
+      //          Log.e("StatusFragment", "Cannot send message, service is not bound or null");
+      //      }
+      //  }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
