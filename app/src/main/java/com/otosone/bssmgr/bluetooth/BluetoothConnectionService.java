@@ -9,8 +9,11 @@ import android.bluetooth.BluetoothGatt;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -114,6 +117,7 @@ public class BluetoothConnectionService extends Service {
 
     public void connectToDevice(RxBleDevice device) {
         disconnect();
+        Handler handler = new Handler(Looper.getMainLooper());
 
         connectionDisposable = device.establishConnection(false)
                 .subscribe(
@@ -134,9 +138,13 @@ public class BluetoothConnectionService extends Service {
                         },
                         throwable -> {
                             Log.e("ConnectionError", "Error connecting to device", throwable);
+                            handler.post(() -> {
+                                Toast.makeText(getApplicationContext(), "Failed to connect to device. Try again", Toast.LENGTH_SHORT).show();
+                            });
                         }
                 );
     }
+
 
 
     public void disconnect() {
@@ -232,7 +240,7 @@ public class BluetoothConnectionService extends Service {
 
             if (closeBraceIndex != -1) {
                 String completeJsonString = receivedMessageBuilder.substring(openBraceIndex, closeBraceIndex + 1);
-
+                    Log.d("string", completeJsonString);
                 if (messageReceivedListener != null) {
                     messageReceivedListener.onMessageReceived(completeJsonString);
 

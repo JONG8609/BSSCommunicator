@@ -639,8 +639,8 @@ public class StatusFragment extends Fragment {
                     case 0:
                         if(binaryStatus.charAt(29) == '0' && binaryStatus.charAt(28) == '0' && isAllZeroes(binaryStatus, 0, 11)) {
                             layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
-                        }else if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '0' && !isAllZeroes(binaryStatus, 0, 11)){
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));// Yellow
+                        }else if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '0' && isAllZeroes(binaryStatus, 0, 11)){
+                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFFFFFFF"), 60));// blue
                     }else {
                             layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
                         }
