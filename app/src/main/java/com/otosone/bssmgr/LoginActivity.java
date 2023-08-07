@@ -41,8 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
         dataBinding();
         initialize();
-        username_et.setText("admin");
-        password_et.setText("otosone");
+
 
         login_btn.setOnClickListener(new View.OnClickListener() {
             @Override

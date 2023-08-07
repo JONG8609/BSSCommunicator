@@ -65,6 +65,35 @@ public class StatusFragment extends Fragment {
     private static final int CELL_V_LENGTH = 10;
     private static final int CELL_T_LENGTH = 6;
     private static final int CYCLE_LENGTH = 2;
+
+    private static String strColorBlack = "#202124";
+    private static String strColorYELLOW = "#FFC20A";
+    private static String strColorGrey = "#BFBEBD";
+    private static String strColorBlue = "#0000FF";
+    private static String strColorRED = "#FE423E";
+    private static String strColorSKYBLUE = "#27B6FF";
+
+    private static final int BIT_CAN_ONLINE = 31;
+    private static final int BIT_CHG_ONLINE = 30;
+    private static final int BIT_BMS_ONLINE = 29;
+    private static final int BIT_BAT_EXIST = 28;
+    private static final int BIT_LOCK_STATUS = 27;
+    private static final int BIT_DOOR_STATUS = 26;
+    private static final int BIT_CHARGING_STATUS = 25;
+
+    private static final int BIT_CHG_BAT_FAIL =11;
+    private static final int BIT_CHG_FAN_FAIL =10;
+    private static final int BIT_CHG_AC_FAIL = 9;
+    private static final int BIT_CHG_OVER_TEMP = 8;
+    private static final int BIT_CHG_DC_FAIL = 7;
+    private static final int BIT_CHG_BAT_OVER_VOLTAGE = 6;
+    private static final int BIT_CHG_RELAY_FAIL = 5;
+    private static final int BIT_CHG_OUTPUT_FAIL = 4;
+    private static final int BIT_CHG_BAT_CONN_FAIL = 3;
+    private static final int BIT_CHG_TEMP_SENSOR_FAIL = 2;
+    private static final int BIT_CHG_CURRENT_SENSOR_FAIL = 1;
+    private static final int BIT_CHG_OVER_CURRENT = 0;
+
     public static StatusFragment newInstance(String param1, String param2) {
         StatusFragment fragment = new StatusFragment();
         Bundle args = new Bundle();
@@ -263,30 +292,16 @@ public class StatusFragment extends Fragment {
 
     private void retryCurrentRequest() {
 
-
         if (requestQueue.isEmpty()) {
-
         } else if (!isBound) {
-
         } else if (bluetoothConnectionService == null) {
-
         } else {
             if (retryCount < MAX_RETRY) {
-
-
                 // Use the Looper of the main thread
                 Handler handler = new Handler(Looper.getMainLooper());
-
-
-
                 handler.postDelayed(() -> {
-
-
                     JSONObject currentRequest = requestQueue.peek();
                     bluetoothConnectionService.sendMessage(currentRequest.toString());
-
-
-
                     retryCount++;
                 }, 1000);
             } else {
@@ -609,6 +624,7 @@ public class StatusFragment extends Fragment {
         try {
 
             int index = dataObject.getInt("index");
+            Log.d("socketStatus", "Processing index: " + index);
             indexString = Integer.toString(index);
             LinearLayout[] layouts = {layout1, layout2, layout3, layout4, layout5, layout6, layout7, layout8, layout9, layout10, layout11, layout12, layout13, layout14, layout15, layout16};
             TextView[] chargerTextViews = {charger1Tv, charger2Tv, charger3Tv, charger4Tv, charger5Tv, charger6Tv, charger7Tv, charger8Tv, charger9Tv, charger10Tv, charger11Tv, charger12Tv, charger13Tv, charger14Tv, charger15Tv, charger16Tv};
@@ -623,72 +639,68 @@ public class StatusFragment extends Fragment {
             String status = dataObject.getString("status");
             binaryStatus = HexToBinUtil.hexToBin(status);
 
+            String strColor = strColorGrey;
+            boolean bCANOnline = (binaryStatus.charAt(BIT_CAN_ONLINE) == '1') ? true : false;
+            boolean bCHGOnline = binaryStatus.charAt(BIT_CHG_ONLINE) == '1' ? true : false;
+            boolean bBMSOnline = binaryStatus.charAt(BIT_BMS_ONLINE) == '1' ? true : false;
+            boolean bBATExist = binaryStatus.charAt(BIT_BAT_EXIST) == '1' ? true : false;
+            boolean bLOCKStatus = binaryStatus.charAt(BIT_LOCK_STATUS) == '1' ? true : false;
 
-            char lockBit = binaryStatus.length() >= 31 ? binaryStatus.charAt(27) : '0';
-            String lockStatus = lockBit == '0' ? "UNLOCK" : "LOCK";
-
-
-            // Set background color
-            if (binaryStatus.charAt(30) == '0' || binaryStatus.charAt(31) == '0') {
-
-                layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#202124"), 60));// Dark Grey / Black
-            } else if(isAllOne(binaryStatus, 31, 27) && !isAllZeroes(binaryStatus, 0, 11)) {
-                layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));// Yellow
-            }else
+            if(bCANOnline && bCHGOnline && bBATExist && bLOCKStatus) {
                 switch (charging) {
-                    case 0:
-                        if(binaryStatus.charAt(29) == '0' && binaryStatus.charAt(28) == '0' && isAllZeroes(binaryStatus, 0, 11)) {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
-                        }else if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '0' && isAllZeroes(binaryStatus, 0, 11)){
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFFFFFFF"), 60));// blue
-                    }else {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
-                        }
+                    case 0: // IDLE
+                        strColor = strColorBlue;
                         break;
-                    case 1:
-
-                        if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '1' && isAllZeroes(binaryStatus, 0, 11)){
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
-                        }
-
-                    case 2:
-                        if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '1' && isAllZeroes(binaryStatus, 0, 11)){
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
-                        }
-                    case 3:
-                        if(isAllOne(binaryStatus, 31, 27) && binaryStatus.charAt(25) == '1' && isAllZeroes(binaryStatus, 0, 11)){
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
-                        }
+                    case 1: // PRE_CHG
+                    case 2: // NOR_CHG
+                    case 3: // POST_CHG
+                        strColor = strColorRED;
                         break;
-                    case 4:
-                        if (soc > 95) {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#27B6FF"), 60));// Bright Blue
-                        } else {
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FE423E"), 60));// Bright Red
-                        }
+                    case 4: // COMPLETE
+                        strColor = strColorSKYBLUE;
                         break;
-                    case 6:
-                        if(isAllOne(binaryStatus, 31, 27))
-                            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#FFC20A"), 60));// Yellow
-
+                    case 6: // ERROR
+                        strColor = strColorYELLOW;
                         break;
                     default:
-                        layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor("#BFBEBD"), 60));// Light Grey
+                        strColor = strColorGrey;
                         break;
                 }
+                if(!isAllZeroes(binaryStatus, 0, 11)) {
+                    strColor = strColorYELLOW;
+                }
+                else {
+                    if(!bBMSOnline) {
+                        strColor = strColorYELLOW;
+                    }
+                }
+            }
+            else {
+                if(bCANOnline && bCHGOnline) {
+                    strColor = strColorGrey;
+                }
+                else {
+                    strColor = strColorBlack;
+                }
+            }
+            layouts[index].setBackground(getRoundedCornerDrawable(Color.parseColor(strColor), 60));
 
-
-
+            String lockStatus = bLOCKStatus ? "LOCK" : "UNLOCK";
 
             // Set charger info and lock status
             chargerTextViews[index].setText(String.valueOf(soc));
             lockTextViews[index].setText(lockStatus);
+            Log.d("socketStatus", "Successfully set charger info and lock status for index: " + index);
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("socketStatus", "JSON parsing error: " + e.getMessage());
+        } catch (Exception e) {
+            Log.e("socketStatus", "An unexpected error occurred: " + e.getMessage());
         }
 
+
     }
+
 
     private boolean isAllZeroes(String binaryStatus, int start, int end) {
         for (int i = start; i <= end; i++) {

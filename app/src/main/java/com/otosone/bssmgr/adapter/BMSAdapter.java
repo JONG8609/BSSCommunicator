@@ -66,11 +66,13 @@ public class BMSAdapter extends BaseAdapter {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             checkBox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
         }
+        String modifiedId = String.format("%02d", Integer.parseInt(bmsItem.getId()) + 1);
+
         TextView bms1_tv = convertView.findViewById(R.id.bms1_tv);
         TextView bms2_et = convertView.findViewById(R.id.bms2_et);
         TextView bms_spinner_tv = convertView.findViewById(R.id.bms_spinner_tv);
 
-        bms1_tv.setText(bmsItem.getId());
+        bms1_tv.setText(modifiedId);
         int newValue = bmsItem.getValue() / 10;
         bms2_et.setText(String.valueOf(newValue));
         bms2_et.setFilters(new InputFilter[]{new InputFilterMinMax(0, 100)});

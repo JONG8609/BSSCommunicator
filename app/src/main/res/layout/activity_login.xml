@@ -28,7 +28,7 @@
                     android:layout_height="wrap_content"
                     android:imeOptions="actionDone"
                     android:inputType="text"
-                    android:text="admin" />
+                    android:text="" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:imeOptions="actionDone"
                     android:inputType="textPassword"
-                    android:text="otosone" />
+                    android:text="" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout

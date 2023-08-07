@@ -117,9 +117,8 @@ public class Bms3Adapter extends BaseAdapter {
     }
 
     private String formatCellValue(int value) {
-        float floatValue = value / 1000f; // Convert to float and shift decimal
-        floatValue = Math.round(floatValue * 100) / 100f; // Round to two decimal places
-        return String.format("%.2f", floatValue); // Format as string with two decimal places
+        int intValue = value / 10; // Convert to int and shift decimal
+        return String.valueOf(intValue); // Format as string without decimal
     }
 
 }

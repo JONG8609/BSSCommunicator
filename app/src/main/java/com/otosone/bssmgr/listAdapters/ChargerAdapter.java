@@ -85,8 +85,19 @@ public class ChargerAdapter extends BaseAdapter {
             try {
                 indexTextView.setText(String.format("%02d", dataItem.getInt("index")+1));
                 thermometerTextView.setText(dataItem.getString("temp"));
-                voltTextView.setText(dataItem.getString("volt"));
-                amperTextView.setText(dataItem.getString("amper"));
+
+                // Convert the volts and amperes to the correct format and display them
+                double volts = dataItem.getDouble("volt") / 10.0;
+                voltTextView.setText(String.format("%.1f", volts));
+                double amperes = dataItem.getDouble("amper");
+                if (amperes < 0) {
+                    amperes = Math.abs(amperes) / 10.0;
+                    amperTextView.setText(String.format("-%.1f", amperes));
+                } else {
+                    amperes = amperes / 10.0;
+                    amperTextView.setText(String.format("%.1f", amperes));
+                }
+                amperTextView.setText(String.format("%.1f", amperes));
 
                 int chargingStatus = dataItem.getInt("charging");
                 String statusText;
